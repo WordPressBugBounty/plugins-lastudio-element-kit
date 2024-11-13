@@ -9,13 +9,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Floating_Effects {
     public function __construct() {
         add_action('elementor/element/common/_section_style/after_section_end', [ $this, 'init_module']);
-        add_action('elementor/frontend/after_register_styles', [ $this, 'register_enqueue_scripts']);
+        add_action('elementor/frontend/before_enqueue_scripts', [ $this, 'register_enqueue_scripts']);
         add_action('elementor/preview/enqueue_scripts', [ $this, 'enqueue_preview_scripts']);
         add_action('elementor/frontend/before_render', [ $this, 'enqueue_in_widget']);
     }
 
     public function register_enqueue_scripts(){
-
+        if(lastudio_kit()->elementor()->experiments->is_feature_active('e_element_cache')){
+            wp_enqueue_script('lastudio-kit-floating-effects');
+        }
     }
 
     public function enqueue_preview_scripts(){

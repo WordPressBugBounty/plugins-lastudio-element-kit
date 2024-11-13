@@ -315,6 +315,9 @@ body {
 .lakit-dots-h-align-left .lakit-carousel__dots {
   left: 0
 }
+body .lakit-dots-h-align-left .lakit-carousel__dots{
+  right: auto;
+}
 .lakit-dots-h-align-left .lakit-carousel .swiper-pagination.lakit-carousel__dots {
   left: calc(-1 * var(--swiper-pagination-bullet-horizontal-gap, 4px));
   transform: none;
@@ -368,6 +371,9 @@ body {
   position: relative;
   transition: .2s;
   vertical-align: middle
+}
+.swiper-pagination-bullets-dynamic.no-bullets-dynamic .swiper-pagination-bullet{
+  top: 0!important;
 }
 .swiper-pagination-bullet-active-main:first-child, .swiper-pagination-bullet-active-main:first-child ~ .swiper-pagination-bullet, .swiper-pagination-bullets-dynamic.no-bullets-dynamic .swiper-pagination-bullet {
   left: 0 !important

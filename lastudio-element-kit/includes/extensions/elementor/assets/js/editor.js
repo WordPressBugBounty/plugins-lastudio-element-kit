@@ -331,15 +331,15 @@
 
 			if(customAttr !== ''){
 				const tmpAttr = customAttr.split('\n');
-				const black_list = [ 'id', 'class', 'data-id', 'data-settings', 'data-element_type', 'data-widget_type', 'data-model-cid' ];
+				const black_list = [ 'id', 'class', 'data-id', 'data-settings', 'data-element_type', 'data-widget_type', 'data-model-cid', 'style' ];
 				Array.from(context.el.attributes).forEach(({ name }) => {
 					if(!black_list.includes(name)){
 						context.el.removeAttribute(name);
 					}
 				})
 				tmpAttr.forEach( _item => {
-					const _attr = _item.split('|').map( _el => _el.replace(/[^a-zA-Z0-9_-]/g, '') )
-					if(!black_list.includes(_attr[0])){
+					const _attr = _item.trim().split('|').map( _el => _el.replace(/[^\.%a-zA-Z0-9_-]/g, '') )
+					if(_attr.length > 0 && _attr[0] !== '' && !black_list.includes(_attr[0])){
 						context.el.setAttribute(_attr[0], _attr[1] ?? '');
 					}
 				} )

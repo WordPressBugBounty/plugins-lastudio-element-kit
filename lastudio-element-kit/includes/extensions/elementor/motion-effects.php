@@ -84,11 +84,18 @@ class Motion_Effects
     private function get_assets() {
         return [
             'scripts' => [
-                'e-sticky' => [
+                'lastudio-kit-sticky-js' => [
                     'src' => lastudio_kit()->plugin_url('assets/js/lib/jquery.sticky.min.js'),
                     'version' => lastudio_kit()->get_version(true),
                     'dependencies' => [
                         'jquery',
+                    ],
+                ],
+                'lastudio-kit-motion-fx' => [
+                    'src' => lastudio_kit()->plugin_url('assets/js/addons/motion-fx.min.js'),
+                    'version' => lastudio_kit()->get_version(true),
+                    'dependencies' => [
+                        'lastudio-kit-sticky-js',
                     ],
                 ],
             ],
@@ -96,11 +103,7 @@ class Motion_Effects
     }
 
     private function register_assets() {
-        $assets = $this->get_assets();
-
-        if ( $assets ) {
-            lastudio_kit()->elementor()->assets_loader->add_assets( $assets );
-        }
+        lastudio_kit()->elementor()->assets_loader->add_assets( $this->get_assets() );
     }
 
     private function is_assets_loader_exist() {
@@ -108,7 +111,9 @@ class Motion_Effects
     }
 
     public function register_enqueue_scripts() {
-
+        if(false && lastudio_kit()->elementor()->experiments->is_feature_active('e_element_cache')){
+            wp_enqueue_script('lastudio-kit-motion-fx');
+        }
     }
 
     public function enqueue_preview_scripts() {
@@ -126,7 +131,7 @@ class Motion_Effects
         $need_enqueue_motion = false;
         foreach ($motion_groups as $group_key) {
             $group_value = $element->get_settings_for_display($group_key);
-            if (!empty($group_value) && ($group_value == 'yes' || $group_value == 'top' || $group_value == 'bottom')) {
+            if( in_array($group_value, ['yes', 'top', 'bottom']) ){
                 $need_enqueue_motion = true;
             }
         }
@@ -217,6 +222,28 @@ class Motion_Effects
                     ],
                 ],
             ],
+            'assets' => [
+                'scripts' => [
+                    [
+                        'name' => 'lastudio-kit-motion-fx',
+                        'conditions' => [
+                            'relation' => 'or',
+                            'terms' => [
+                                [
+                                    'name' => 'background_motion_fx_motion_fx_scrolling',
+                                    'operator' => '!==',
+                                    'value' => '',
+                                ],
+                                [
+                                    'name' => 'background_motion_fx_motion_fx_mouse',
+                                    'operator' => '!==',
+                                    'value' => '',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ];
         $element->update_control('background_motion_fx_motion_fx_scrolling', $options);
         $element->update_control('background_motion_fx_motion_fx_mouse', $options);
@@ -226,17 +253,33 @@ class Motion_Effects
     public function init_sticky($element) {
 
         $element->add_control('sticky', [
-                'label' => __('Sticky', 'lastudio-kit'),
-                'type' => \Elementor\Controls_Manager::SELECT,
-                'options' => [
-                    '' => __('None', 'lastudio-kit'),
-                    'top' => __('Top', 'lastudio-kit'),
-                    'bottom' => __('Bottom', 'lastudio-kit'),
+            'label' => __('Sticky', 'lastudio-kit'),
+            'type' => \Elementor\Controls_Manager::SELECT,
+            'options' => [
+                '' => __('None', 'lastudio-kit'),
+                'top' => __('Top', 'lastudio-kit'),
+                'bottom' => __('Bottom', 'lastudio-kit'),
+            ],
+            'separator' => 'before',
+            'render_type' => 'none',
+            'frontend_available' => true,
+            'assets' => [
+                'scripts' => [
+                    [
+                        'name' => 'lastudio-kit-motion-fx',
+                        'conditions' => [
+                            'terms' => [
+                                [
+                                    'name' => 'sticky',
+                                    'operator' => '!==',
+                                    'value' => '',
+                                ],
+                            ],
+                        ],
+                    ],
                 ],
-                'separator' => 'before',
-                'render_type' => 'none',
-                'frontend_available' => true,
-            ]);
+            ],
+        ]);
 
 
         $activeBreakpoints = array_merge(

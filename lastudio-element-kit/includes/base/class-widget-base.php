@@ -141,7 +141,7 @@ abstract class LaStudioKit_Base extends Widget_Base
     public function _get_global_template($name = null)
     {
 
-        $name = str_replace(['//', '../'], ['/', ''], $name);
+        $name = sanitize_file_name($name);
 
         $widget_name = str_replace(['lakit-', 'lastudio-kit-'], '', $this->get_name());
 
