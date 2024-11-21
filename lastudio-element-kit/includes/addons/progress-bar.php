@@ -877,7 +877,7 @@ class LaStudioKit_Progress_Bar extends LaStudioKit_Base {
 
     public function get_type_template( $type = '' ){
 	    $widget_name = str_replace(['lakit-', 'lastudio-kit-'], '', $this->get_name());
-	    $template = lastudio_kit()->get_template($widget_name . '/global/types/' . sanitize_file_name($type) . '.php' );
+	    $template = lastudio_kit()->get_template($widget_name . '/global/types/' . $type . '.php' );
 
 	    if(!empty($template)){
 	    	include $template;
