@@ -217,6 +217,9 @@ add_action('elementor/element/divider/section_divider/before_section_end', funct
 }, 10);
 
 add_action('elementor/element/divider/section_divider_style/before_section_end', function( $element ){
+	if(defined('LASTUDIO_VERSION')){
+		return;
+	}
     $weight_args = lakit__override_elementor_control_args($element->get_controls('weight'));
     $element->remove_control('weight');
     $element->start_injection([
@@ -333,6 +336,9 @@ add_filter(join(
  * Modify Counter - Visible control
  */
 add_action('elementor/element/counter/section_number/before_section_end', function( $element ){
+	if(defined('LASTUDIO_VERSION')){
+		return;
+	}
     $element->add_control(
         'hide_prefix',
         array(
@@ -365,6 +371,9 @@ add_action('elementor/element/counter/section_number/before_section_end', functi
  * Modify Counter - Align control
  */
 add_action('elementor/element/counter/section_title/before_section_end', function( $element ){
+	if(defined('LASTUDIO_VERSION')){
+		return;
+	}
     $element->add_responsive_control(
         'text_alignment',
         array(
@@ -415,6 +424,11 @@ add_action('elementor/element/icon/section_style_icon/before_section_end', funct
     ]);
     $element->add_responsive_control('border_width', $border_width_args);
     $element->end_injection();
+
+	if(defined('LASTUDIO_VERSION')){
+		return;
+	}
+
     $element->add_group_control(
         Elementor\Group_Control_Box_Shadow::get_type(),
         [
@@ -466,6 +480,9 @@ add_action('elementor/element/spacer/section_spacer/before_section_end', functio
  * Modify Heading - Color Hover
  */
 add_action('elementor/element/heading/section_title_style/before_section_end', function( $element ){
+	if(defined('LASTUDIO_VERSION')){
+		return;
+	}
 	$element->add_control(
 		'title_hover_color',
 		[
@@ -536,6 +553,22 @@ add_action('elementor/element/container/section_background_overlay/before_sectio
 	        'options' => LaStudio_Kit_Helper::get_blend_mode_options()
         ]
     );
+	$element->add_responsive_control(
+		'overlay_zidx',
+		[
+			'label'        => esc_html__( 'Z-Index', 'elementor' ),
+			'type'         => \Elementor\Controls_Manager::TEXT,
+			'selectors' => [
+				'{{WRAPPER}}:before' => 'z-index: {{SIZE}};',
+			],
+			'condition' => [
+				'background_overlay_background' => [ 'classic', 'gradient' ],
+			],
+			'ai' => [
+				'active' => false,
+			],
+		]
+	);
 }, 10 );
 /**
  * Modify Heading - blend_mode

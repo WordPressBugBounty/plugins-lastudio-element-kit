@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       LA-Studio Element Kit for Elementor
  * Description:       Additional widgets for Elementor page builder. It has 60 highly customizable widgets
- * Version:           1.4.3
+ * Version:           1.4.4
  * Author:            LA-Studio
  * Author URI:        https://la-studioweb.com/
  * License:           GPL-2.0+
@@ -58,7 +58,7 @@ if(!class_exists('LaStudio_Kit')){
          *
          * @var string
          */
-        private $version = '1.4.3';
+        private $version = '1.4.4';
 
         /**
          * Framework component
@@ -368,10 +368,8 @@ if(!class_exists('LaStudio_Kit')){
             require_once $this->plugin_path( 'includes/rest-api/endpoints/plugin-settings.php' );
             require_once $this->plugin_path( 'includes/rest-api/endpoints/get-menu-items.php' );
 
-            if(!defined('LASTUDIO_VERSION')){
-                require_once $this->plugin_path( 'includes/integrations/override.php' );
-                require_once $this->plugin_path( 'includes/integrations/advance.php' );
-            }
+	        require_once $this->plugin_path( 'includes/integrations/override.php' );
+	        require_once $this->plugin_path( 'includes/integrations/advance.php' );
 
         }
 
