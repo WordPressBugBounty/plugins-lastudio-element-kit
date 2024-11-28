@@ -37,6 +37,9 @@ if(!defined('ELEMENTOR_PRO_VERSION')) {
         if ( empty( $attributes['id'] ) ) {
             return '';
         }
+        if(get_post_status($attributes['id']) !== 'publish' || get_post_type($attributes['id']) !== 'elementor_library'){
+            return '';
+        }
         $include_css = false;
         if ( isset( $attributes['css'] ) && 'false' !== $attributes['css'] ) {
             $include_css = (bool) $attributes['css'];

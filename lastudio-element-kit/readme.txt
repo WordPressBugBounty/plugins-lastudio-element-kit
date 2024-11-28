@@ -4,7 +4,7 @@ Tags: elementor addons, elementor extensions, header footer builder, widgets for
 Donate Link: https://paypal.me/dpv0990
 Requires at least: 5.0
 Tested up to: 6.7.1
-Stable tag: 1.4.4
+Stable tag: 1.4.5
 Requires PHP: 7.0
 WC tested up to: 9.4.2
 Elementor tested up to: 3.26.x
