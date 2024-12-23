@@ -480,25 +480,6 @@ add_action('elementor/element/spacer/section_spacer/before_section_end', functio
 }, 10 );
 
 /**
- * Modify Heading - Color Hover
- */
-add_action('elementor/element/heading/section_title_style/before_section_end', function( $element ){
-	if(defined('LASTUDIO_VERSION')){
-		return;
-	}
-	$element->add_control(
-		'title_hover_color',
-		[
-			'label' => __( 'Text Hover Color', 'lastudio-kit' ),
-			'type' => \Elementor\Controls_Manager::COLOR,
-			'selectors' => [
-				'{{WRAPPER}} .elementor-heading-title:hover' => 'color: {{VALUE}};',
-			]
-		]
-	);
-}, 10 );
-
-/**
  * Modify Image Box - Color Hover
  */
 add_action('elementor/element/image-box/section_style_content/before_section_end', function ( $element ){

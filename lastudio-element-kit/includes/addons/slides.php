@@ -14,7 +14,7 @@ class LaStudioKit_Slides extends LaStudioKit_Base {
     protected function enqueue_addon_resources(){
 	    if(!lastudio_kit_settings()->is_combine_js_css()) {
         if(!lastudio_kit()->is_optimized_css_mode()){
-          wp_register_style( $this->get_name(), lastudio_kit()->plugin_url( 'assets/css/addons/slides.min.css' ), [ 'lastudio-kit-base' ], lastudio_kit()->get_version() );
+          wp_register_style( $this->get_name(), lastudio_kit()->plugin_url( 'assets/css/addons/slides.min.css' ), [ 'lastudio-kit-base', 'e-swiper' ], lastudio_kit()->get_version() );
           $this->add_style_depends( $this->get_name() );
         }
 		    $this->add_script_depends( 'lastudio-kit-base' );
