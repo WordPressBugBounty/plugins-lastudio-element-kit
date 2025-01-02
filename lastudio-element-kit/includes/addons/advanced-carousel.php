@@ -26,7 +26,7 @@ class LaStudioKit_Advanced_Carousel extends LaStudioKit_Base {
 		    $this->add_script_depends( 'lastudio-kit-base' );
 		    if(!lastudio_kit()->is_optimized_css_mode()) {
 			    wp_register_style( 'lakit-banner', lastudio_kit()->plugin_url('assets/css/addons/banner.min.css'), ['lastudio-kit-base'], lastudio_kit()->get_version());
-			    wp_register_style( $this->get_name(), lastudio_kit()->plugin_url('assets/css/addons/advanced-carousel.min.css'), ['lakit-banner'], lastudio_kit()->get_version());
+			    wp_register_style( $this->get_name(), lastudio_kit()->plugin_url('assets/css/addons/advanced-carousel.min.css'), ['lakit-banner', 'e-swiper'], lastudio_kit()->get_version());
 			    $this->add_style_depends( $this->get_name() );
 		    }
 	    }

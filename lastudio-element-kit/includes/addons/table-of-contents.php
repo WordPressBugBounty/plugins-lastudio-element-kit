@@ -14,6 +14,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class LaStudioKit_Table_Of_Contents extends LaStudioKit_Base {
 
+	public function has_widget_inner_wrapper(): bool {
+		return true;
+	}
+
   protected function enqueue_addon_resources() {
     if ( ! lastudio_kit_settings()->is_combine_js_css() ) {
       $this->add_script_depends( 'lastudio-kit-w__tableofcontent');

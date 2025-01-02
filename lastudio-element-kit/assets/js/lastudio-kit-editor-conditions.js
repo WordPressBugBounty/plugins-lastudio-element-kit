@@ -6268,7 +6268,6 @@
 
             (0, _defineProperty.default)(LaStudioKitPro.config, 'theme_builder', {
               get: function get() {
-                elementorCommon.helpers.softDeprecated('theme_builder', '2.9.0', 'elementor.config.document.theme_builder');
                 return elementor.config.document.theme_builder;
               }
             });

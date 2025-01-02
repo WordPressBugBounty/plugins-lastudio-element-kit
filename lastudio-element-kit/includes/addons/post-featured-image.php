@@ -18,6 +18,10 @@ if (!defined('WPINC')) {
  */
 class LaStudioKit_Post_Featured_Image extends LaStudioKit_Base {
 
+	public function has_widget_inner_wrapper(): bool {
+		return true;
+	}
+
     protected function enqueue_addon_resources(){
 	    if(!lastudio_kit_settings()->is_combine_js_css()) {
 		    $this->add_style_depends( 'lastudio-kit-base' );

@@ -13,6 +13,9 @@ if ( ! defined( 'WPINC' ) ) {
 
 class LaStudioKit_Hotspots extends Widget_Image {
 
+	public function has_widget_inner_wrapper(): bool {
+		return true;
+	}
     public function __construct($data = [], $args = null)
     {
         parent::__construct($data, $args);

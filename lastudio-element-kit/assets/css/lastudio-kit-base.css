@@ -2645,7 +2645,7 @@ form.error {
   top: 0;
   bottom: 0
 }
-.lakit-carousel__item--template .elementor .elementor-html5-video {
+.lakit-carousel__item--template .elementor .elementor-background-video-hosted {
   width: 100vw !important;
   height: var(--min-height, 100vh) !important
 }

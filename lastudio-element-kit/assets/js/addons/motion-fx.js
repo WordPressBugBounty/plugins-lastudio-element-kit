@@ -1042,15 +1042,7 @@
 
                     if ('element' === type && !['section', 'container'].includes(elementType)) {
                         $dimensionsElement = $element;
-                        var childElementSelector;
-
-                        if ('column' === elementType) {
-                            childElementSelector = elementorFrontend.config.legacyMode.elementWrappers ? '.elementor-column-wrap' : '.elementor-widget-wrap';
-                        } else {
-                            childElementSelector = '.elementor-widget-container';
-                        }
-
-                        $element = $element.find('> ' + childElementSelector);
+                        $element = $element.find('> [class*="elementor-"]');
                     }
 
                     var options = {

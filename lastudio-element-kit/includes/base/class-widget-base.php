@@ -41,6 +41,9 @@ abstract class LaStudioKit_Base extends Widget_Base
 
     protected function enqueue_addon_resources() { }
 
+    public function has_widget_inner_wrapper(): bool {
+      return false;
+    }
     protected function get_html_wrapper_class()
     {
         return 'lastudio-kit elementor-' . $this->get_name();
