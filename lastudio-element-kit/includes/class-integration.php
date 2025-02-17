@@ -104,7 +104,9 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 
             add_filter('elementor/shapes/additional_shapes', [ $this, 'e_shapes' ], 20);
 
-            add_filter( 'style_loader_src', [ $this, 'override_e_animation_src' ], 20, 2 );
+//            add_filter( 'style_loader_src', [ $this, 'override_e_animation_src' ], 20, 2 );
+
+            add_action( 'elementor/frontend/before_enqueue_scripts', [ $this, 'enqueue_frontend_scripts' ] );
         }
 
 		/**
@@ -1597,6 +1599,44 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
                 'path'   => lastudio_kit()->plugin_path('assets/shapes/custom-07.svg'),
             ];
             return $additional_shapes;
+        }
+
+        public function enqueue_frontend_scripts(){
+            if(!!lastudio_kit()->elementor()->assets_loader){
+                $this->register_assets();
+            }
+        }
+        private function register_assets() {
+            lastudio_kit()->elementor()->assets_loader->add_assets( $this->get_assets() );
+        }
+
+        private function get_assets() {
+
+            $new_animation = [
+                'lakitShortFadeInDown' => 'Short Fade In Down',
+                'lakitShortFadeInUp' => 'Short Fade In Up',
+                'lakitShortFadeInLeft' => 'Short Fade In Left',
+                'lakitShortFadeInRight' => 'Short Fade In Right',
+                'lakitRevealCircle' => 'Reveal from circle',
+                'lakitRevealTop' => 'Reveal from top',
+                'lakitRevealBottom' => 'Reveal from bottom',
+                'lakitRevealLeft' => 'Reveal from left',
+                'lakitRevealRight' => 'Reveal from right',
+                'lakitRevealCenter' => 'Reveal from center',
+            ];
+
+            $styles = [];
+            foreach ($new_animation as $k => $v){
+                $styles['e-animation-' . $k] = [
+                    'src' => lastudio_kit()->plugin_url('assets/css/animations/'.$k.'.min.css'),
+                    'version' => lastudio_kit()->get_version(true),
+                    'dependencies' => []
+                ];
+            }
+
+            return [
+                'styles' => $styles
+            ];
         }
 	}
 
