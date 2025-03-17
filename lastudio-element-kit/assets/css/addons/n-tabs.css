@@ -296,3 +296,14 @@
   padding-left: 0;
   padding-right: 0;
 }
+
+.etab--overflow > .lakit-ntabs-heading {
+  overflow: auto;
+  justify-content: flex-start;
+}
+.rtl .etab--overflow > .lakit-ntabs-heading {
+  justify-content: flex-end;
+}
+.etab--overflow > .lakit-ntabs-heading .ntabs--title{
+  white-space: pre;
+}

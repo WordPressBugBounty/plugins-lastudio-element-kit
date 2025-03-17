@@ -972,8 +972,17 @@ abstract class LaStudioKit_Base extends Widget_Base
                 )
             );
         }
+        else{
+            $this->_add_control(
+                'enable_carousel',
+                [
+                    'type' => Controls_Manager::HIDDEN,
+                    'default' => 'yes',
+                ]
+            );
+        }
 
-        $this->_add_control(
+        $this->_add_responsive_control(
             'carousel_direction',
             array(
                 'label' => esc_html__('Carousel Type', 'lastudio-kit'),
@@ -983,6 +992,9 @@ abstract class LaStudioKit_Base extends Widget_Base
                     'horizontal' => esc_html__('Horizontal', 'lastudio-kit'),
                     'vertical' => esc_html__('Vertical', 'lastudio-kit'),
                 ],
+                'condition' => [
+                    'enable_carousel' => 'yes'
+                ]
             )
         );
 
@@ -993,10 +1005,11 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => array('%', 'px', 'em', 'vw', 'vh'),
                 'selectors' => array(
-                    '{{WRAPPER}} .lakit-carousel .swiper-container-vertical' => 'height: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .lakit-carousel .swiper-vertical' => 'height: {{SIZE}}{{UNIT}};',
                 ),
                 'condition' => array(
                     'carousel_direction' => 'vertical',
+                    'enable_carousel' => 'yes'
                 ),
             )
         );
@@ -1010,6 +1023,9 @@ abstract class LaStudioKit_Base extends Widget_Base
                     'type' => Controls_Manager::SELECT,
                     'default' => '1',
                     'options' => lastudio_kit_helper()->get_select_range(10),
+                    'condition' => [
+                        'enable_carousel' => 'yes'
+                    ]
                 )
             );
         } else {
@@ -1026,26 +1042,29 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'label_off' => esc_html__('No', 'lastudio-kit'),
                 'return_value' => 'yes',
                 'default' => '',
+                'condition' => [
+                    'enable_carousel' => 'yes'
+                ]
             )
         );
         $this->_add_responsive_control('swiper_item_align_self', [
-            'label' => esc_html__( 'Align Items', 'elementor' ),
+            'label' => esc_html__('Align Items', 'elementor'),
             'type' => Controls_Manager::CHOOSE,
             'options' => [
                 'flex-start' => [
-                    'title' => esc_html__( 'Start', 'elementor' ),
+                    'title' => esc_html__('Start', 'elementor'),
                     'icon' => 'eicon-flex eicon-align-start-v',
                 ],
                 'center' => [
-                    'title' => esc_html__( 'Center', 'elementor' ),
+                    'title' => esc_html__('Center', 'elementor'),
                     'icon' => 'eicon-flex eicon-align-center-v',
                 ],
                 'flex-end' => [
-                    'title' => esc_html__( 'End', 'elementor' ),
+                    'title' => esc_html__('End', 'elementor'),
                     'icon' => 'eicon-flex eicon-align-end-v',
                 ],
                 'stretch' => [
-                    'title' => esc_html__( 'Stretch', 'elementor' ),
+                    'title' => esc_html__('Stretch', 'elementor'),
                     'icon' => 'eicon-flex eicon-align-stretch-v',
                 ],
             ],
@@ -1053,36 +1072,41 @@ abstract class LaStudioKit_Base extends Widget_Base
             'selectors' => [
                 '{{WRAPPER}} .lakit-carousel .swiper-slide' => 'align-self: {{VALUE}};',
             ],
+            'condition' => [
+                'enable_carousel' => 'yes'
+            ]
         ]);
-          $this->_add_responsive_control(
+        $this->_add_responsive_control(
             'swiper_item__normal_width',
             array(
-              'label' => esc_html__('Item Normal Width', 'lastudio-kit'),
-              'type' => Controls_Manager::SLIDER,
-              'size_units' => array('px', '%', 'custom'),
-              'condition' => array(
-                'enable_swiper_item_auto_width' => 'yes',
-              ),
-              'selectors' => array(
-                '{{WRAPPER}}' => '--lakit-carousel-item-normal-width: {{SIZE}}{{UNIT}};',
-              ),
+                'label' => esc_html__('Item Normal Width', 'lastudio-kit'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => array('px', '%', 'custom'),
+                'condition' => array(
+                    'enable_swiper_item_auto_width' => 'yes',
+                    'enable_carousel' => 'yes'
+                ),
+                'selectors' => array(
+                    '{{WRAPPER}}' => '--lakit-carousel-item-normal-width: {{SIZE}}{{UNIT}};',
+                ),
             )
-          );
+        );
 
-      $this->_add_responsive_control(
-        'swiper_item__active_width',
-        array(
-          'label' => esc_html__('Item Active Width', 'lastudio-kit'),
-          'type' => Controls_Manager::SLIDER,
-            'size_units' => array('px', '%', 'custom'),
-          'condition' => array(
-            'enable_swiper_item_auto_width' => 'yes',
-          ),
-          'selectors' => array(
-            '{{WRAPPER}}' => '--lakit-carousel-item-active-width: {{SIZE}}{{UNIT}};',
-          ),
-        )
-      );
+        $this->_add_responsive_control(
+            'swiper_item__active_width',
+            array(
+                'label' => esc_html__('Item Active Width', 'lastudio-kit'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => array('px', '%', 'custom'),
+                'condition' => array(
+                    'enable_swiper_item_auto_width' => 'yes',
+                    'enable_carousel' => 'yes'
+                ),
+                'selectors' => array(
+                    '{{WRAPPER}}' => '--lakit-carousel-item-active-width: {{SIZE}}{{UNIT}};',
+                ),
+            )
+        );
 
         $this->_add_responsive_control(
             'carousel_to_scroll',
@@ -1093,6 +1117,7 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'options' => lastudio_kit_helper()->get_select_range(20),
                 'condition' => array(
                     $column_dependency => '1',
+                    'enable_carousel' => 'yes'
                 ),
             )
         );
@@ -1106,6 +1131,7 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'options' => lastudio_kit_helper()->get_select_range(6),
                 'condition' => array(
                     'carousel_direction' => 'horizontal',
+                    'enable_carousel' => 'yes'
                 ),
             )
         );
@@ -1123,6 +1149,9 @@ abstract class LaStudioKit_Base extends Widget_Base
 			    'selectors' => array(
 				    '{{WRAPPER}} .swiper-container' => 'overflow: inherit',
 			    ),
+                'condition' => [
+                    'enable_carousel' => 'yes'
+                ]
 		    )
 	    );
 
@@ -1135,6 +1164,9 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'label_off' => esc_html__('No', 'lastudio-kit'),
                 'return_value' => 'true',
                 'default' => 'true',
+                'condition' => [
+                    'enable_carousel' => 'yes'
+                ]
             )
         );
 
@@ -1150,6 +1182,7 @@ abstract class LaStudioKit_Base extends Widget_Base
                 ),
                 'condition' => array(
                     'carousel_arrows' => 'true',
+                    'enable_carousel' => 'yes'
                 ),
             )
         );
@@ -1166,6 +1199,7 @@ abstract class LaStudioKit_Base extends Widget_Base
                 ),
                 'condition' => array(
                     'carousel_arrows' => 'true',
+                    'enable_carousel' => 'yes'
                 ),
             )
         );
@@ -1179,6 +1213,9 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'label_off' => esc_html__('No', 'lastudio-kit'),
                 'return_value' => 'true',
                 'default' => '',
+                'condition' => [
+                    'enable_carousel' => 'yes'
+                ]
             )
         );
 
@@ -1196,6 +1233,7 @@ abstract class LaStudioKit_Base extends Widget_Base
                 ],
                 'condition' => array(
                     'carousel_dots' => 'true',
+                    'enable_carousel' => 'yes'
                 ),
             )
         );
@@ -1209,6 +1247,9 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'label_off' => esc_html__('No', 'lastudio-kit'),
                 'return_value' => 'true',
                 'default' => 'true',
+                'condition' => [
+                    'enable_carousel' => 'yes'
+                ]
             )
         );
 
@@ -1220,6 +1261,9 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'label_on' => esc_html__('Yes', 'lastudio-kit'),
                 'label_off' => esc_html__('No', 'lastudio-kit'),
                 'return_value' => 'true',
+                'condition' => [
+                    'enable_carousel' => 'yes'
+                ]
             )
         );
 
@@ -1234,6 +1278,7 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'default' => '',
                 'condition' => array(
                     'carousel_autoplay' => 'true',
+                    'enable_carousel' => 'yes'
                 ),
             )
         );
@@ -1250,6 +1295,7 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'default' => '',
                 'condition' => array(
                     'carousel_autoplay' => 'true',
+                    'enable_carousel' => 'yes'
                 ),
             )
         );
@@ -1265,6 +1311,7 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'default' => '',
                 'condition' => array(
                     'carousel_autoplay' => 'true',
+                    'enable_carousel' => 'yes'
                 ),
             )
         );
@@ -1277,6 +1324,7 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'default' => 5000,
                 'condition' => array(
                     'carousel_autoplay' => 'true',
+                    'enable_carousel' => 'yes'
                 ),
             )
         );
@@ -1290,6 +1338,9 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'label_off' => esc_html__('No', 'lastudio-kit'),
                 'return_value' => 'true',
                 'default' => 'true',
+                'condition' => [
+                    'enable_carousel' => 'yes'
+                ]
             )
         );
 
@@ -1303,6 +1354,9 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'label_off' => esc_html__('No', 'lastudio-kit'),
                 'return_value' => 'true',
                 'default' => 'false',
+                'condition' => [
+                    'enable_carousel' => 'yes'
+                ]
             )
         );
 
@@ -1315,7 +1369,10 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'label_off' => esc_html__('No', 'lastudio-kit'),
                 'return_value' => 'lakit-carousel-equalheight',
                 'default' => '',
-                'prefix_class' => ''
+                'prefix_class' => '',
+                'condition' => [
+                    'enable_carousel' => 'yes'
+                ]
             )
         );
 
@@ -1336,11 +1393,15 @@ abstract class LaStudioKit_Base extends Widget_Base
                     'creative' => esc_html__('Creative', 'lastudio-kit'),
                 ),
 //                'prefix_class' => 'lakit-carousel-item-effect-',
+                'condition' => [
+                    'enable_carousel' => 'yes'
+                ]
             )
         );
 
         $coverflow_conditions = [
-            'carousel_effect' => 'coverflow'
+            'carousel_effect' => 'coverflow',
+            'enable_carousel' => 'yes'
         ];
         if ($enable_carousel) {
             $coverflow_conditions['enable_carousel'] = 'yes';
@@ -1418,13 +1479,6 @@ abstract class LaStudioKit_Base extends Widget_Base
             )
         );
 
-        $disable_content_effect_c = [];
-        if($enable_carousel){
-	        $disable_content_effect_c = [
-		        'enable_carousel' => 'yes'
-            ];
-        }
-
         $this->_add_control(
             'carousel_disable_content_effect',
             array(
@@ -1435,7 +1489,9 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'type' => Controls_Manager::SWITCHER,
                 'return_value' => 'slide-no-animation',
                 'prefix_class' => '',
-                'condition' => $disable_content_effect_c
+                'condition' => [
+                    'enable_carousel' => 'yes'
+                ]
             )
         );
 
@@ -1451,6 +1507,7 @@ abstract class LaStudioKit_Base extends Widget_Base
 			    'condition' => array(
 				    'carousel_autoplay' => 'true',
 				    'carousel_effect' => 'slide',
+                    'enable_carousel' => 'yes'
 			    ),
 		    )
 	    );
@@ -1470,6 +1527,7 @@ abstract class LaStudioKit_Base extends Widget_Base
                 ),
                 'condition' => array(
                     'carousel_effect' => ['flip', 'cube', 'coverflow'],
+                    'enable_carousel' => 'yes'
                 ),
             )
         );
@@ -1480,6 +1538,9 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'label' => esc_html__('Animation Speed', 'lastudio-kit'),
                 'type' => Controls_Manager::NUMBER,
                 'default' => 500,
+                'condition' => array(
+                    'enable_carousel' => 'yes'
+                ),
             )
         );
 
@@ -1491,7 +1552,10 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'label_on' => esc_html__('Yes', 'lastudio-kit'),
                 'label_off' => esc_html__('No', 'lastudio-kit'),
                 'return_value' => 'yes',
-                'default' => ''
+                'default' => '',
+                'condition' => array(
+                    'enable_carousel' => 'yes'
+                ),
             )
         );
 
@@ -1517,6 +1581,9 @@ abstract class LaStudioKit_Base extends Widget_Base
                 ),
                 'selectors' => array(
                     '{{WRAPPER}}' => '--lakit-carousel-padding-left: {{SIZE}}{{UNIT}};',
+                ),
+                'condition' => array(
+                    'enable_carousel' => 'yes'
                 ),
             )
         );
@@ -1544,6 +1611,9 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'selectors' => array(
                     '{{WRAPPER}}' => '--lakit-carousel-padding-right: {{SIZE}}{{UNIT}}',
                 ),
+                'condition' => array(
+                    'enable_carousel' => 'yes'
+                ),
             )
         );
 
@@ -1554,6 +1624,9 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'type' => Controls_Manager::TEXT,
                 'separator' => 'before',
                 'label_block' => true,
+                'condition' => array(
+                    'enable_carousel' => 'yes'
+                ),
             )
         );
 	    $this->_add_control(
@@ -1563,6 +1636,9 @@ abstract class LaStudioKit_Base extends Widget_Base
 			    'label_block' => true,
 			    'description' => sprintf('%1$s <a href="%3$s" target="_blank">%2$s</a>', esc_html__('Enter Carousel ID.', 'lastudio-kit'), esc_html__('Learn more.', 'lastudio-kit'), 'https://swiperjs.com/swiper-api#controller'),
 			    'type' => Controls_Manager::TEXT,
+                'condition' => array(
+                    'enable_carousel' => 'yes'
+                ),
 		    )
 	    );
         $this->_add_control(
@@ -1572,15 +1648,16 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'label_block' => true,
                 'description' => sprintf('%1$s <a href="%3$s" target="_blank">%2$s</a>', esc_html__('Enter Carousel ID.', 'lastudio-kit'), esc_html__('Learn more.', 'lastudio-kit'), 'https://swiperjs.com/swiper-api#thumbs'),
                 'type' => Controls_Manager::TEXT,
+                'condition' => array(
+                    'enable_carousel' => 'yes'
+                ),
             )
         );
 
         $this->_end_controls_section();
     }
 
-    protected function register_carousel_arrows_dots_style_section($carousel_condition = [])
-    {
-
+    protected function register_carousel_arrows_style_section($carousel_condition = []){
         /**
          * Arrow Sections
          */
@@ -1950,7 +2027,9 @@ abstract class LaStudioKit_Base extends Widget_Base
         );
 
         $this->_end_controls_section();
+    }
 
+    protected function register_carousel_dots_style_section($carousel_condition = []){
         $this->_start_controls_section(
             'carousel_dot_style_section',
             array(
@@ -1977,7 +2056,7 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'label' => esc_html__('Dots Style', 'lastudio-kit'),
                 'selector' => '{{WRAPPER}} .lakit-carousel .swiper-pagination-bullet',
                 'condition' => [
-                  'carousel_dot_type!' => ['progressbar', 'custom', 'fraction']
+                    'carousel_dot_type!' => ['progressbar', 'custom', 'fraction']
                 ]
             )
         );
@@ -2171,17 +2250,17 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'condition' => $bar_conditions
             )
         );
-	    $this->_add_responsive_control(
-		    '_carousel_scrollbar__width',
-		    array(
-			    'label' => esc_html__('Width', 'lastudio-kit'),
-			    'type' => Controls_Manager::SLIDER,
-			    'size_units' => ['px', 'em', '%', 'custom'],
-			    'selectors' => array(
-				    '{{WRAPPER}}' => '--swiper-scrollbar-width: {{SIZE}}{{UNIT}};',
-			    ),
-		    )
-	    );
+        $this->_add_responsive_control(
+            '_carousel_scrollbar__width',
+            array(
+                'label' => esc_html__('Width', 'lastudio-kit'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px', 'em', '%', 'custom'],
+                'selectors' => array(
+                    '{{WRAPPER}}' => '--swiper-scrollbar-width: {{SIZE}}{{UNIT}};',
+                ),
+            )
+        );
         $this->_add_responsive_control(
             '_carousel_scrollbar__height',
             array(
@@ -2194,17 +2273,17 @@ abstract class LaStudioKit_Base extends Widget_Base
             )
         );
 
-	    $this->_add_responsive_control(
-		    '_carousel_scrollbar_drag__width',
-		    array(
-			    'label' => esc_html__('Draggable Width', 'lastudio-kit'),
-			    'type' => Controls_Manager::SLIDER,
-			    'size_units' => ['px', 'em', '%', 'custom'],
-			    'selectors' => array(
-				    '{{WRAPPER}}' => '--swiper-scrollbar-drag-width: {{SIZE}}{{UNIT}};',
-			    ),
-		    )
-	    );
+        $this->_add_responsive_control(
+            '_carousel_scrollbar_drag__width',
+            array(
+                'label' => esc_html__('Draggable Width', 'lastudio-kit'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px', 'em', '%', 'custom'],
+                'selectors' => array(
+                    '{{WRAPPER}}' => '--swiper-scrollbar-drag-width: {{SIZE}}{{UNIT}};',
+                ),
+            )
+        );
         $this->_add_responsive_control(
             '_carousel_scrollbar_drag__height',
             array(
@@ -2262,8 +2341,13 @@ abstract class LaStudioKit_Base extends Widget_Base
         $this->_end_controls_section();
     }
 
-    public function get_lakit_id()
+    protected function register_carousel_arrows_dots_style_section($carousel_condition = [])
     {
+        $this->register_carousel_arrows_style_section($carousel_condition);
+        $this->register_carousel_dots_style_section($carousel_condition);
+    }
+
+    public function get_lakit_id(){
         return esc_attr($this->get_id());
     }
 
@@ -2277,9 +2361,12 @@ abstract class LaStudioKit_Base extends Widget_Base
         }
 
         $rows = lastudio_kit_helper()->get_attribute_with_all_breakpoints('carousel_rows', $settings);
+
+        $carousel_direction_resp = lastudio_kit_helper()->get_attribute_with_all_breakpoints('carousel_direction', $settings);
+
         $carousel_direction = (!empty($settings['carousel_direction']) && $settings['carousel_direction'] == 'vertical') ? 'vertical' : 'horizontal';
         if ($carousel_direction == 'vertical') {
-            $rows = lastudio_kit_helper()->get_attribute_with_all_breakpoints('carousel_rows', []);
+//            $rows = lastudio_kit_helper()->get_attribute_with_all_breakpoints('carousel_rows', []);
         }
 
         $carousel_id = $this->get_settings_for_display('carousel_id');
@@ -2323,6 +2410,7 @@ abstract class LaStudioKit_Base extends Widget_Base
             'thumbs' => $settings['carousel_thumbs'] ?? '',
             'autoHeight' => filter_var($carousel_autoheight, FILTER_VALIDATE_BOOLEAN),
             'scrollbar' => filter_var($settings['carousel_scrollbar'], FILTER_VALIDATE_BOOLEAN),
+            'directionbkp' => $carousel_direction_resp,
         );
         if ($carousel_columns === false) {
             $options['slidesToShow'] = lastudio_kit_helper()->get_attribute_with_all_breakpoints('carousel_columns', $settings);
@@ -3337,5 +3425,331 @@ abstract class LaStudioKit_Base extends Widget_Base
 	    $filename = preg_replace("/(\/\/)+/i", '', $filename);
 	    $filename = trim( $filename, '.-_' );
 	    return $filename;
+    }
+
+    protected function dotv2_register_pagination_controls( $conditions = [] ){
+        $start_logical = is_rtl() ? 'right' : 'left';
+        $end_logical = is_rtl() ? 'left' : 'right';
+
+        $this->_start_controls_section(
+            'section_carousel_pagination_style',
+            array(
+                'label'      => esc_html__( 'Carousel Pagination', 'lastudio-kit' ),
+                'tab'        => Controls_Manager::TAB_STYLE,
+                'show_label' => false,
+                'condition' => $conditions
+            )
+        );
+
+        $this->add_responsive_control(
+            'dots_direction',
+            [
+                'label' => esc_html__( 'Direction', 'lastudio-kit' ),
+                'type' => Controls_Manager::CHOOSE,
+                'options' => [
+                    'row' => [
+                        'title' => esc_html__( 'Row', 'lastudio-kit' ),
+                        'icon' => 'eicon-arrow-right',
+                    ],
+                    'column' => [
+                        'title' => esc_html__( 'Column', 'lastudio-kit' ),
+                        'icon' => 'eicon-arrow-down',
+                    ],
+                    'none' => [
+                        'title' => esc_html__( 'None', 'lastudio-kit' ),
+                        'icon' => 'eicon-ban',
+                    ],
+                ],
+                'default' => 'row',
+                'selectors' => [
+                    '{{WRAPPER}}' => '{{VALUE}}',
+                ],
+                'selectors_dictionary' => [
+                    'row' => '--e-dot-direction: row;--e-dot-display: flex',
+                    'column' => '--e-dot-direction: column;--e-dot-display: flex',
+                    'none' => '--e-dot-display: none',
+                ]
+            ]
+        );
+
+        $this->add_control(
+            'heading_dots_pagination_horizontal',
+            [
+                'type' => Controls_Manager::HEADING,
+                'label' => esc_html__( 'Horizontal', 'lastudio-kit' ),
+            ]
+        );
+
+        $this->add_responsive_control(
+            'dots_h_orientation',
+            [
+                'label' => esc_html__( 'Orientation', 'lastudio-kit' ),
+                'type' => Controls_Manager::CHOOSE,
+                'options' => [
+                    'start' => [
+                        'title' => esc_html__( 'Start', 'lastudio-kit' ),
+                        'icon' => 'eicon-h-align-' . $start_logical,
+                    ],
+                    'center' => [
+                        'title' => esc_html__( 'Center', 'lastudio-kit' ),
+                        'icon' => 'eicon-h-align-center',
+                    ],
+                    'end' => [
+                        'title' => esc_html__( 'End', 'lastudio-kit' ),
+                        'icon' => 'eicon-h-align-' . $end_logical,
+                    ],
+                ],
+                'default' => 'center',
+                'selectors' => [
+                    '{{WRAPPER}}' => '{{VALUE}}',
+                ],
+                'selectors_dictionary' => [
+                    'start' => '--e-dot-h-position:0px;--e-dot-h-transform:0%;',
+                    'center' => '--e-dot-h-position:50%;--e-dot-h-transform:-50%;',
+                    'end' => '--e-dot-h-position:100%;--e-dot-h-transform:-100%;',
+                ]
+            ]
+        );
+
+        $this->add_responsive_control(
+            'dots_h_offset',
+            array_merge( $this->dotv2_get_position_slider_initial_configuration(), [
+                'selectors' => [
+                    '{{WRAPPER}}' => '--e-dot-h-offset: {{SIZE}}{{UNIT}};',
+                ],
+                'default' => [
+                    'size' => 0,
+                ],
+            ] )
+        );
+
+        $this->add_control(
+            'heading_dots_pagination_vertical',
+            [
+                'type' => Controls_Manager::HEADING,
+                'label' => esc_html__( 'Vertical', 'lastudio-kit' ),
+            ]
+        );
+
+        $this->add_responsive_control(
+            'dots_v_orientation',
+            [
+                'label' => esc_html__( 'Orientation', 'lastudio-kit' ),
+                'type' => Controls_Manager::CHOOSE,
+                'options' => [
+                    'start' => [
+                        'title' => esc_html__( 'Start', 'lastudio-kit' ),
+                        'icon' => 'eicon-v-align-top',
+                    ],
+                    'center' => [
+                        'title' => esc_html__( 'Center', 'lastudio-kit' ),
+                        'icon' => 'eicon-v-align-middle',
+                    ],
+                    'end' => [
+                        'title' => esc_html__( 'End', 'lastudio-kit' ),
+                        'icon' => 'eicon-v-align-bottom',
+                    ],
+                ],
+                'default' => 'end',
+                'selectors' => [
+                    '{{WRAPPER}}' => '{{VALUE}}',
+                ],
+                'selectors_dictionary' => [
+                    'start' => '--e-dot-v-position: 0%;--e-dot-v-transform: 0%;',
+                    'center' => '--e-dot-v-position: 50%;--e-dot-v-transform: -50%;',
+                    'end' => '--e-dot-v-position: 100%;--e-dot-v-transform: -100%;',
+                ]
+            ]
+        );
+
+        $this->add_responsive_control(
+            'dots_v_offset',
+            array_merge( $this->dotv2_get_position_slider_initial_configuration(), [
+                'selectors' => [
+                    '{{WRAPPER}}' => '--e-dot-v-offset: {{SIZE}}{{UNIT}};',
+                ],
+                'default' => [
+                    'size' => 0,
+                ],
+                'separator' => 'after',
+            ] )
+        );
+
+
+        $this->add_control(
+            'heading_dots_pagination_label',
+            [
+                'type' => Controls_Manager::HEADING,
+                'label' => esc_html__( 'Dot Item', 'lastudio-kit' ),
+            ]
+        );
+
+        $this->add_responsive_control(
+            'dot_space',
+            [
+                'label' => esc_html__( 'Item space', 'lastudio-kit' ),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+                'selectors' => [
+                    '{{WRAPPER}}' => '--e-dot-gap: {{SIZE}}{{UNIT}}',
+                ],
+            ]
+        );
+
+        $this->start_controls_tabs( 'pg_tabs' );
+        $this->start_controls_tab( 'pg_tab_normal', [
+            'label' => esc_html__( 'Normal', 'lastudio-kit' ),
+        ] );
+        $this->add_control(
+            'dot_color',
+            [
+                'label' => esc_html__( 'Color', 'lastudio-kit' ),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}}' => '--e-dot-color: {{VALUE}}',
+                ],
+            ]
+        );
+        $this->add_responsive_control(
+            'dot_width',
+            [
+                'label' => esc_html__( 'Width', 'lastudio-kit' ),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+                'selectors' => [
+                    '{{WRAPPER}}' => '--e-dot-width: {{SIZE}}{{UNIT}}',
+                ],
+            ]
+        );
+        $this->add_responsive_control(
+            'dot_height',
+            [
+                'label' => esc_html__( 'Height', 'lastudio-kit' ),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+                'selectors' => [
+                    '{{WRAPPER}}' => '--e-dot-height: {{SIZE}}{{UNIT}}',
+                ],
+            ]
+        );
+        $this->add_responsive_control(
+            'dot_radius',
+            [
+                'label' => esc_html__( 'Radius', 'lastudio-kit' ),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+                'selectors' => [
+                    '{{WRAPPER}}' => '--e-dot-radius: {{SIZE}}{{UNIT}}',
+                ],
+            ]
+        );
+        $this->add_responsive_control(
+            'dot_scale',
+            [
+                'label' => esc_html__( 'Scale', 'lastudio-kit' ),
+                'type' => Controls_Manager::SLIDER,
+                'range' => [
+                    'px' => [
+                        'max' => 3,
+                        'min' => 0,
+                        'step' => 0.01,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}}' => '--e-dot-scale: {{SIZE}}',
+                ],
+            ]
+        );
+        $this->end_controls_tab();
+        $this->start_controls_tab( 'pg_tab_hover', [
+            'label' => esc_html__( 'Active', 'lastudio-kit' ),
+        ] );
+        $this->add_control(
+            'dot_active_color',
+            [
+                'label' => esc_html__( 'Color', 'lastudio-kit' ),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}}' => '--e-dot-active-color: {{VALUE}}',
+                ],
+            ]
+        );
+        $this->add_responsive_control(
+            'dot_active_width',
+            [
+                'label' => esc_html__( 'Width', 'lastudio-kit' ),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+                'selectors' => [
+                    '{{WRAPPER}}' => '--e-dot-active-width: {{SIZE}}{{UNIT}}',
+                ],
+            ]
+        );
+        $this->add_responsive_control(
+            'dot_active_height',
+            [
+                'label' => esc_html__( 'Height', 'lastudio-kit' ),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ 'px', 'em', 'rem', 'custom' ],
+                'selectors' => [
+                    '{{WRAPPER}}' => '--e-dot-active-height: {{SIZE}}{{UNIT}}',
+                ],
+            ]
+        );
+        $this->add_responsive_control(
+            'dot_active_scale',
+            [
+                'label' => esc_html__( 'Scale', 'lastudio-kit' ),
+                'type' => Controls_Manager::SLIDER,
+                'range' => [
+                    'px' => [
+                        'max' => 3,
+                        'min' => 0,
+                        'step' => 0.01,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}}' => '--e-dot-active-scale: {{SIZE}}',
+                ],
+            ]
+        );
+        $this->end_controls_tab();
+        $this->end_controls_tabs();
+
+        $this->_end_controls_section();
+    }
+
+    protected function dotv2_get_position_slider_initial_configuration(){
+        return [
+            'label' => esc_html__( 'Position', 'lastudio-kit' ),
+            'type' => Controls_Manager::SLIDER,
+            'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'vh', 'custom' ],
+            'range' => [
+                'px' => [
+                    'min' => -1000,
+                    'max' => 1000,
+                ],
+                '%' => [
+                    'min' => -200,
+                    'max' => 200,
+                ],
+                'em' => [
+                    'min' => -50,
+                    'max' => 50,
+                ],
+                'rem' => [
+                    'min' => -50,
+                    'max' => 50,
+                ],
+                'vw' => [
+                    'min' => -200,
+                    'max' => 200,
+                ],
+                'vh' => [
+                    'min' => -200,
+                    'max' => 200,
+                ],
+            ],
+        ];
     }
 }

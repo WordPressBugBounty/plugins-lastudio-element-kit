@@ -632,12 +632,11 @@ if ( ! class_exists( 'LaStudio_Kit_Helper' ) ) {
                     }
                 }
             }
-
 		    if( $inherit && isset($config['laptop']) && empty($data['laptop']) && !empty($data['desktop'])){
                 $data['laptop'] = $data['desktop'];
             }
-            if( $inherit && empty($data['tablet']) && !empty($data['laptop'])){
-                $data['tablet'] = $data['laptop'];
+            if( $inherit && empty($data['tablet'])){
+                $data['tablet'] =  !empty($data['laptop']) ? $data['laptop'] : ($data['desktop'] ?? 1);
             }
 		    if( $inherit && isset($config['tabletportrait']) && empty($data['tabletportrait']) && !empty($data['tablet'])){
                 $data['tabletportrait'] = $data['tablet'];
@@ -660,6 +659,7 @@ if ( ! class_exists( 'LaStudio_Kit_Helper' ) ) {
 
         public function col_new_classes( $atts = '', $settings = [] ){
             $layouts = $this->get_attribute_with_all_breakpoints($atts, $settings, true);
+
             $classes = [];
             $grid_mapping = [
                 'desktop'       => 'desk',

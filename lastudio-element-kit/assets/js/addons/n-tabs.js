@@ -43,6 +43,7 @@
             return elements;
         }
 
+
         bindEvents() {
             this.elements.$controlItem.on( 'click', this.onControlItemClick.bind( this ) );
             this.elements.$cControlItem.on( 'click', this.onCollapseControlItemClick.bind( this ) );
@@ -59,14 +60,44 @@
             document.addEventListener('click', this.onSelectBoxClose.bind(this) )
             this.onHashChange();
             window.addEventListener('scroll', this.detectSticky.bind(this))
+            this._autoCenterTab()
+        }
+
+        _autoCenterTab() {
+            const breakpoint_selector = this.getElementSettings('breakpoint_selector');
+            const tab_as_selectbox = this.getElementSettings('tab_as_selectbox');
+            const isAccordion = this.getSettings('isAccordion');
+
+            if( !isAccordion && (!breakpoint_selector || breakpoint_selector === 'none') && (!tab_as_selectbox || tab_as_selectbox !== 'yes')){
+                this.elements.$tabs.addClass('etab--overflow');
+            }
+            else{
+                this.elements.$tabs.removeClass('etab--overflow');
+            }
         }
 
         onCollapseControlItemClick( evt ) {
             evt.preventDefault();
-            this.onControlItemClick(evt, false, true)
+            this._handleClickControl(evt, false, true)
         }
 
-        onControlItemClick( evt, isAutoTrigger, isAccordion ) {
+        onControlItemClick(evt) {
+            const element = evt.currentTarget;
+            const container = element.parentElement;
+            const elementWidth = element.offsetWidth;
+            const containerWidth = container.offsetWidth;
+            const elementOffset = element.offsetLeft;
+
+            const scrollPosition = elementOffset - (containerWidth / 2) + (elementWidth / 2);
+            container.scrollTo({
+                left: scrollPosition,
+                behavior: 'smooth'
+            });
+
+            this._handleClickControl(evt, false, false)
+        }
+
+        _handleClickControl( evt, isAutoTrigger, isAccordion ) {
             evt.preventDefault();
 
             const tab_as_selectbox = this.getElementSettings('tab_as_selectbox');
@@ -171,19 +202,22 @@
             evt.preventDefault();
             this.elements.$selectBoxWrap.toggleClass('e-open');
         }
+
         onSelectBoxClose( evt ){
             if( !$(evt.target).closest(this.elements.$selectBoxWrap).length ){
                 this.elements.$selectBoxWrap.removeClass('e-open')
             }
         }
+
         onElementChange(propertyName) {
             if( 'tab_type' === propertyName ){
                 $('>.elementor-element', this.elements.$contentItem).removeAttr('style')
             }
         }
         onCanChangeToSelectBox( isAccordion ) {
-            let breakpoint_selector = this.getElementSettings('breakpoint_selector');
-            let sticky_breakpoint = this.getElementSettings('sticky_breakpoint');
+            const breakpoint_selector = this.getElementSettings('breakpoint_selector');
+            const sticky_breakpoint = this.getElementSettings('sticky_breakpoint');
+
             if(breakpoint_selector && breakpoint_selector !== 'none'){
                 let maxWidth = elementorFrontend.breakpoints.responsiveConfig.breakpoints[breakpoint_selector].value + 1;
                 if( window.innerWidth < maxWidth){
@@ -193,6 +227,7 @@
                     this.elements.$tabs.removeClass('e-active-selectbox');
                 }
             }
+
             if(sticky_breakpoint && sticky_breakpoint !== 'none'){
                 if(sticky_breakpoint === 'all'){
                     this.elements.$control.addClass('e--sticky');
@@ -265,6 +300,15 @@
                 if ($removed.length) {
                     return elementorModules.ViewModule.prototype.onInit.apply(this, args);
                 }
+            }
+        }
+
+        onEditSettingsChange(propertyName) {
+            if ('activeItemIndex' === propertyName) {
+                const { isAccordion } =  this.getDefaultSettings()
+                const _idx = this.getEditSettings('activeItemIndex') - 1;
+                this.elements.$controlItem.eq(_idx).trigger('click', [ true, isAccordion ]);
+                this.elements.$cControlItem.eq(_idx).trigger('click', [ true, isAccordion ]);
             }
         }
     }

@@ -24,8 +24,20 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
 	    if(!lastudio_kit_settings()->is_combine_js_css()) {
 		    $this->add_style_depends( 'lastudio-kit-woocommerce' );
 		    $this->add_style_depends( 'e-swiper' );
+            if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+                $this->add_style_depends( 'lastudio-kit-swiper-dotv2' );
+            }
 		    $this->add_script_depends( 'lastudio-kit-base' );
+
 	    }
+    }
+
+    protected function get_html_wrapper_class(){
+        $wrapper_class = parent::get_html_wrapper_class();
+        if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+            $wrapper_class .= ' lakit-carousel-v2';
+        }
+        return $wrapper_class;
     }
 
     public function get_name() {
@@ -4265,12 +4277,36 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
                 ],
                 'default' => '',
                 'selectors_dictionary' => [
-                    'left'    => 'text-align:left; align-items: flex-start;',
-                    'center' => 'text-align:center; align-items: center;',
-                    'right' => 'text-align:right; align-items: flex-end;',
+                    'left'    => 'align-items: flex-start;',
+                    'center' => 'align-items: center;',
+                    'right' => 'align-items: flex-end;',
                 ],
                 'selectors' => [
                     '{{WRAPPER}} .lakitp-zone-d' => '{{VALUE}}',
+                ],
+            ]
+        );
+        $this->_add_responsive_control(
+            'zone_4_text_align',
+            [
+                'label' => esc_html__( 'Text Align', 'lastudio-kit' ),
+                'type' => Controls_Manager::CHOOSE,
+                'options' => [
+                    'left' => [
+                        'title' => esc_html__( 'Left', 'lastudio-kit' ),
+                        'icon' => 'eicon-text-align-left',
+                    ],
+                    'center' => [
+                        'title' => esc_html__( 'Center', 'lastudio-kit' ),
+                        'icon' => 'eicon-text-align-center',
+                    ],
+                    'right' => [
+                        'title' => esc_html__( 'Right', 'lastudio-kit' ),
+                        'icon' => 'eicon-text-align-right',
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .lakitp-zone-d' => 'text-align: {{VALUE}}',
                 ],
             ]
         );
@@ -4666,6 +4702,30 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
             [
                 'label' => esc_html__( 'Product Price', 'lastudio-kit' ),
                 'tab' => Controls_Manager::TAB_STYLE,
+            ]
+        );
+        $this->_add_responsive_control(
+            'price_text_align',
+            [
+                'label' => esc_html__( 'Text Align', 'lastudio-kit' ),
+                'type' => Controls_Manager::CHOOSE,
+                'options' => [
+                    'left' => [
+                        'title' => esc_html__( 'Left', 'lastudio-kit' ),
+                        'icon' => 'eicon-text-align-left',
+                    ],
+                    'center' => [
+                        'title' => esc_html__( 'Center', 'lastudio-kit' ),
+                        'icon' => 'eicon-text-align-center',
+                    ],
+                    'right' => [
+                        'title' => esc_html__( 'Right', 'lastudio-kit' ),
+                        'icon' => 'eicon-text-align-right',
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .product_item--price' => 'text-align: {{VALUE}}',
+                ],
             ]
         );
         $this->_add_control(
@@ -5855,7 +5915,25 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
         $this->v2_style_slfield();
         $this->v2_style_heading_section();
         $this->register_section_style_pagination();
-        $this->register_carousel_arrows_dots_style_section( [ 'enable_masonry!' => 'yes', 'enable_carousel' => 'yes' ] );
+
+        if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+            $this->register_carousel_arrows_style_section([
+                'enable_masonry!' => 'yes',
+                'enable_carousel' => 'yes',
+                'carousel_arrows' => 'true',
+            ]);
+            $this->dotv2_register_pagination_controls([
+                'enable_masonry!' => 'yes',
+                'enable_carousel' => 'yes',
+                'carousel_dots' => 'true',
+            ]);
+        }
+        else{
+            $this->register_carousel_arrows_dots_style_section([
+                'enable_masonry!' => 'yes',
+                'enable_carousel' => 'yes'
+            ]);
+        }
     }
 
     protected function register_controls() {

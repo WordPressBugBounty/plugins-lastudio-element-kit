@@ -412,6 +412,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
             }
 
             wp_register_style( 'lastudio-kit-w__hotspots', lastudio_kit()->plugin_url('assets/css/addons/hotspots.min.css'), ['lastudio-kit-base'], lastudio_kit()->get_version());
+            wp_register_style( 'lastudio-kit-swiper-dotv2', lastudio_kit()->plugin_url( 'assets/css/addons/n-carousel.min.css' ), [ 'lastudio-kit-base' ], lastudio_kit()->get_version() );
 
             if(lastudio_kit_settings()->is_combine_js_css()){
             	wp_enqueue_style('lastudio-kit-base');
@@ -474,7 +475,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
             wp_register_script( 'lastudio-kit-w__image-compare', lastudio_kit()->plugin_url( 'assets/js/addons/image-compare.min.js' ), [], lastudio_kit()->get_version(), true );
             wp_register_script( 'lakit-subscribe-form', lastudio_kit()->plugin_url( 'assets/js/addons/subscribe-form.js' ), [], lastudio_kit()->get_version(), true );
 	        wp_register_script( 'lastudio-kit-w__gmap', lastudio_kit()->plugin_url( 'assets/js/addons/google-map.js' ), [], lastudio_kit()->get_version(), true );
-
+            wp_register_script( 'lastudio-kit-w__ncarousel', lastudio_kit()->plugin_url( 'assets/js/addons/n-carousel.min.js' ), ['lastudio-kit-base'], lastudio_kit()->get_version(), true );
 
             $rest_api_url = apply_filters( 'lastudio-kit/rest/frontend/url', get_rest_url() );
 

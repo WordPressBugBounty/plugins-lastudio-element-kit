@@ -30,10 +30,22 @@ class LaStudioKit_Images_Layout extends LaStudioKit_Base {
 	    if(!lastudio_kit_settings()->is_combine_js_css()) {
 		    $this->add_script_depends( 'lastudio-kit-base' );
 		    if ( ! lastudio_kit()->is_optimized_css_mode() ) {
-			    wp_register_style( $this->get_name(), lastudio_kit()->plugin_url( 'assets/css/addons/images-layout.min.css' ), [ 'lastudio-kit-base', 'e-swiper' ], lastudio_kit()->get_version() );
+                $depends = [ 'lastudio-kit-base', 'e-swiper' ];
+                if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+                    $depends[] = 'lastudio-kit-swiper-dotv2';
+                }
+			    wp_register_style( $this->get_name(), lastudio_kit()->plugin_url( 'assets/css/addons/images-layout.min.css' ), $depends, lastudio_kit()->get_version() );
 			    $this->add_style_depends( $this->get_name() );
 		    }
 	    }
+    }
+
+    protected function get_html_wrapper_class(){
+        $wrapper_class = parent::get_html_wrapper_class();
+        if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+            $wrapper_class .= ' lakit-carousel-v2';
+        }
+        return $wrapper_class;
     }
 
 	public function get_widget_css_config($widget_name){
@@ -1433,7 +1445,25 @@ class LaStudioKit_Images_Layout extends LaStudioKit_Base {
 
         $this->end_controls_section();
 
-        $this->register_carousel_arrows_dots_style_section( [ 'enable_masonry!' => 'yes' ] );
+        if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+            $this->register_carousel_arrows_style_section([
+                'enable_masonry!' => 'yes',
+                'enable_carousel' => 'yes',
+                'carousel_arrows' => 'true',
+            ]);
+            $this->dotv2_register_pagination_controls([
+                'enable_masonry!' => 'yes',
+                'enable_carousel' => 'yes',
+                'carousel_dots' => 'true',
+            ]);
+        }
+        else{
+            $this->register_carousel_arrows_dots_style_section([
+                'enable_masonry!' => 'yes',
+                'enable_carousel' => 'yes'
+            ]);
+        }
+
     }
     /**
      * Get loop image html

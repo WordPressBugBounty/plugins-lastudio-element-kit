@@ -18,18 +18,20 @@ class Wrapper_Link {
     }
 
     public function enqueue_in_widget( $element ) {
-        $settings = $element->get_settings_for_display();
-		if( !empty($settings['lakit_element_link']['url']) ){
-            $allowed_protocols = array_merge( wp_allowed_protocols(), [ 'skype', 'viber' ] );
-            $settings['lakit_element_link']['url'] = esc_url($settings['lakit_element_link']['url'], $allowed_protocols);
-            if(!empty($settings['lakit_element_link']['url'])){
-                $element->add_render_attribute('_wrapper', [
-                    'data-lakit-element-link' => wp_json_encode($settings['lakit_element_link']),
-                    'style' => 'cursor: pointer'
-                ]);
-                $element->add_script_depends('lastudio-kit-wrapper-links');
+        if( in_array($element->get_name(), ['column', 'section', 'container']) ){
+            $lakit_element_link = $element->get_settings_for_display('lakit_element_link');
+            if( !empty($lakit_element_link['url']) ){
+                $allowed_protocols = array_merge( wp_allowed_protocols(), [ 'skype', 'viber' ] );
+                $lakit_element_link['url'] = esc_url($lakit_element_link['url'], $allowed_protocols);
+                if(!empty($lakit_element_link['url']) && $lakit_element_link['url'] !== '#'){
+                    $element->add_render_attribute('_wrapper', [
+                        'data-lakit-element-link' => wp_json_encode($lakit_element_link),
+                        'style' => 'cursor: pointer'
+                    ]);
+                    $element->add_script_depends('lastudio-kit-wrapper-links');
+                }
             }
-		}
+        }
     }
 
 	/**

@@ -27,11 +27,23 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
 	    $this->add_script_depends( 'jquery-isotope' );
 	    if(!lastudio_kit_settings()->is_combine_js_css()) {
 		    if(!lastudio_kit()->is_optimized_css_mode()){
-			    wp_register_style( $this->get_name(), lastudio_kit()->plugin_url( 'assets/css/addons/banner-list.min.css' ), [ 'lastudio-kit-base', 'e-swiper' ], lastudio_kit()->get_version() );
+                $depends = [ 'lastudio-kit-base', 'e-swiper' ];
+                if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+                    $depends[] = 'lastudio-kit-swiper-dotv2';
+                }
+			    wp_register_style( $this->get_name(), lastudio_kit()->plugin_url( 'assets/css/addons/banner-list.min.css' ), $depends, lastudio_kit()->get_version() );
 			    $this->add_style_depends( $this->get_name() );
 			}
 		    $this->add_script_depends( 'lastudio-kit-base' );
 	    }
+    }
+
+    protected function get_html_wrapper_class(){
+        $wrapper_class = parent::get_html_wrapper_class();
+        if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+            $wrapper_class .= ' lakit-carousel-v2';
+        }
+        return $wrapper_class;
     }
 
 	public function get_widget_css_config($widget_name){
@@ -83,6 +95,7 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
                 'button'            => '.lakit-bannerlist__btn',
                 'button_icon'       => '.btn-icon',
                 'icon'              => '.lakit-bannerlist__icon',
+                'column_inactive'   => '.swiper-slide:not(.swiper-slide-active)'
             )
         );
 
@@ -96,8 +109,27 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
 
         $this->_register_section_general_styles($css_scheme);
 
-        $this->register_carousel_arrows_dots_style_section( [ 'enable_masonry!' => 'yes' ] );
+        if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+            $this->register_carousel_arrows_style_section([
+                'enable_masonry!' => 'yes',
+                'enable_carousel' => 'yes',
+                'carousel_arrows' => 'true',
+            ]);
+            $this->dotv2_register_pagination_controls([
+                'enable_masonry!' => 'yes',
+                'enable_carousel' => 'yes',
+                'carousel_dots' => 'true',
+            ]);
+        }
+        else{
+            $this->register_carousel_arrows_dots_style_section([
+                'enable_masonry!' => 'yes',
+                'enable_carousel' => 'yes'
+            ]);
+        }
     }
+
+
     /**
      * Get loop image html
      *
@@ -174,10 +206,12 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
     protected function render() {
 
         $this->_context = 'render';
-        $css_selector = sprintf('.elementor-element-%1$s .swiper-wrapper', esc_attr($this->get_id()));
-        $css = lastudio_kit_helper()->get_css_by_responsive_columns( lastudio_kit_helper()->get_attribute_with_all_breakpoints('columns', $this->get_settings_for_display()), $css_selector );
-        if(!empty($css)){
-            echo sprintf('<style>%1$s</style>', $css); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        if(filter_var($this->get_settings_for_display('enable_carousel'), FILTER_VALIDATE_BOOLEAN)){
+            $css_selector = sprintf('.elementor-element-%1$s .swiper-wrapper', esc_attr($this->get_id()));
+            $css = lastudio_kit_helper()->get_css_by_responsive_columns( lastudio_kit_helper()->get_attribute_with_all_breakpoints('columns', $this->get_settings_for_display()), $css_selector );
+            if(!empty($css)){
+                echo sprintf('<style>%1$s</style>', $css); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            }
         }
         $this->_open_wrap();
         include $this->_get_global_template( 'index' );
@@ -911,6 +945,33 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
 
 
         $this->end_controls_section();
+
+        $this->_start_controls_section(
+            'section_inactive_column_style',
+            array(
+                'label'      => esc_html__( 'Inactive Item', 'lastudio-kit' ),
+                'tab'        => Controls_Manager::TAB_STYLE,
+                'show_label' => false,
+            )
+        );
+        $this->_add_responsive_control(
+            'column_inactive_opacity',
+            [
+                'label' => esc_html__( 'Opacity', 'elementor' ),
+                'type' => Controls_Manager::SLIDER,
+                'range' => [
+                    'px' => [
+                        'max' => 1,
+                        'min' => 0.10,
+                        'step' => 0.01,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} ' . $css_scheme['column_inactive'] => 'opacity: {{SIZE}};',
+                ],
+            ]
+        );
+        $this->_end_controls_section();
 
         $this->start_controls_section(
             'section_style_image',

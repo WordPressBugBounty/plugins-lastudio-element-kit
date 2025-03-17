@@ -16,11 +16,18 @@ class Module extends \Elementor\Core\Base\Module {
     }
 
     public function before_enqueue_scripts(){
-        wp_register_script( $this->get_name(), lastudio_kit()->plugin_url('includes/modules/nested-elements/assets/js/nested-elements.min.js'), [
-            'elementor-common',
+
+        if(! lastudio_kit()->elementor()->experiments->is_feature_active( 'nested-elements', true )){
+            wp_register_script( $this->get_name(), lastudio_kit()->plugin_url('includes/modules/nested-elements/assets/js/bk/nested-elements.min.js'), [
+                'elementor-common',
+            ], ELEMENTOR_VERSION, true );
+        }
+
+        wp_enqueue_script( 'lakit-nested-carousel-editor', lastudio_kit()->plugin_url('includes/modules/nested-elements/assets/js/nested-carousel-editor.min.js'), [
+            $this->get_name()
         ], ELEMENTOR_VERSION, true );
 
-        wp_enqueue_script( 'lakit-nested-tabs-editor', lastudio_kit()->plugin_url('includes/modules/nested-elements/assets/js/nested-tabs.min.js'), [
+        wp_enqueue_script( 'lakit-nested-tabs-editor', lastudio_kit()->plugin_url('includes/modules/nested-elements/assets/js/nested-tabs-editor.min.js'), [
             $this->get_name()
         ], ELEMENTOR_VERSION, true );
     }
@@ -34,7 +41,8 @@ class Module extends \Elementor\Core\Base\Module {
         } );
 
         add_action( 'elementor/widgets/register', function ($widgets_manager){
-            $widgets_manager->register( new Widgets\NestedTabs() );
+            $widgets_manager->register( new Widgets\Nested_Tabs() );
+            $widgets_manager->register( new Widgets\Nested_Carousel() );
         } );
 
         add_action( 'elementor/editor/before_enqueue_scripts', [ $this, 'before_enqueue_scripts' ] );

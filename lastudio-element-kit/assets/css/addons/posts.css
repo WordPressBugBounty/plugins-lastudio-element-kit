@@ -244,8 +244,8 @@
 	transform: translateY(20px)
 }
 .lakit--button-hover-yes .lakit-posts__more-wrap {
-	margin-bottom: calc((var(--lakit-posts-content-padding-bottom, 40px) + 15px) * -1);
-	transition: .3s ease-in
+	margin-bottom: calc((var(--lakit-posts-content-padding-bottom, 40px) + 2em) * -1);
+	transition: .2s ease-in
 }
 .lakit--button-hover-yes .lakit-posts__outer-box:hover .lakit-posts__more-wrap {
 	margin-bottom: 0

@@ -436,6 +436,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
+            const isNestedCarousel = $scope.hasClass('elementor-widget-lakit-n-carousel')
+
             const $swiperContainer = $carousel.find('>.swiper-container, >div>.swiper-container').first();
 
             if ($swiperContainer.length === 0) {
@@ -450,57 +452,90 @@ document.addEventListener('DOMContentLoaded', function () {
 
             $carousel.addClass('inited');
 
-            const isSwiperLatest = elementorFrontendConfig.experimentalFeatures.e_swiper_latest || false;
-
             let elementSettings = $carousel.data('slider_options'),
                 slidesToShow = parseInt(elementSettings.slidesToShow.desktop) || 1,
                 elementorBreakpoints = elementorFrontend.config.responsive.activeBreakpoints,
                 carousel_id = elementSettings.uniqueID,
                 eUniqueId = $carousel.closest('.elementor-element').data('id'),
-                e_dRows = parseInt(elementSettings.rows.desktop || 1);
+                e_dRows = parseInt(elementSettings.rows.desktop || 1),
+                _directionBase = elementSettings.directionbkp.desktop ?? 'horizontal'
 
             let swiperOptions = {
                 slidesPerView: slidesToShow,
                 loop: elementSettings.infinite,
                 speed: elementSettings.speed,
-                handleElementorBreakpoints: true,
+                handleElementorBreakpoints: false,
                 slidesPerGroup: parseInt(elementSettings.slidesToScroll.desktop || 1),
-                loopAdditionalSlides: 1,
-                loopFillGroupWithBlank: 1,
-                loopedSlides: 4,
+                loopAdditionalSlides: isNestedCarousel ? 0 : 1,
+                loopFillGroupWithBlank: isNestedCarousel ? 0 : 1,
+                loopedSlides: isNestedCarousel ? 4 : 1,
                 preloadImages: false,
-                ...( isSwiperLatest ? {
-                    grid: {
-                        rows: e_dRows,
-                        fill: 'row'
-                    }
-                } : {
-                    slidesPerColumn: e_dRows,
-                }),
-                ...(e_dRows > 1 ? { rewind: elementSettings.infinite, loop: false } : {})
+                grid: {
+                    rows: e_dRows,
+                    fill: 'row'
+                },
+                ...(e_dRows > 1 ? { rewind: elementSettings.infinite, loop: false } : {}),
+                direction: _directionBase
             }
 
-            swiperOptions.breakpoints = {};
+            const _bkpData = {}
 
             let lastBreakpointSlidesToShowValue = 1;
             let defaultLGDevicesSlidesCount = 1;
             Object.keys(elementorBreakpoints).reverse().forEach(function (breakpointName) {
                 // Tablet has a specific default `slides_to_show`.
                 let defaultSlidesToShow = 'tablet' === breakpointName ? defaultLGDevicesSlidesCount : lastBreakpointSlidesToShowValue;
-                swiperOptions.breakpoints[elementorBreakpoints[breakpointName].value] = {
+                _bkpData[elementorBreakpoints[breakpointName].value] = {
                     slidesPerView: +elementSettings.slidesToShow[breakpointName] || defaultSlidesToShow,
                     slidesPerGroup: +elementSettings.slidesToScroll[breakpointName] || 1,
-                    ...( isSwiperLatest ? {
-                        grid: {
-                            rows: +elementSettings.rows[breakpointName] || 1,
-                            fill: 'row'
-                        }
-                    } : {
-                        slidesPerColumn: +elementSettings.rows[breakpointName] || 1,
-                    } )
+                    grid: {
+                        rows: +elementSettings.rows[breakpointName] || 1,
+                        fill: 'row'
+                    },
+                    direction: elementSettings.directionbkp[breakpointName] || _directionBase
                 }
                 lastBreakpointSlidesToShowValue = +elementSettings.slidesToShow[breakpointName] || defaultSlidesToShow;
             });
+
+            let last_bkp_index = ''
+
+            const adjustBreakpointConfigs = ( bkp ) => {
+                const elementorBreakpointValues = elementorFrontend.breakpoints.getBreakpointValues();
+                Object.keys(bkp).forEach(configBPKey => {
+                    const configBPKeyInt = parseInt(configBPKey);
+                    let breakpointToUpdate;
+                    if (configBPKeyInt === elementorBreakpoints.mobile.value || configBPKeyInt + 1 === elementorBreakpoints.mobile.value) {
+                        breakpointToUpdate = 0;
+                    }
+                    else if (elementorBreakpoints.widescreen && (configBPKeyInt === elementorBreakpoints.widescreen.value || configBPKeyInt + 1 === elementorBreakpoints.widescreen.value)) {
+                        breakpointToUpdate = configBPKeyInt;
+                    }
+                    else {
+                        const currentBPIndexInElementorBPs = elementorBreakpointValues.findIndex(elementorBP => {
+                            return configBPKeyInt === elementorBP || configBPKeyInt + 1 === elementorBP;
+                        });
+                        breakpointToUpdate = elementorBreakpointValues[currentBPIndexInElementorBPs - 1];
+                    }
+                    bkp[breakpointToUpdate] = bkp[configBPKey];
+                    // Then reset the settings in the original breakpoint key to the default values
+                    bkp[configBPKey] = {
+                        slidesPerView: 1,
+                        slidesPerGroup: 1
+                    };
+                    last_bkp_index = configBPKey
+                });
+                return bkp;
+            }
+
+            const _bkpDataModified = adjustBreakpointConfigs(_bkpData)
+            _bkpDataModified[last_bkp_index] = {
+                slidesPerView: swiperOptions.slidesPerView,
+                slidesPerGroup: swiperOptions.slidesPerGroup,
+                grid: swiperOptions.grid,
+                direction: swiperOptions.direction
+            }
+
+            swiperOptions.breakpoints = _bkpDataModified;
 
             if (elementSettings.autoplay) {
                 swiperOptions.autoplay = {
@@ -670,10 +705,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if ($carousel.closest('.no-slide-animation').length || $carousel.closest('.slide-no-animation').length) {
                 _has_slidechange_effect = false;
             }
-
-            if (elementSettings.direction) {
-                swiperOptions.direction = elementSettings.direction;
-            }
             if (elementSettings.autoHeight) {
                 swiperOptions.autoHeight = elementSettings.autoHeight
             }
@@ -783,41 +814,25 @@ document.addEventListener('DOMContentLoaded', function () {
             swiperOptions.on = {
                 ...swiperOptions?.on,
                 beforeInit: ( _swiper ) => {
-                    if(isSwiperLatest){
-                        let _classFB = ['swiper-container', 'swiper-container-initialized'];
-                        _classFB.push(`swiper-container-${_swiper.params.direction}`);
-                        _classFB.push(`swiper-container-${_swiper.params.effect}`);
-                        if( ['coverflow', 'cube', 'flip', 'creative', 'creative'].includes(_swiper.params.effect) ) {
-                            _classFB.push('swiper-container-3d');
-                        }
-                        if( _swiper.params.autoHeight ){
-                            _classFB.push('swiper-container-autoheight');
-                        }
-                        $swiperContainer.addClass(_classFB)
+                    let _classFB = ['swiper-container', 'swiper-container-initialized'];
+                    _classFB.push(`swiper-container-${_swiper.params.effect}`);
+                    if( ['coverflow', 'cube', 'flip', 'creative', 'creative'].includes(_swiper.params.effect) ) {
+                        _classFB.push('swiper-container-3d');
                     }
+                    if( _swiper.params.autoHeight ){
+                        _classFB.push('swiper-container-autoheight');
+                    }
+                    $swiperContainer.addClass(_classFB)
                 },
                 afterInit: ( _swiper ) => {
                     $('.swiper-slide-duplicate .lakit-embla_wrap.embla--inited', _swiper.$wrapperEl).removeClass('embla--inited').trigger('lastudio-kit/init-embla-slider');
-                },
-                changeDirection: function( ) {
-                    if(isSwiperLatest){
-                        $swiperContainer.removeClass('swiper-container-horizontal swiper-container-vertical').addClass(`swiper-container-${this.params.direction}`)
-                    }
                 },
                 beforeResize: function (){
                     $('>.swiper-slide', this.$wrapperEl).css('width', '')
                 },
                 slideChangeTransitionEnd: function (){
                     const _swiper = this;
-                    let _slides = [];
-                    if(isSwiperLatest){
-                        _slides = _swiper.slides;
-                    }
-                    else{
-                        for (let i = 0; i < _swiper.slides.length; i += 1) {
-                            _slides.push(_swiper.slides[i])
-                        }
-                    }
+                    let _slides = _swiper.slides;
                     let _deactivateSlides = _slides.filter( (_item, _idx) => {
                         let _flag = !_swiper.visibleSlidesIndexes.includes(_idx);
                         if(_swiper.params.slidesPerView !== 'auto' && _swiper.params.slidesPerView > 1 && (_item.classList.contains('swiper-slide-duplicate-prev') || _item.classList.contains('swiper-slide-duplicate-next'))){
@@ -853,6 +868,12 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             swiperOptions = elementorFrontend.hooks.applyFilters('lastudio-kit/carousel/options', swiperOptions, $scope, carousel_id);
+
+            if(isNestedCarousel && elementorFrontend.isEditMode()){
+                delete swiperOptions?.autoplay;
+                swiperOptions.loop = false;
+                swiperOptions.noSwipingSelector = '.swiper-slide > .e-con .elementor-element';
+            }
 
             new Swiper($swiperContainer, swiperOptions).then(function (SwiperInstance) {
 
@@ -4620,7 +4641,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                 title: 'iframe',
                                 scrolling: 'no'
                             }).appendTo(giveEmbed);
-                            iFrameResize();
+                            if( typeof iFrameResize !== "undefined"){
+                                iFrameResize();
+                            }
                         }
                     }
                 }

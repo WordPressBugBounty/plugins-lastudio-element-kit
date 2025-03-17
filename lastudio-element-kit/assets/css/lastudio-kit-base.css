@@ -61,7 +61,7 @@ body {
   --lakit-timing-func-b: cubic-bezier(.075,.82,.165,1);
   --lakit-timing-func-c: cubic-bezier(.125,.98,.565,1.17);
 }
-.elementor-btn-align-icon-top .elementor-button-content-wrapper, .swiper-container-vertical > .swiper-wrapper {
+.elementor-btn-align-icon-top .elementor-button-content-wrapper, .swiper-vertical > .swiper-wrapper {
   flex-direction: column
 }
 .swiper-container-cube .swiper-slide, .swiper-container-flip .swiper-slide {
@@ -96,7 +96,7 @@ body {
 .actionzone-a-hover-yes .lakitp-zone-a .lakit-btn + .lakit-btn + .lakit-btn + .lakit-btn + .lakit-btn, .actionzone-a-toggle-yes .lakitp-zone-a .lakit-btn + .lakit-btn + .lakit-btn + .lakit-btn + .lakit-btn, .actionzone-b-hover-yes .lakitp-zone-b .lakit-btn + .lakit-btn + .lakit-btn + .lakit-btn + .lakit-btn, .actionzone-b-toggle-yes .lakitp-zone-b .lakit-btn + .lakit-btn + .lakit-btn + .lakit-btn + .lakit-btn, .lakit-loader.spinner5 div:first-child, .lakit-loader.spinner5 div:nth-child(5), .lakit-loader.spinner5 div:nth-child(9) {
   animation-delay: .2s
 }
-.figure__object_fit, .lakit-embla__viewport, .lakit-wc-tabs--controls ul.wc-tabs, .stock_bar--progress, .swiper-container-vertical .lakit-carousel__item-inner .lakit-carousel__item-link {
+.figure__object_fit, .lakit-embla__viewport, .lakit-wc-tabs--controls ul.wc-tabs, .stock_bar--progress, .swiper-vertical .lakit-carousel__item-inner .lakit-carousel__item-link {
   overflow: hidden
 }
 .lakit-hint:after, .tooltip {
@@ -290,7 +290,7 @@ body {
   margin-right: calc(-1 * var(--lakit-carousel-item-right-space));
   overflow: hidden
 }
-.lakit-carousel .swiper-container-horizontal {
+.lakit-carousel .swiper-horizontal {
   padding-left: var(--lakit-carousel-padding-left);
   padding-right: var(--lakit-carousel-padding-right)
 }
@@ -359,7 +359,7 @@ body .lakit-dots-h-align-left .lakit-carousel__dots{
 .lakit-dots-text-left .lakit-carousel__dots {
   text-align: left
 }
-.lakit-carousel.lakit-equal-cols .lakit-banner, .lakit-carousel.lakit-equal-cols .lakit-banner__img, .lakit-carousel.lakit-equal-cols .lakit-carousel__item-inner, .lakit-equal-height-enable, .lakit-equal-height-enable .elementor-widget-container, .swiper-container-vertical .lakit-carousel__item-inner .lakit-carousel__item-img {
+.lakit-carousel.lakit-equal-cols .lakit-banner, .lakit-carousel.lakit-equal-cols .lakit-banner__img, .lakit-carousel.lakit-equal-cols .lakit-carousel__item-inner, .lakit-equal-height-enable, .lakit-equal-height-enable .elementor-widget-container, .swiper-vertical .lakit-carousel__item-inner .lakit-carousel__item-img {
   height: 100%
 }
 .swiper-pagination-bullets-dynamic {
@@ -422,12 +422,12 @@ body .lakit-dots-h-align-left .lakit-carousel__dots{
   opacity: 0;
   visibility: hidden
 }
-.lakit-carousel .swiper-container-vertical {
+.lakit-carousel .swiper-vertical {
   padding-top: var(--lakit-carousel-padding-left);
   padding-bottom: var(--lakit-carousel-padding-right);
   height: 100vh
 }
-.lakit-carousel .swiper-container-vertical .lakit-carousel__item-inner {
+.lakit-carousel .swiper-vertical .lakit-carousel__item-inner {
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -1849,7 +1849,7 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
 .lastudio-kit ul.products.ul_products_v2.lakit-products__list li {
   padding: var(--lakit-item-padding-top) var(--lakit-item-padding-right) var(--lakit-item-padding-bottom) var(--lakit-item-padding-left)
 }
-.lakit-products.lakit-carousel .lakit-products__list_wrapper.swiper-container-horizontal {
+.lakit-products.lakit-carousel .lakit-products__list_wrapper.swiper-horizontal {
   --lakit-carousel-item-left-space: var(--lakit-item-padding-left);
   --lakit-carousel-item-right-space: var(--lakit-item-padding-right)
 }
@@ -2614,7 +2614,7 @@ form.error {
 /*.lakit-carousel.e-swiper--variablewidth .swiper-slide {*/
 /*	transition: none !important;*/
 /*}*/
-/*.lakit-carousel.e-swiper--variablewidth .swiper-container-horizontal {*/
+/*.lakit-carousel.e-swiper--variablewidth .swiper-horizontal {*/
 /*  height: var(--swiperHeight, auto)*/
 /*}*/
 .lakit-carousel.e-swiper--variablewidth .swiper-slide {
@@ -3622,3 +3622,6 @@ body:not(.e-has-header-sticky) .lakit-ntabs-heading.e--sticky {
 }
 
 @font-face{font-family:LaStudioBIcons;font-weight:400;font-style:normal;src:url(data:application/octet-stream;base64,d09GMgABAAAAAAsYAA8AAAAAF/AAAArAAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHFQGYACDDAgOCZwMEQgKg3SDawsKAAE2AiQDEAQgBYYVB08MgRwb1hZRlI1Wg+yLA54Mb5QhIVLFdURIW62EDnHDcRys+lrem+B5+s76c6uqO5nu4Yo9s5AGQDLLobOQ/h6A5MnM0xc/kw/k+vD/aOt1TEUFJNu5yguQJkCGCWkp4fUPSUHJO96i/kWtrjoas2m2tAOElixfcTtFFaAJEOze/6tPmjImTfWk19vOHKt7w8lQykgBjP//c6V99ydZImH3pGXhUbJzsz+T6bwkC5yZJUTV8ghVUj0ry2QJHKCrJr9CVmm2vsfY7A+wlm3gyZqcfrT7ih8SARwWsh6VnVtcTWJ3Q6iXcRgAQKDZXbo72hrwBxUYDMCfZoveUt8ll7BA7VFPAeemX16+Y5EoUFia3rKXt+Y081yUqNKVsU7q9T1cBUgBVgQWNOaSyZUAzpUcW4IkjVOBYTqxDJRFVSw2Bobcvmu+RJCfu15UPDFLadQQJdIRiOooiO4BTf67dwAg8JQ2WfrhBcbufsB4+CsxXKb6Vo5qr69w1JeWDEjrYA+d9+AN0NYLVFhigEA2HwMM8+YDCpofq5nLQ1wRoEqJnWdWsZe6CfO3U+F0mKs6I7enC3d1sURynZse5mpxz545uCmYFpeATq9KNHCbHuUlrF17I2mnEiEmVkWYq9z7dZrFYY9Ufy1VHeXmsME4Sh4V+eTvVLCtax/Gw22St80spvPG6VtWh7I6U6VmzIOJrtUVokMrHdX2ZUF2Likry7fsczGmsVtyLnYDOHDyAO4TuAjYx/2OinT79EV94ZUDepsXWpqc55qhlLP0lF8iYVrMAQ1thESdhcl9wvSI5dF5n6EcMEztYZTqu9lE5UhVHXfscuyCHJWha5/zYqiW/f/X1Lu9gVQPUtm7epKTZZ/F9iFBydnEPI5LBUxg47sLulxM1gu3eTQBjxVujlALyph1wAZpI9w8vBBpBG4T25zzs8ta0qvZsdjGhJv4ji815BhbihznDm5PyQCRKNq0QtFs6CwsO6OF7DJbY7moQJ319hfjWjeT4gbAhIzcUplX8tg1It1H++Sd+fyOD3jQueuI37IOeAFlCQ+/B7dJeDxmvDHcw1sW8GFuGOQZ6oVIqxUKPha1T8Pn0QJ+/PBb6tJe59dwdew0EEhVPkg//BplOh8pgVWD6Jha/e73j28MlYgvZUA4YvcweK8NzZlQsU+dhAUhwba3fXb31t6gsnQcRpwyNFqtMx7u8EKIAjtqMu67aYdctDVEsLOQavOFhTB0uo5+S/g9aoPbIy4HOao8jy6ckcnh4hBj1J6C9wyVHhxI/KXlV3MgjI7ZdwORqSCKCqaYUBQXQgmhKSkMSgmT0sKijLAVN2C2vyBG/uG3ZBqhryvKoYFmTnhY/d2wFV5W/5Ysi4GkpGMlVJ5GEsbohhwMeRgKMBRhKMFQhqECQxWGGgx1WEUbmkorddoWolkrW7VX7iynTLu61nZBJw1OTR3oQdrpRJZbvWPX6pNHLac59b1heXf3HVW2i9Gru9bZTfoga+gMTDN5vGIIfSp10QgDLHB0uNBQksPHuyHmnkCGYVh/aXf6UGf1XJIxNGknuwsYfEOBCcarU2BarAzioehrnaGzzL2uUTvgEY7v2v7Ed1aVHjqfIY/LVHX20juBOcAcEY9IIFHk2t0pBzj47qPWdmlq04tNLLI1Bs3C8CgYFJ83J723d+mx2AVz45tUF5ZyjCbsVCsIu7YtQSjCklcKSndI5xWW2dCs8z6tZFbHrHIjN654oJoEb17Ztt5xhp1bOLDzAHstYpYBG5fL9KTRUdE7DCDVEURJsBqbN6KjDlOdA0s7rCcJXbk23ckOX2Vjx/xbkHvk2gxbG4p4rXxV8JhGTeYdnFEitBsCGBGb893DFq8DJ6zo5omyvLynbbqG5c2WpxUym4+ez731W5hGCy7zlgjT3p3kpCmPvasz7wZ2yK4nbr/w0WaTFj7hYzBPe2t9AhapZZuyeu1jmxZrg8GRrjCdZmOuajqV1RsrTo9qy9LZ1TRptDu7/o6fodt7IoK58vxP7Cqw1EfehB052R3nq0quzzLSeTE23rUIX8Q8zVxvntRkjPq4dGYv81kLrtz+i7yIcb0lV7XX6NCVTCas7AbMJnR7JcxtTKO2rVAslXWH0pzJ7aLNPRbI1seDUHqMIsGTUOsZx07oW7UEqokSUCukbd3cB4EsDwFFKBgtoF4R2pgEgk2K0OZoAVsUsbYeDjliG3JEA3JEI3KsJop80SwptUQJaBVit8mEbNFuNKkjWkCnInYXSEC3ItQTLaBXkZa+uRHWOs/uj2WG00N1ABnWoMENgsyqobkRwSmkibJdE9qRz7odYqe6DrvUdc7uBTJpDwTp2Gvm0j5NaH8+63eFA+p6HFTX45C6HodNoCOa0FFN+BiEb8BxdQNOqBtwUt2AUybQaU3ojCYVZ+c+4D6obRW2xz9g1PzOgSmp41ODwcw5YX9LWE8t33VLfbV5CBKLAWoP2E9gc72PswAT8FhvjaBGxJvpg2e598xbz2EOPf+2m3T23RfFOvzCO051ddCprXbq6t2aumCr07L3zCel6tBHPXyCT90aHllxD338MXtuYrmHxsq1H696293pNrfE1wecttaEYNDtdHwfjkg7PDZ1IG3s4bQBPzFtIPXTmXvL67/8tfrJy8/c9szmz/6rfu7ovVfcm/J74SMryx4JLI88lrFn+rLNmYt3bArumX/YCq2obZy+1zm8frClfF9quv/+t4MTlxdvWVFcP4F9yAvuumfUUi4urzjzSN6i//9uqGv4cOTn4/8f3zL6qp6c+KJ64JPiP89WLugHIHaH7tYjYsdadZeuhNhr+lH1T3rNpPFjRhqfLcXYxmds3yFHfApWVQf8Qpx1PhvTpkWJqLqwTMlWutcq87wRIwRvijclLXXE5P5nM3HCuLGjR7l+hssw1x41J31+ilboYSKoYpRWxxHkBBp0EK1pAE3FtKkTJ4xONvaYOelzXb+ljLGkWAtYBqsNI2LqMEa2KhEjZSnD2JMn2/aEOQgg0Nj0V+bWpLX/+ukowPdH5/ZMDT1FtBN+FAgbz/UE0FGEYuO1g2B2kaW7hh5ULg1INkxH30IxilWcBzoS4+mVDOObXdAyk+pCIst0hY8s1jytkA1oAd3CpZVt0AZ0hzkcvL3LcO5CIyYO6ORp0IUJMkNXJEoWa9Aq2IDWo1uMktNsg3a97lArTx7hMl2l/GvvYNYs7zfu7q55Nl+AtdLf8ixr4WXtZE53Q12s1VjbmDr01eTjhOPEzHOUIRbNX5g55o1n7Yd2tC0OhVrPN6bmHsr3fTTmWZ4xMjw3suijn90M0kEb7YTwmEkWs/BYzEIWswSPRrTIo0/g5h300kA3Hg1sJ0Q7l4cIpxNuDbiXwy2Uu5erz6eJPnq4oc0h4cRmOrhxbDeJBYaoDLiNK/FFDwpNnl9QS4sMdkd86T0WMZ+FwsizezfgBhQtpp4plHe0eDEnMUQrt+JSg1AeuboVePTzuTPFTcSeb0EOcU5sNQtYYIscRW8rHC5lRIkWIxbJ9c5F83bNe2FghB3q6Ar1dcUlbgkUPcZrlYGIyIVgWB4SD+6P4MuMwOzpxs6RjwNucMPH0ZAdmSqnKgLh9FOBODWLmYWP+fHakR0cH5kRtHrCfwgxInlN1Zmyd+4IibMfk9jxsDkfUen2D1rNNtnZAAA=)}.lastudioicon-b-tiktok,.lastudioicon-b-twitter-x,.lastudioicon-b-twitter-x-squared{display:inline-block;font:1em/1 LaStudioBIcons;speak:none;text-transform:none;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}.lastudioicon-b-tiktok:before{content:'\e801'}.lastudioicon-b-twitter-x-squared:before{content:'\e800'}.lastudioicon-b-twitter-x:before{content:'\e802'}
+.lakit-carousel-equalheight .swiper-slide > .e-con {
+  height: 100%;
+}

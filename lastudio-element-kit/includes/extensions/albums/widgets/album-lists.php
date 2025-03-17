@@ -35,7 +35,12 @@ class Album_Lists extends LaStudioKit_Posts{
 		if(!lastudio_kit_settings()->is_combine_js_css()) {
 			$this->add_script_depends( 'lastudio-kit-base' );
 			if(!lastudio_kit()->is_optimized_css_mode()) {
-				wp_register_style( 'lakit-posts', lastudio_kit()->plugin_url( 'assets/css/addons/posts.min.css' ), [ 'lastudio-kit-base' ], lastudio_kit()->get_version() );
+
+                $depends = [ 'lastudio-kit-base', 'e-swiper' ];
+                if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+                    $depends[] = 'lastudio-kit-swiper-dotv2';
+                }
+				wp_register_style( 'lakit-posts', lastudio_kit()->plugin_url( 'assets/css/addons/posts.min.css' ), $depends, lastudio_kit()->get_version() );
 				wp_register_style( $this->get_name(), lastudio_kit()->plugin_url( 'assets/css/addons/' . $this->css_file_name ), [ 'lakit-posts' ], lastudio_kit()->get_version() );
 				$this->add_style_depends( $this->get_name() );
 			}
@@ -43,6 +48,14 @@ class Album_Lists extends LaStudioKit_Posts{
 		$this->add_script_depends('lastudio-kit-player');
 		$this->add_style_depends('lastudio-kit-player');
 	}
+
+    protected function get_html_wrapper_class(){
+        $wrapper_class = parent::get_html_wrapper_class();
+        if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+            $wrapper_class .= ' lakit-carousel-v2';
+        }
+        return $wrapper_class;
+    }
 
 	public function get_inline_css_depends() {
 		return [
@@ -788,7 +801,24 @@ class Album_Lists extends LaStudioKit_Posts{
 
 		$this->_register_section_style_pagination( $css_schema );
 
-		$this->register_carousel_arrows_dots_style_section( [ 'enable_masonry!' => 'yes' ] );
+        if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+            $this->register_carousel_arrows_style_section([
+                'enable_masonry!' => 'yes',
+                'enable_carousel' => 'yes',
+                'carousel_arrows' => 'true',
+            ]);
+            $this->dotv2_register_pagination_controls([
+                'enable_masonry!' => 'yes',
+                'enable_carousel' => 'yes',
+                'carousel_dots' => 'true',
+            ]);
+        }
+        else{
+            $this->register_carousel_arrows_dots_style_section([
+                'enable_masonry!' => 'yes',
+                'enable_carousel' => 'yes'
+            ]);
+        }
 
 		$this->update_control('layout_type', [
 			'type'    => Controls_Manager::HIDDEN,

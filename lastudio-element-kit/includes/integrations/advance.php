@@ -62,7 +62,7 @@ add_action('elementor/app/init', function (){
     add_action('wp_print_footer_scripts', function (){
         ?>
         <script type="text/javascript">
-            function E_LaStudioReplaceLinks(){
+            function LaStudioKit_ReplaceLinks2(){
                 document.querySelectorAll('a[href*="go.elementor.com"]').forEach( elm => {
                     elm.setAttribute('href', 'https://la-studioweb.com/go/elementor-pro')
                 } )
@@ -70,8 +70,8 @@ add_action('elementor/app/init', function (){
                     elm.setAttribute('href', 'https://la-studioweb.com/go/elementor/popup-builder')
                 } )
             }
-            document.addEventListener('DOMContentLoaded', E_LaStudioReplaceLinks);
-            window.addEventListener('load', E_LaStudioReplaceLinks);
+            document.addEventListener('DOMContentLoaded', LaStudioKit_ReplaceLinks2);
+            window.addEventListener('load', LaStudioKit_ReplaceLinks2);
         </script>
         <?php
     }, 999);
@@ -80,7 +80,7 @@ add_action('elementor/app/init', function (){
 add_action('admin_footer', function (){
     ?>
     <script type="text/javascript">
-        function E_LaStudioReplaceLinks(){
+        function LaStudioKit_ReplaceLinks2(){
             document.querySelectorAll('a[href*="go.elementor.com"]').forEach( elm => {
                 elm.setAttribute('href', 'https://la-studioweb.com/go/elementor-pro')
             } )
@@ -88,8 +88,8 @@ add_action('admin_footer', function (){
                 elm.setAttribute('href', 'https://la-studioweb.com/go/elementor/popup-builder')
             } )
         }
-        document.addEventListener('DOMContentLoaded', E_LaStudioReplaceLinks);
-        window.addEventListener('load', E_LaStudioReplaceLinks);
+        document.addEventListener('DOMContentLoaded', LaStudioKit_ReplaceLinks2);
+        window.addEventListener('load', LaStudioKit_ReplaceLinks2);
     </script>
     <?php
 }, 999);
@@ -104,20 +104,20 @@ add_filter('wp_redirect', function ( $location ){
 add_action('elementor/editor/footer', function (){
     ?>
     <script type="text/javascript">
-        const LaStudioScriptTemplateIds = ['#tmpl-elementor-panel-categories', '#tmpl-elementor-panel-global', '#tmpl-elementor-template-library-get-pro-button', '#elementor-preview-responsive-wrapper #elementor-notice-bar'];
-        LaStudioScriptTemplateIds.forEach(function (id){
+        const LaStudioKit_ScriptTemplateIds = ['#tmpl-elementor-panel-categories', '#tmpl-elementor-panel-global', '#tmpl-elementor-template-library-get-pro-button', '#elementor-preview-responsive-wrapper #elementor-notice-bar'];
+        LaStudioKit_ScriptTemplateIds.forEach(function (id){
             const temp = document.querySelector(id);
             if(temp){
                 temp.innerHTML = temp.innerHTML.replace(/href="(.*?)"/gi, 'href="https://la-studioweb.com/go/elementor-pro"');
             }
         });
-        function E_LaStudioReplaceLinks(){
+        function LaStudioKit_ReplaceLinks(){
             document.querySelectorAll('a[href*="go.elementor.com"]').forEach( elm => {
                 elm.setAttribute('href', 'https://la-studioweb.com/go/elementor/docs')
             } )
         }
-        document.addEventListener('DOMContentLoaded', E_LaStudioReplaceLinks);
-        window.addEventListener('load', E_LaStudioReplaceLinks);
+        document.addEventListener('DOMContentLoaded', LaStudioKit_ReplaceLinks);
+        window.addEventListener('load', LaStudioKit_ReplaceLinks);
     </script>
     <?php
 }, 100);

@@ -323,7 +323,7 @@ class LaStudioKit_Button extends LaStudioKit_Base {
             ]
         );
 
-        $this->_add_control(
+        $this->_add_responsive_control(
             'border_radius',
             [
                 'label' => __( 'Border Radius', 'lastudio-kit' ),
@@ -406,7 +406,7 @@ class LaStudioKit_Button extends LaStudioKit_Base {
             ]
         );
 
-        $this->_add_control(
+        $this->_add_responsive_control(
             'border_radius_hover',
             [
                 'label' => __( 'Border Radius', 'lastudio-kit' ),

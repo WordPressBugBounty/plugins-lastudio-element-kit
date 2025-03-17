@@ -33,6 +33,10 @@ class LaStudioKit_Logo extends LaStudioKit_Base {
         return [ 'lastudiokit-builder' ];
     }
 
+    public function has_widget_inner_wrapper(): bool {
+        return false;
+    }
+
 	protected function register_controls() {
 
         $this->_start_controls_section(

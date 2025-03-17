@@ -16,7 +16,7 @@ use Elementor\Repeater;
 use LaStudioKitThemeBuilder\Modules\NestedElements\Base\Widget_Nested_Base;
 use LaStudioKitThemeBuilder\Modules\NestedElements\Controls\Control_Nested_Repeater;
 
-class NestedTabs extends Widget_Nested_Base {
+class Nested_Tabs extends Widget_Nested_Base {
 
     protected function enqueue_addon_resources() {
         if ( ! lastudio_kit_settings()->is_combine_js_css() ) {
@@ -216,7 +216,8 @@ class NestedTabs extends Widget_Nested_Base {
 				],
 			],
 			'title_field' => '{{{ tab_title }}}',
-			'button_text' => 'Add Tab',
+			'button_text' => 'Add Tab'
+
 		] );
 
         $this->add_control(
@@ -2166,7 +2167,13 @@ class NestedTabs extends Widget_Nested_Base {
 		$id_int = substr( $this->get_id_int(), 0, 3 );
         $title_control_id = 'lakit-ntab-controlid-' . esc_attr($this->get_id());
 
-		$this->add_render_attribute( 'elementor-tabs', 'class', ['lakit-ntabs', 'lakit-ntabs-' . esc_attr($this->get_id())] );
+        $wrapClasses = ['lakit-ntabs', 'lakit-ntabs-' . esc_attr($this->get_id())];
+        if($tab_type === 'tab'){
+            $wrapClasses[] = 'etab--overflow';
+        }
+
+		$this->add_render_attribute( 'elementor-tabs', 'class', $wrapClasses );
+
 		$this->add_render_attribute( 'tab-title-text', 'class', 'lakit-ntab-title-text' );
 		$this->add_render_attribute( 'tab-icon', 'class', 'lakit-ntab-icon' );
 		$this->add_render_attribute( 'tab-icon-active', 'class', [ 'lakit-ntab-icon', 'e-active' ] );

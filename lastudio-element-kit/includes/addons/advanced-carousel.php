@@ -25,11 +25,25 @@ class LaStudioKit_Advanced_Carousel extends LaStudioKit_Base {
 	    if(!lastudio_kit_settings()->is_combine_js_css()){
 		    $this->add_script_depends( 'lastudio-kit-base' );
 		    if(!lastudio_kit()->is_optimized_css_mode()) {
+
+                $depends = [ 'lakit-banner', 'e-swiper' ];
+                if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+                    $depends[] = 'lastudio-kit-swiper-dotv2';
+                }
+
 			    wp_register_style( 'lakit-banner', lastudio_kit()->plugin_url('assets/css/addons/banner.min.css'), ['lastudio-kit-base'], lastudio_kit()->get_version());
-			    wp_register_style( $this->get_name(), lastudio_kit()->plugin_url('assets/css/addons/advanced-carousel.min.css'), ['lakit-banner', 'e-swiper'], lastudio_kit()->get_version());
+			    wp_register_style( $this->get_name(), lastudio_kit()->plugin_url('assets/css/addons/advanced-carousel.min.css'), $depends, lastudio_kit()->get_version());
 			    $this->add_style_depends( $this->get_name() );
 		    }
 	    }
+    }
+
+    protected function get_html_wrapper_class(){
+        $wrapper_class = parent::get_html_wrapper_class();
+        if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+            $wrapper_class .= ' lakit-carousel-v2';
+        }
+        return $wrapper_class;
     }
 
 	public function get_inline_css_depends() {
@@ -1846,7 +1860,17 @@ class LaStudioKit_Advanced_Carousel extends LaStudioKit_Base {
 
         $this->_end_controls_section();
 
-        $this->register_carousel_arrows_dots_style_section();
+        if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+            $this->register_carousel_arrows_style_section([
+                'carousel_arrows' => 'true',
+            ]);
+            $this->dotv2_register_pagination_controls([
+                'carousel_dots' => 'true',
+            ]);
+        }
+        else{
+            $this->register_carousel_arrows_dots_style_section();
+        }
 
     }
 

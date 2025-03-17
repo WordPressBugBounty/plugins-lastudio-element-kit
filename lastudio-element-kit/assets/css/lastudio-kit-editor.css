@@ -3,7 +3,6 @@ body.elementor-device-laptop div#elementor-preview-responsive-wrapper {
   max-height: 768px;
 }
 
-
 body.e-is-device-mode.elementor-device-tablet #elementor-preview-responsive-wrapper{
   width: 1024px;
 }
@@ -13,9 +12,12 @@ body.e-is-device-mode.elementor-device-tablet #elementor-preview-responsive-wrap
   height: 700px;
 }
 
+body.e-is-device-mode.elementor-device-mobile_extra div#elementor-preview-responsive-wrapper {
+  min-width: 767px;
+}
+
 body.e-is-device-mode.elementor-device-mobile #elementor-preview-responsive-wrapper {
-  --e-editor-preview-width: 380px !important;
-  --e-editor-preview-height: 680px !important;
+  min-width: 380px;
 }
 
 i.elementor-icons-manager__tab__item__icon.dlicon {
