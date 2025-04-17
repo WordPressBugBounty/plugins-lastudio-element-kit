@@ -472,14 +472,14 @@ class LaStudioKit_Hotspots extends Widget_Image {
           ],
         ],
         'selectors_dictionary' => [
-          'right'        => 'right: initial;bottom: initial;left: initial;top: initial;right: calc(100% + 15px );',
-          'bottom'       => 'right: initial;bottom: initial;left: initial;top: initial;bottom: calc(100% + 15px );',
-          'left'         => 'right: initial;bottom: initial;left: initial;top: initial;left: calc(100% + 15px );',
-          'top'          => 'right: initial;bottom: initial;left: initial;top: initial;top: calc(100% + 15px );',
-          'top-left'     => 'right: initial;bottom: 0;left: initial;top: initial;right: calc(100% + 15px );',
-          'top-right'    => 'right: initial;bottom: 0;left: initial;top: initial;left: calc(100% + 15px );',
-          'bottom-left'  => 'right: initial;bottom: initial;left: initial;top: 0;right: calc(100% + 15px );',
-          'bottom-right' => 'right: initial;bottom: initial;left: initial;top: 0;left: calc(100% + 15px );',
+          'right'        => 'right: initial;bottom: initial;left: initial;top: initial;right: calc(100% + 10px );',
+          'bottom'       => 'right: initial;bottom: initial;left: initial;top: initial;bottom: calc(100% + 10px );',
+          'left'         => 'right: initial;bottom: initial;left: initial;top: initial;left: calc(100% + 10px );',
+          'top'          => 'right: initial;bottom: initial;left: initial;top: initial;top: calc(100% + 10px );',
+          'top-left'     => 'right: initial;bottom: 0;left: initial;top: initial;right: calc(100% + 10px );',
+          'top-right'    => 'right: initial;bottom: 0;left: initial;top: initial;left: calc(100% + 10px );',
+          'bottom-left'  => 'right: initial;bottom: initial;left: initial;top: 0;right: calc(100% + 10px );',
+          'bottom-right' => 'right: initial;bottom: initial;left: initial;top: 0;left: calc(100% + 10px );',
         ],
         'selectors'            => [
           '{{WRAPPER}} {{CURRENT_ITEM}} .lakit-hotspot--tooltip-position' => '{{VALUE}}',
@@ -631,7 +631,7 @@ class LaStudioKit_Hotspots extends Widget_Image {
           ],
         ],
         'selectors'          => [
-          '{{WRAPPER}} .lakit-hotspot--tooltip-position' => 'right: initial;bottom: initial;left: initial;top: initial;{{VALUE}}: calc(100% + 15px );',
+          '{{WRAPPER}} .lakit-hotspot--tooltip-position' => 'right: initial;bottom: initial;left: initial;top: initial;{{VALUE}}: calc(100% + 10px );',
         ],
         'frontend_available' => true,
       ]

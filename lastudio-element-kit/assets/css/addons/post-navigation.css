@@ -51,7 +51,7 @@
 .elementor-post-navigation .elementor-post-navigation__link a {
 	display: flex;
 	align-items: center;
-	max-width: 90%
+	max-width: 100%
 }
 .elementor-post-navigation .post-navigation__next--label, .elementor-post-navigation .post-navigation__prev--label {
 	text-transform: uppercase;
@@ -85,9 +85,9 @@
 .elementor-post-navigation .elementor-post-navigation__separator-wrapper {
 	text-align: center
 }
-.elementor-post-navigation .elementor-post-navigation__next a {
-	float: right
-}
+/*.elementor-post-navigation .elementor-post-navigation__next a {*/
+/*	float: right*/
+/*}*/
 .elementor-post-navigation .elementor-post-navigation__menu a {
 	max-width: 100%;
 	justify-content: center;
@@ -105,9 +105,9 @@ body.rtl .elementor-post-navigation .elementor-post-navigation__next,
 body.rtl .elementor-post-navigation span.elementor-post-navigation__link__next{
 	text-align: left;
 }
-body.rtl .elementor-post-navigation .elementor-post-navigation__next a{
-	float: left;
-}
+/*body.rtl .elementor-post-navigation .elementor-post-navigation__next a{*/
+/*	float: left;*/
+/*}*/
 .epn-pos-bottom.elementor-lakit-post-navigation .elementor-post-navigation__link a,
 .epn-pos-top.elementor-lakit-post-navigation .elementor-post-navigation__link a{
 	flex-direction: column;

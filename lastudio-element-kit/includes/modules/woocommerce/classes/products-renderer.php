@@ -68,7 +68,12 @@ class Products_Renderer extends Base_Products_Renderer {
             $posts = $query->posts;
 
             if($is_filtered){
+                $pre_post_in = $query->get('post__in');
+                add_filter('loop_shop_post_in', function ( $post_in ) use ( $pre_post_in ){
+                    return array_merge($post_in, $pre_post_in);
+                }, 9001);
                 WC()->query->product_query($query);
+                remove_all_filters('loop_shop_post_in', 9001);
                 $posts = $query->get_posts();
             }
 

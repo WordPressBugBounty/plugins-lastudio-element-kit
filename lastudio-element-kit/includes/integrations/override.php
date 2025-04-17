@@ -481,30 +481,60 @@ add_action('elementor/element/spacer/section_spacer/before_section_end', functio
 
 /**
  * Modify Image Box - Color Hover
+ * section_style_box
  */
+add_action('elementor/element/image-box/section_style_box/before_section_end', function ( \Elementor\Controls_Stack $element){
+    $element->update_responsive_control('position', [
+        'prefix_class' => '',
+        'selectors_dictionary' => [
+            'left' => '--e-imb-direction: row;',
+            'top' => '--e-imb-direction: column;',
+            'right' => '--e-imb-direction: row-reverse;',
+        ],
+        'selectors' => [
+            '{{WRAPPER}}' => '{{VALUE}}',
+        ],
+    ]);
+    $element->update_responsive_control('content_vertical_alignment', [
+        'prefix_class' => '',
+        'selectors_dictionary' => [
+            'top' => '--e-imb-align-items: flex-start;',
+            'middle' => '--e-imb-align-items: center;',
+            'bottom' => '--e-imb-align-items: flex-end;',
+        ],
+        'selectors' => [
+            '{{WRAPPER}}' => '{{VALUE}}',
+        ],
+    ]);
+    $element->update_responsive_control('image_space', [
+        'selectors' => [
+            '{{WRAPPER}}' => '--e-imb-gap: {{SIZE}}{{UNIT}}',
+        ],
+    ]);
+});
 add_action('elementor/element/image-box/section_style_content/before_section_end', function ( $element ){
-    $element->add_responsive_control(
-        'content_padding',
-        [
-            'label' => esc_html__( 'Content Padding', 'lastudio-kit' ),
-            'type' => \Elementor\Controls_Manager::DIMENSIONS,
-            'size_units' => [ 'px', '%', 'em' ],
-            'selectors' => [
-                '{{WRAPPER}} .elementor-image-box-content' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-            ]
-        ]
-    );
-    $element->add_responsive_control(
-        'content_margin',
-        [
-            'label' => esc_html__( 'Content Margin', 'lastudio-kit' ),
-            'type' => \Elementor\Controls_Manager::DIMENSIONS,
-            'size_units' => [ 'px', '%', 'em' ],
-            'selectors' => [
-                '{{WRAPPER}} .elementor-image-box-content' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-            ]
-        ]
-    );
+//    $element->add_responsive_control(
+//        'content_padding',
+//        [
+//            'label' => esc_html__( 'Content Padding', 'lastudio-kit' ),
+//            'type' => \Elementor\Controls_Manager::DIMENSIONS,
+//            'size_units' => [ 'px', '%', 'em' ],
+//            'selectors' => [
+//                '{{WRAPPER}} .elementor-image-box-content' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+//            ]
+//        ]
+//    );
+//    $element->add_responsive_control(
+//        'content_margin',
+//        [
+//            'label' => esc_html__( 'Content Margin', 'lastudio-kit' ),
+//            'type' => \Elementor\Controls_Manager::DIMENSIONS,
+//            'size_units' => [ 'px', '%', 'em' ],
+//            'selectors' => [
+//                '{{WRAPPER}} .elementor-image-box-content' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+//            ]
+//        ]
+//    );
 	$element->add_control(
 		'title_hover_color',
 		[
@@ -592,3 +622,12 @@ add_action(
 		);
 	}
 );
+/**
+ * Allow override lakit_query
+ */
+add_filter('elementor/query/lakit_avoid_duplicate', function($wp_query, $widget){
+    $post__not_in = $wp_query->get('post__not_in');
+    $post__not_in = array_merge( $post__not_in, LaStudioKitExtensions\Elementor\Classes\Query_Control::$displayed_ids );
+    $wp_query->set( 'post__not_in', $post__not_in );
+    return $wp_query;
+}, 20, 2);

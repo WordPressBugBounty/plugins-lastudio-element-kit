@@ -46,7 +46,8 @@
     overflow: hidden
 }
 .elementor-widget-lakit-hotspots .elementor-widget-container {
-    width: 100%
+    width: 100%;
+    min-height: var(--container-height);
 }
 .elementor-widget-lakit-hotspots .elementor-widget-container > img {
     display: block;
@@ -256,7 +257,7 @@
 }
 .elementor-root-fake {
     height: 0;
-    overflow: hidden
+    overflow: hidden;
 }
 .elementor-root-fake .lakit-hotspot {
     position: static
@@ -281,4 +282,8 @@
     width: 100%;
     height: 100%;
     top: 0;
+}
+.elementor-widget-lakit-hotspots .lakit-hotspot .lakit-hotspot__tooltip{
+    opacity: 0;
+    pointer-events: none;
 }

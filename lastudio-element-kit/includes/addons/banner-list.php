@@ -461,160 +461,162 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
             ]
         );
 
-        $repeater->add_responsive_control(
-            'icontent_width',
-            [
-                'label' => __( 'Content Width', 'lastudio-kit' ),
-                'type' => Controls_Manager::SLIDER,
-                'size_units' => [ 'px', '%' ],
-                'selectors' => [
-                    '{{WRAPPER}} {{CURRENT_ITEM}}' => '--lakit-bannerlist-content-width: {{SIZE}}{{UNIT}};',
-                ],
-                'condition' => [
-                    'custom_style' => 'yes',
-                ],
-            ]
-        );
+        if( !lastudio_kit()->get_theme_support('elementor::optimize-bnlist') ) {
 
-        $repeater->add_control(
-            'icontent_horizontal',
-            [
-                'label' => esc_html__( 'Horizontal Orientation', 'lastudio-kit' ),
-                'type' => Controls_Manager::CHOOSE,
-                'default' => is_rtl() ? 'right' : 'left',
-                'options' => [
-                    'left' => [
-                        'title' => esc_html__( 'Left', 'lastudio-kit' ),
-                        'icon' => 'eicon-h-align-left',
+            $repeater->add_responsive_control(
+                'icontent_width',
+                [
+                    'label' => __('Content Width', 'lastudio-kit'),
+                    'type' => Controls_Manager::SLIDER,
+                    'size_units' => ['px', '%'],
+                    'selectors' => [
+                        '{{WRAPPER}} {{CURRENT_ITEM}}' => '--lakit-bannerlist-content-width: {{SIZE}}{{UNIT}};',
                     ],
-                    'right' => [
-                        'title' => esc_html__( 'Right', 'lastudio-kit' ),
-                        'icon' => 'eicon-h-align-right',
+                    'condition' => [
+                        'custom_style' => 'yes',
                     ],
-                ],
-                'toggle' => false,
-                'condition' => [
-                    'custom_style' => 'yes',
-                ],
-            ]
-        );
+                ]
+            );
 
-        $repeater->add_responsive_control(
-            'icontent_offset_x',
-            [
-                'label' => esc_html__( 'Offset', 'lastudio-kit' ),
-                'type' => Controls_Manager::SLIDER,
-                'size_units' => [ 'px', '%' ],
-                'selectors' => [
-                    '{{WRAPPER}} {{CURRENT_ITEM}} ' . $css_scheme['content_inner'] => 'left: initial; right: initial;{{icontent_horizontal.VALUE}}: {{SIZE}}{{UNIT}};',
-                ],
-                'condition' => [
-                    'custom_style' => 'yes',
-                ],
-            ]
-        );
-
-        $repeater->add_control(
-            'icontent_vertical',
-            [
-                'label' => esc_html__( 'Vertical Orientation', 'lastudio-kit' ),
-                'type' => Controls_Manager::CHOOSE,
-                'options' => [
-                    'top' => [
-                        'title' => esc_html__( 'Top', 'lastudio-kit' ),
-                        'icon' => 'eicon-v-align-top',
+            $repeater->add_control(
+                'icontent_horizontal',
+                [
+                    'label' => esc_html__('Horizontal Orientation', 'lastudio-kit'),
+                    'type' => Controls_Manager::CHOOSE,
+                    'default' => is_rtl() ? 'right' : 'left',
+                    'options' => [
+                        'left' => [
+                            'title' => esc_html__('Left', 'lastudio-kit'),
+                            'icon' => 'eicon-h-align-left',
+                        ],
+                        'right' => [
+                            'title' => esc_html__('Right', 'lastudio-kit'),
+                            'icon' => 'eicon-h-align-right',
+                        ],
                     ],
-                    'bottom' => [
-                        'title' => esc_html__( 'Bottom', 'lastudio-kit' ),
-                        'icon' => 'eicon-v-align-bottom',
+                    'toggle' => false,
+                    'condition' => [
+                        'custom_style' => 'yes',
                     ],
-                ],
-                'default' => 'top',
-                'toggle' => false,
-                'condition' => [
-                    'custom_style' => 'yes',
-                ],
-            ]
-        );
+                ]
+            );
 
-        $repeater->add_responsive_control(
-            'icontent_offset_y',
-            [
-                'label' => esc_html__( 'Offset', 'lastudio-kit' ),
-                'type' => Controls_Manager::SLIDER,
-                'size_units' => [ 'px', '%' ],
-                'selectors' => [
-                    '{{WRAPPER}} {{CURRENT_ITEM}} ' . $css_scheme['content_inner'] => 'top: initial; bottom: initial;{{icontent_vertical.VALUE}}: {{SIZE}}{{UNIT}};',
-                ],
-                'condition' => [
-                    'custom_style' => 'yes',
-                ],
-            ]
-        );
-
-        $repeater->add_responsive_control(
-            'icontent_padding',
-            [
-                'label' => __( 'Content Padding', 'lastudio-kit' ),
-                'type' => Controls_Manager::DIMENSIONS,
-                'size_units' => [ 'px', 'em', '%', 'vw', 'vh' ],
-                'selectors' => [
-                    '{{WRAPPER}} {{CURRENT_ITEM}}' => '--lakit-bannerlist-content-padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-                ],
-                'condition' => [
-                    'custom_style' => 'yes',
-                ],
-            ]
-        );
-
-        $repeater->add_responsive_control(
-            'icontent_margin',
-            [
-                'label' => __( 'Content Margin', 'lastudio-kit' ),
-                'type' => Controls_Manager::DIMENSIONS,
-                'size_units' => [ 'px', 'em', '%', 'vw', 'vh' ],
-                'selectors' => [
-                    '{{WRAPPER}} {{CURRENT_ITEM}}' => '--lakit-bannerlist-content-margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-                ],
-                'condition' => [
-                    'custom_style' => 'yes',
-                ],
-            ]
-        );
-
-        $repeater->add_responsive_control(
-            'itext_align',
-            [
-                'label' => __( 'Text Align', 'lastudio-kit' ),
-                'type' => Controls_Manager::CHOOSE,
-                'label_block' => false,
-                'options' => [
-                    'left' => [
-                        'title' => __( 'Left', 'lastudio-kit' ),
-                        'icon' => 'eicon-text-align-left',
+            $repeater->add_responsive_control(
+                'icontent_offset_x',
+                [
+                    'label' => esc_html__('Offset', 'lastudio-kit'),
+                    'type' => Controls_Manager::SLIDER,
+                    'size_units' => ['px', '%'],
+                    'selectors' => [
+                        '{{WRAPPER}} {{CURRENT_ITEM}} ' . $css_scheme['content_inner'] => 'left: initial; right: initial;{{icontent_horizontal.VALUE}}: {{SIZE}}{{UNIT}};',
                     ],
-                    'center' => [
-                        'title' => __( 'Center', 'lastudio-kit' ),
-                        'icon' => 'eicon-text-align-center',
+                    'condition' => [
+                        'custom_style' => 'yes',
                     ],
-                    'right' => [
-                        'title' => __( 'Right', 'lastudio-kit' ),
-                        'icon' => 'eicon-text-align-right',
+                ]
+            );
+
+            $repeater->add_control(
+                'icontent_vertical',
+                [
+                    'label' => esc_html__('Vertical Orientation', 'lastudio-kit'),
+                    'type' => Controls_Manager::CHOOSE,
+                    'options' => [
+                        'top' => [
+                            'title' => esc_html__('Top', 'lastudio-kit'),
+                            'icon' => 'eicon-v-align-top',
+                        ],
+                        'bottom' => [
+                            'title' => esc_html__('Bottom', 'lastudio-kit'),
+                            'icon' => 'eicon-v-align-bottom',
+                        ],
                     ],
-                ],
-                'selectors_dictionary' => [
-                    'left' => '--e_bnl-text-align: left;--e_bnl-align: flex-start;',
-                    'center' => '--e_bnl-text-align: center;--e_bnl-align: center;',
-                    'right' => '--e_bnl-text-align: right;--e_bnl-align: flex-end;',
-                ],
-                'selectors' => [
-                    '{{WRAPPER}} {{CURRENT_ITEM}}' => '{{VALUE}}',
-                ],
-                'condition' => [
-                    'custom_style' => 'yes',
-                ],
-            ]
-        );
+                    'default' => 'top',
+                    'toggle' => false,
+                    'condition' => [
+                        'custom_style' => 'yes',
+                    ],
+                ]
+            );
+
+            $repeater->add_responsive_control(
+                'icontent_offset_y',
+                [
+                    'label' => esc_html__('Offset', 'lastudio-kit'),
+                    'type' => Controls_Manager::SLIDER,
+                    'size_units' => ['px', '%'],
+                    'selectors' => [
+                        '{{WRAPPER}} {{CURRENT_ITEM}} ' . $css_scheme['content_inner'] => 'top: initial; bottom: initial;{{icontent_vertical.VALUE}}: {{SIZE}}{{UNIT}};',
+                    ],
+                    'condition' => [
+                        'custom_style' => 'yes',
+                    ],
+                ]
+            );
+
+            $repeater->add_responsive_control(
+                'icontent_padding',
+                [
+                    'label' => __('Content Padding', 'lastudio-kit'),
+                    'type' => Controls_Manager::DIMENSIONS,
+                    'size_units' => ['px', 'em', '%', 'vw', 'vh'],
+                    'selectors' => [
+                        '{{WRAPPER}} {{CURRENT_ITEM}}' => '--lakit-bannerlist-content-padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    ],
+                    'condition' => [
+                        'custom_style' => 'yes',
+                    ],
+                ]
+            );
+
+            $repeater->add_responsive_control(
+                'icontent_margin',
+                [
+                    'label' => __('Content Margin', 'lastudio-kit'),
+                    'type' => Controls_Manager::DIMENSIONS,
+                    'size_units' => ['px', 'em', '%', 'vw', 'vh'],
+                    'selectors' => [
+                        '{{WRAPPER}} {{CURRENT_ITEM}}' => '--lakit-bannerlist-content-margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    ],
+                    'condition' => [
+                        'custom_style' => 'yes',
+                    ],
+                ]
+            );
+            $repeater->add_responsive_control(
+                'itext_align',
+                [
+                    'label' => __( 'Text Align', 'lastudio-kit' ),
+                    'type' => Controls_Manager::CHOOSE,
+                    'label_block' => false,
+                    'options' => [
+                        'left' => [
+                            'title' => __( 'Left', 'lastudio-kit' ),
+                            'icon' => 'eicon-text-align-left',
+                        ],
+                        'center' => [
+                            'title' => __( 'Center', 'lastudio-kit' ),
+                            'icon' => 'eicon-text-align-center',
+                        ],
+                        'right' => [
+                            'title' => __( 'Right', 'lastudio-kit' ),
+                            'icon' => 'eicon-text-align-right',
+                        ],
+                    ],
+                    'selectors_dictionary' => [
+                        'left' => '--e_bnl-text-align: left;--e_bnl-align: flex-start;',
+                        'center' => '--e_bnl-text-align: center;--e_bnl-align: center;',
+                        'right' => '--e_bnl-text-align: right;--e_bnl-align: flex-end;',
+                    ],
+                    'selectors' => [
+                        '{{WRAPPER}} {{CURRENT_ITEM}}' => '{{VALUE}}',
+                    ],
+                    'condition' => [
+                        'custom_style' => 'yes',
+                    ],
+                ]
+            );
+        }
 
         $repeater->add_control(
             'isubtitle_color',
@@ -743,41 +745,43 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
             ]
         );
 
-        $repeater->add_group_control(
-            Group_Control_Typography::get_type(),
-            array(
-                'name'     => 'subtitle_fontsize',
-                'label' => __( 'Subtitle font size', 'lastudio-kit' ),
-                'selector' => '{{WRAPPER}} {{CURRENT_ITEM}} ' . $css_scheme['subtitle'],
-            )
-        );
+        if( !lastudio_kit()->get_theme_support('elementor::optimize-bnlist') ){
+            $repeater->add_group_control(
+                Group_Control_Typography::get_type(),
+                array(
+                    'name'     => 'subtitle_fontsize',
+                    'label' => __( 'Subtitle font size', 'lastudio-kit' ),
+                    'selector' => '{{WRAPPER}} {{CURRENT_ITEM}} ' . $css_scheme['subtitle'],
+                )
+            );
 
-        $repeater->add_group_control(
-            Group_Control_Typography::get_type(),
-            array(
-                'name'     => 'title_fontsize',
-                'label' => __( 'Title font size', 'lastudio-kit' ),
-                'selector' => '{{WRAPPER}} {{CURRENT_ITEM}} ' . $css_scheme['title'],
-            )
-        );
+            $repeater->add_group_control(
+                Group_Control_Typography::get_type(),
+                array(
+                    'name'     => 'title_fontsize',
+                    'label' => __( 'Title font size', 'lastudio-kit' ),
+                    'selector' => '{{WRAPPER}} {{CURRENT_ITEM}} ' . $css_scheme['title'],
+                )
+            );
 
-        $repeater->add_group_control(
-            Group_Control_Typography::get_type(),
-            array(
-                'name'     => 'desc_fontsize',
-                'label' => __( 'Description font size', 'lastudio-kit' ),
-                'selector' => '{{WRAPPER}} {{CURRENT_ITEM}} ' . $css_scheme['desc'],
-            )
-        );
+            $repeater->add_group_control(
+                Group_Control_Typography::get_type(),
+                array(
+                    'name'     => 'desc_fontsize',
+                    'label' => __( 'Description font size', 'lastudio-kit' ),
+                    'selector' => '{{WRAPPER}} {{CURRENT_ITEM}} ' . $css_scheme['desc'],
+                )
+            );
 
-        $repeater->add_group_control(
-            Group_Control_Typography::get_type(),
-            array(
-                'name'     => 'subdesc_fontsize',
-                'label' => __( 'SubDescription font size', 'lastudio-kit' ),
-                'selector' => '{{WRAPPER}} {{CURRENT_ITEM}} ' . $css_scheme['subdesc'],
-            )
-        );
+            $repeater->add_group_control(
+                Group_Control_Typography::get_type(),
+                array(
+                    'name'     => 'subdesc_fontsize',
+                    'label' => __( 'SubDescription font size', 'lastudio-kit' ),
+                    'selector' => '{{WRAPPER}} {{CURRENT_ITEM}} ' . $css_scheme['subdesc'],
+                )
+            );
+        }
 
         $repeater->end_controls_tab();
 
@@ -1045,7 +1049,7 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
                     'unit' => 'px'
                 ],
                 'selectors' => array(
-                    '{{WRAPPER}} ' . $css_scheme['image'] . ':before' => 'padding-bottom: {{SIZE}}{{UNIT}};'
+                    '{{WRAPPER}}' => '--e_bnl-pb: {{SIZE}}{{UNIT}};'
                 ),
                 'condition' => [
                     'enable_custom_image_height!' => ''
@@ -1511,6 +1515,21 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
                 'size_units' => [ 'px', '%' ],
                 'selectors' => [
                     '{{WRAPPER}}' => '--lakit-bannerlist-content-width: {{SIZE}}{{UNIT}};',
+                ],
+                'condition' => [
+                    'layout_type' => 'overlay'
+                ]
+            ]
+        );
+
+        $this->add_responsive_control(
+            'content_height',
+            [
+                'label' => __( 'Content Height', 'lastudio-kit' ),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ 'px', '%' ],
+                'selectors' => [
+                    '{{WRAPPER}}' => '--lakit-bannerlist-content-height: {{SIZE}}{{UNIT}};',
                 ],
                 'condition' => [
                     'layout_type' => 'overlay'
@@ -2124,6 +2143,19 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
                     ),
                 )
             );
+
+            $this->add_responsive_control(
+                $section_key .'_radius',
+                array(
+                    'label'      => __( 'Border Radius', 'lastudio-kit' ),
+                    'type'       => Controls_Manager::DIMENSIONS,
+                    'size_units' => array( 'px', '%', 'em', 'custom' ),
+                    'selectors'  => array(
+                        '{{WRAPPER}} ' . $css_scheme[$section_key] => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    ),
+                )
+            );
+
             $this->add_group_control(
                 Group_Control_Border::get_type(),
                 array(
@@ -2157,9 +2189,6 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
                 'label_on'     => esc_html__( 'Yes', 'lastudio-kit' ),
                 'return_value' => 'yes',
                 'prefix_class' => 'btn-visible-hover-',
-                'condition' => [
-                    'layout_type' => 'flat'
-                ]
             ]
         );
 
@@ -2297,7 +2326,7 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => array( 'px', '%' ),
                 'selectors'  => array(
-                    '{{WRAPPER}} ' . $css_scheme['button'] => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .lakit-bannerlist__btn_wrap' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ),
             )
         );
@@ -2346,7 +2375,7 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
             Group_Control_Background::get_type(),
             array(
                 'name'     => 'button_bg_hover',
-                'selector' => '{{WRAPPER}} ' . $css_scheme['inner'] . ':hover ' . $css_scheme['button'],
+                'selector' => '{{WRAPPER}} ' . $css_scheme['button'] . ':hover',
             )
         );
 
@@ -2356,7 +2385,7 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
                 'label'     => esc_html__( 'Text Color', 'lastudio-kit' ),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => array(
-                    '{{WRAPPER}} ' . $css_scheme['inner'] . ':hover ' . $css_scheme['button'] => 'color: {{VALUE}}',
+                    '{{WRAPPER}} ' . $css_scheme['button'] . ':hover' => 'color: {{VALUE}}',
                 ),
             )
         );
@@ -2366,7 +2395,7 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
                 'label'     => esc_html__( 'Icon Color', 'lastudio-kit' ),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => array(
-                    '{{WRAPPER}} ' . $css_scheme['inner'] . ':hover ' . $css_scheme['button'] . ' ' . $css_scheme['button_icon'] => 'color: {{VALUE}}',
+                    '{{WRAPPER}} ' . $css_scheme['button'] . ':hover ' . $css_scheme['button_icon'] => 'color: {{VALUE}}',
                 ),
             )
         );
@@ -2375,7 +2404,7 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
             Group_Control_Typography::get_type(),
             array(
                 'name'     => 'button_typography_hover',
-                'selector' => '{{WRAPPER}} ' . $css_scheme['inner'] . ':hover ' . $css_scheme['button'],
+                'selector' => '{{WRAPPER}} ' . $css_scheme['button'] . ':hover',
             )
         );
 
@@ -2386,7 +2415,7 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => array( 'px', '%', 'em' ),
                 'selectors'  => array(
-                    '{{WRAPPER}} ' . $css_scheme['inner'] . ':hover ' . $css_scheme['button'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} ' . $css_scheme['button'] . ':hover' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ),
             )
         );
@@ -2398,7 +2427,7 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => array( 'px', '%' ),
                 'selectors'  => array(
-                    '{{WRAPPER}} ' . $css_scheme['inner'] . ':hover ' . $css_scheme['button'] => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} ' . $css_scheme['inner'] . ':hover .lakit-bannerlist__btn_wrap' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ),
             )
         );
@@ -2410,7 +2439,7 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => array( 'px', '%' ),
                 'selectors'  => array(
-                    '{{WRAPPER}} ' . $css_scheme['inner'] . ':hover ' . $css_scheme['button'] => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} ' . $css_scheme['button'] . ':hover' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ),
             )
         );
@@ -2422,7 +2451,7 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
                 'label'       => esc_html__( 'Border', 'lastudio-kit' ),
                 'placeholder' => '1px',
                 'default'     => '1px',
-                'selector'    => '{{WRAPPER}} ' . $css_scheme['inner'] . ':hover ' . $css_scheme['button']
+                'selector'    => '{{WRAPPER}} ' . $css_scheme['button'] . ':hover'
             )
         );
 
@@ -2430,7 +2459,7 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
             Group_Control_Box_Shadow::get_type(),
             array(
                 'name'     => 'button_box_shadow_hover',
-                'selector' => '{{WRAPPER}} ' . $css_scheme['inner'] . ':hover ' . $css_scheme['button']
+                'selector' => '{{WRAPPER}} ' . $css_scheme['button'] . ':hover'
             )
         );
 

@@ -709,6 +709,9 @@ if ( ! class_exists( 'Cherry_X_Post_Meta' ) ) {
             }
 
             if ( empty( $field['sanitize_callback'] ) ) {
+                if( $field['type'] == 'wysiwyg' ) {
+                    return wp_kses_post($value);
+                }
                 return $this->sanitize_deafult( $value );
             }
 

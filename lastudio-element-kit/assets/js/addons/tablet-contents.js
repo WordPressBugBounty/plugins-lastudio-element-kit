@@ -226,12 +226,12 @@
                     if (elementorFrontend.config.experimentalFeatures.e_font_icon_svg && !elementorFrontend.isEditMode()) {
                         renderedIcon = typeof icon.rendered_tag !== 'undefined' ? icon.rendered_tag : '';
                     } else {
-                        renderedIcon = icon.value ? `<i class="${icon.value}"></i>` : '';
+                        renderedIcon = icon.value ? `<i class="${this.sanitizeAttributeValue(icon.value)}"></i>` : '';
                     }
                 }
 
                 // Open new list/nested list
-                let html = `<${settings.listWrapperTag} class="${settings.classes.listWrapper}">`;
+                let html = `<${settings.listWrapperTag} class="${this.sanitizeAttributeValue(settings.classes.listWrapper)}">`;
 
                 // For each list item, build its markup.
                 while (this.listItemPointer < this.headingsData.length) {
@@ -247,7 +247,7 @@
                     if (level === currentItem.level) {
                         html += `<li class="${settings.classes.listItem}">`;
                         html += `<div class="${settings.classes.listTextWrapper}">`;
-                        let liContent = `<a href="#${currentItem.anchorLink}" class="${listItemTextClasses}">${currentItem.text}</a>`;
+                        let liContent = `<a href="#${this.sanitizeAttributeValue(currentItem.anchorLink)}" class="${this.sanitizeAttributeValue(listItemTextClasses)}">${this.sanitizeHTML(currentItem.text)}</a>`;
 
                         // If list type is bullets, add the bullet icon as an <i> tag
                         if ('bullets' === elementSettings.marker_view && icon) {
@@ -398,6 +398,17 @@
                 if (collapseNestedList && listIsActive) {
                     $list.slideUp();
                 }
+            },
+            sanitizeHTMLAttributes: function ( html ){
+                return html.replace(/on[a-z]+=("|).*?.*("|)([^>]|\s+)/gi, '');
+            },
+            sanitizeHTML: function (str){
+                return str.replace(/[^\w. ]/gi, function (c) {
+                    return '&#' + c.charCodeAt(0) + ';';
+                });
+            },
+            sanitizeAttributeValue: function ( value ){
+                return value.replace(/[^\w\s-:]/gi, '');
             }
         })
 

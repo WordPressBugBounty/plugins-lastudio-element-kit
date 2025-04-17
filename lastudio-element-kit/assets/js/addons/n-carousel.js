@@ -66,13 +66,17 @@
 
         onEditSettingsChange(propertyName) {
             if ('activeItemIndex' === propertyName) {
-                this.swiper.slideToLoop(this.getEditSettings('activeItemIndex') - 1);
+                if(!this.swiper.destroyed) {
+                    this.swiper.slideToLoop(this.getEditSettings('activeItemIndex') - 1);
+                }
             }
         }
 
         updateListeners() {
-            this.swiper.initialized = false;
-            this.swiper.init();
+            if(!this.swiper.destroyed){
+                this.swiper.initialized = false;
+                this.swiper.init();
+            }
         }
 
         async linkContainer(event) {
@@ -109,10 +113,11 @@
                 this.updateIndexValues($slides);
                 const isSwiperActive = this.swiper && !this.swiper.destroyed,
                     hasMultipleSlides = $slides.length > 1;
+
                 if (!isSwiperActive && hasMultipleSlides) {
                     await this.initSwiper();
                 } else if (isSwiperActive && !hasMultipleSlides) {
-                    this.swiper.destroy(true);
+                    this.destroySwiper();
                 }
                 this.updateListeners();
             }
@@ -157,12 +162,14 @@
                 const slidesToShow = this.getResponsiveValue('carousel_columns', dbSettings)
                 const slidesToScroll = this.getResponsiveValue('carousel_to_scroll', dbSettings)
                 const rows = this.getResponsiveValue('carousel_rows', dbSettings)
+                const directionbkp = this.getResponsiveValue('carousel_direction', dbSettings)
                 let oldSettings = this.elements.$carousel.data('slider_options')
                 const newSettings = {
                     ...oldSettings,
                     slidesToScroll,
                     slidesToShow,
                     rows,
+                    directionbkp
                 }
                 this.elements.$carousel.data('slider_options', newSettings)
                 this.destroySwiper()

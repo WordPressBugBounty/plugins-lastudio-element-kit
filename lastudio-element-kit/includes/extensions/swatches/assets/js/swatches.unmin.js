@@ -208,7 +208,7 @@
 
     function la_update_swatches_gallery($form, variation ){
 
-        console.log('here1')
+        console.log('here1', variation)
 
         var $product_selector = $form.closest('.product'),
             $main_image_col = $product_selector.find('.woocommerce-product-gallery.images').parent(),
@@ -257,6 +257,8 @@
         }
 
         $(document).trigger('lastudiokit/woocommerce/before_apply_swatches', $main_image_col);
+
+        console.log({variation, _html, $product})
 
         if (_html !== '' && !$product) {
 
@@ -339,7 +341,7 @@
 
         $form.find('th.label').each(function(){
             var $label = $(this).find('label');
-            $label.append('<span class="swatch-label"></span>');
+            $label.append('<span></span><span class="swatch-label"></span>');
         });
 
         if(is_in_list){

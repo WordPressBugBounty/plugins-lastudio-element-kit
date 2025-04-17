@@ -218,7 +218,6 @@ class Module extends \Elementor\Core\Base\Module {
         /* <![CDATA[ */
         var wc_single_product_params = <?php echo wp_json_encode( array(
           'i18n_required_rating_text' => esc_attr__( 'Please select a rating', 'woocommerce' ),
-          'review_rating_required'    => get_option( 'woocommerce_review_rating_required' ),
           'flexslider'                => apply_filters( 'woocommerce_single_product_carousel_options', array(
             'rtl'            => is_rtl(),
             'animation'      => 'slide',
@@ -232,6 +231,15 @@ class Module extends \Elementor\Core\Base\Module {
           'zoom_enabled'              => 0,
           'photoswipe_enabled'        => 0,
           'flexslider_enabled'        => 1,
+            'i18n_rating_options'               => array(
+                esc_attr__( '1 of 5 stars', 'woocommerce' ),
+                esc_attr__( '2 of 5 stars', 'woocommerce' ),
+                esc_attr__( '3 of 5 stars', 'woocommerce' ),
+                esc_attr__( '4 of 5 stars', 'woocommerce' ),
+                esc_attr__( '5 of 5 stars', 'woocommerce' ),
+            ),
+        'i18n_product_gallery_trigger_text' => esc_attr__( 'View full-screen image gallery', 'woocommerce' ),
+        'review_rating_required'            => wc_review_ratings_required() ? 'yes' : 'no',
         ) );?>;
         /* ]]> */
       </script>

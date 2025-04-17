@@ -806,7 +806,7 @@
                 var _this = _possibleConstructorReturn(this, (_class.__proto__ || Object.getPrototypeOf(_class)).call(this));
 
                 elementorFrontend.hooks.addAction('frontend/element_ready/global', function ($element) {
-                    if( $element.closest('.elementor-lakit-advanced-carousel.elementor-element-edit-mode').length > 0 ){
+                    if( $element.closest('.lakit-carousel').length > 0 ){
                         return;
                     }
                     elementorFrontend.elementsHandler.addHandler(_handler2.default, {$element: $element});

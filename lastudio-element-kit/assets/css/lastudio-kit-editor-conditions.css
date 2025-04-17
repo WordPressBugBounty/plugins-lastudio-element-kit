@@ -502,7 +502,8 @@
   color: #556068;
   -webkit-box-shadow: -4px -3px 20px 1px rgba(0, 0, 0, 0.07);
   box-shadow: -4px -3px 20px 1px rgba(0, 0, 0, 0.07);
-  height: 110px;
+  top: auto !important;
+  bottom: 20px;
   width: 260px;
   padding: 20px 30px;
   border-radius: 3px; }

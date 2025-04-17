@@ -1224,6 +1224,17 @@ class LaStudioKit_Testimonials extends LaStudioKit_Base {
             )
         );
 
+        $this->add_group_control(
+            Group_Control_Border::get_type(),
+            array(
+                'name'        => 'name_border',
+                'label'       => esc_html__( 'Border', 'lastudio-kit' ),
+                'placeholder' => '1px',
+                'default'     => '1px',
+                'selector'    => '{{WRAPPER}} ' . $css_scheme['name']
+            )
+        );
+
         $this->end_controls_section();
 
         /**

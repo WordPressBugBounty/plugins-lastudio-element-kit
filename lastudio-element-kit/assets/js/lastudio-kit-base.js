@@ -205,7 +205,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         'data': {
                             'template_id': templateId,
                             'widget_id' : widgetId,
-                            'dev': ''
+                            'dev': window.LaStudioKitSettings.devMode
                         }
                     }
                 }),
@@ -431,6 +431,7 @@ document.addEventListener('DOMContentLoaded', function () {
         initCarousel: function ($scope) {
 
             let $carousel = $scope.find('.lakit-carousel').first();
+            let $carouseInner = $carousel.find('.lakit-carousel-inner').first();
 
             if ($carousel.length === 0) {
                 return;
@@ -466,16 +467,16 @@ document.addEventListener('DOMContentLoaded', function () {
                 speed: elementSettings.speed,
                 handleElementorBreakpoints: false,
                 slidesPerGroup: parseInt(elementSettings.slidesToScroll.desktop || 1),
-                loopAdditionalSlides: isNestedCarousel ? 0 : 1,
-                loopFillGroupWithBlank: isNestedCarousel ? 0 : 1,
-                loopedSlides: isNestedCarousel ? 4 : 1,
+                loopAdditionalSlides: 4,
+                loopFillGroupWithBlank: true,
+                loopedSlides: 4,
                 preloadImages: false,
                 grid: {
                     rows: e_dRows,
                     fill: 'row'
                 },
+                direction: _directionBase,
                 ...(e_dRows > 1 ? { rewind: elementSettings.infinite, loop: false } : {}),
-                direction: _directionBase
             }
 
             const _bkpData = {}
@@ -485,14 +486,21 @@ document.addEventListener('DOMContentLoaded', function () {
             Object.keys(elementorBreakpoints).reverse().forEach(function (breakpointName) {
                 // Tablet has a specific default `slides_to_show`.
                 let defaultSlidesToShow = 'tablet' === breakpointName ? defaultLGDevicesSlidesCount : lastBreakpointSlidesToShowValue;
+                let _per_view = +elementSettings.slidesToShow[breakpointName] || defaultSlidesToShow;
+                let _per_group = +elementSettings.slidesToScroll[breakpointName] || 1;
+                if(_per_group > _per_view){
+                    _per_group = _per_view;
+                }
+                let _bkp_gRows = +elementSettings.rows[breakpointName] || 1
                 _bkpData[elementorBreakpoints[breakpointName].value] = {
-                    slidesPerView: +elementSettings.slidesToShow[breakpointName] || defaultSlidesToShow,
-                    slidesPerGroup: +elementSettings.slidesToScroll[breakpointName] || 1,
+                    slidesPerView: _per_view,
+                    slidesPerGroup: _per_group,
                     grid: {
-                        rows: +elementSettings.rows[breakpointName] || 1,
+                        rows: _bkp_gRows,
                         fill: 'row'
                     },
-                    direction: elementSettings.directionbkp[breakpointName] || _directionBase
+                    direction: elementSettings.directionbkp[breakpointName] || _directionBase,
+                    loop: _bkp_gRows > 1 ? false : elementSettings.infinite
                 }
                 lastBreakpointSlidesToShowValue = +elementSettings.slidesToShow[breakpointName] || defaultSlidesToShow;
             });
@@ -532,7 +540,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 slidesPerView: swiperOptions.slidesPerView,
                 slidesPerGroup: swiperOptions.slidesPerGroup,
                 grid: swiperOptions.grid,
-                direction: swiperOptions.direction
+                direction: swiperOptions.direction,
+                loop: swiperOptions.loop
             }
 
             swiperOptions.breakpoints = _bkpDataModified;
@@ -564,12 +573,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
             switch (elementSettings.effect) {
                 case 'fade':
-                    if (slidesToShow === 1) {
-                        swiperOptions.effect = elementSettings.effect;
-                        swiperOptions.fadeEffect = {
-                            crossFade: true
-                        };
-                    }
+                    swiperOptions.effect = 'fade';
+                    swiperOptions.fadeEffect = {
+                        crossFade: true
+                    };
                     break;
 
                 case 'coverflow':
@@ -633,16 +640,17 @@ document.addEventListener('DOMContentLoaded', function () {
                 case 'creative':
                     swiperOptions.effect = 'creative';
                     swiperOptions.grabCursor = true;
+                    let _c_translate_x = elementSettings?.creativeEffect?.translateX ?? 100
                     swiperOptions.creativeEffect = {
                         limitProgress: 1,
                         progressMultiplier: 1,
                         prev: {
                             shadow: false,
-                            translate: ["-120%", 0, -500],
+                            translate: ["-"+_c_translate_x+"%", 0, -500],
                         },
                         next: {
                             shadow: false,
-                            translate: ["120%", 0, -500],
+                            translate: [_c_translate_x+"%", 0, -500],
                         },
                     }
                     break;
@@ -690,7 +698,8 @@ document.addEventListener('DOMContentLoaded', function () {
             else {
                 swiperOptions.scrollbar = {
                     el: '.lakit-carousel__scrollbar_' + eUniqueId,
-                    draggable: true
+                    draggable: true,
+                    snapOnRelease: true,
                 }
             }
 
@@ -811,6 +820,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
 
+            let _c_timeout;
+
             swiperOptions.on = {
                 ...swiperOptions?.on,
                 beforeInit: ( _swiper ) => {
@@ -823,9 +834,17 @@ document.addEventListener('DOMContentLoaded', function () {
                         _classFB.push('swiper-container-autoheight');
                     }
                     $swiperContainer.addClass(_classFB)
+                    $carouseInner.addClass('sw--' + _swiper.params.direction)
+                },
+                changeDirection: (_swiper) => {
+                    $carouseInner.removeClass('sw--vertical sw--horizontal').addClass('sw--' + _swiper.params.direction)
                 },
                 afterInit: ( _swiper ) => {
                     $('.swiper-slide-duplicate .lakit-embla_wrap.embla--inited', _swiper.$wrapperEl).removeClass('embla--inited').trigger('lastudio-kit/init-embla-slider');
+                    if(swiperOptions.scrollbar?.el){
+                        $('.swiper-scrollbar-drag', $(swiperOptions.scrollbar?.el)).append('<span/>').wrap('<div class="lakit-carousel__scrollbar-inner"/>')
+                        $(swiperOptions.scrollbar?.el).addClass('la_modified')
+                    }
                 },
                 beforeResize: function (){
                     $('>.swiper-slide', this.$wrapperEl).css('width', '')
@@ -852,10 +871,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     $('[data-carousel-goto="#'+carousel_id+'"][data-carousel-index="'+_swiper.realIndex+'"]').addClass('s-active');
                 },
                 transitionStart: (_swiper) => {
+                    let _max_w = Math.max(..._swiper.slidesSizesGrid),
+                        _min_w = Math.min(..._swiper.slidesSizesGrid);
+
                     if(elementSettings?.variableWidth){
-                        setTimeout(() => {
+                        clearTimeout(_c_timeout)
+                        _c_timeout = setTimeout(() => {
                             _swiper.update()
-                        }, 50)
+                        }, _swiper.params.speed * (_min_w / _max_w) + 80 )
                     }
                 }
             };
@@ -869,7 +892,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             swiperOptions = elementorFrontend.hooks.applyFilters('lastudio-kit/carousel/options', swiperOptions, $scope, carousel_id);
 
-            if(isNestedCarousel && elementorFrontend.isEditMode()){
+            if(elementorFrontend.isEditMode()){
                 delete swiperOptions?.autoplay;
                 swiperOptions.loop = false;
                 swiperOptions.noSwipingSelector = '.swiper-slide > .e-con .elementor-element';
@@ -1125,7 +1148,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         });
                     };
 
-                    let url_request = $('a.next', $parentNav).attr('href').replace(/^\//, '');
+                    let url_request = $('a.next', $parentNav).get(0).href.replace(/^\//, '');
+
+                    console.log({
+                        ajaxType,
+                        url_request,
+                        test: $('a.next', $parentNav).get(0).href
+                    })
 
                     if( ajaxType === 'load_widget' ){
                         let _tmpURL = url_request;
@@ -1960,7 +1989,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 let $nav = $scope.find('.flex-direction-nav');
                 if ($nav.length && $scope.find('.flex-viewport').length) {
-                    $nav.appendTo($scope.find('.flex-viewport'))
+                    // $nav.appendTo($scope.find('.flex-viewport'))
                 }
 
                 let $thumbs = $scope.find('.flex-control-thumbs').get(0);
@@ -2039,9 +2068,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
             let $gallery_target = $scope.find('.woocommerce-product-gallery');
 
-            if ($scope.find('.flex-viewport').length) {
-                $gallery_target.css('--singleproduct-thumbs-maxwidth', $scope.find('.flex-viewport').width())
+            const checkMaxWidth = () => {
+                if ($scope.find('.flex-viewport').length) {
+                    $gallery_target.css('--singleproduct-thumbs-maxwidth', $scope.find('.flex-viewport').width())
+                    const g_thumbs = $scope.find('.flex-control-thumbs').get(0);
+                    if(g_thumbs.scrollWidth > g_thumbs.clientWidth ){
+                        $gallery_target.addClass('e--overflow')
+                    }
+                    else{
+                        $gallery_target.removeClass('e--overflow')
+                    }
+                }
             }
+            checkMaxWidth()
+            window.addEventListener('resize', checkMaxWidth)
 
             let data_columns = parseInt($gallery_target.data('columns'));
             if($galleryWrap.hasClass('layout-type-4')){
@@ -2134,6 +2174,8 @@ document.addEventListener('DOMContentLoaded', function () {
         wooTabs: function ($scope) {
             let $tabs = $scope.find('.wc-tabs-wrapper').first();
             if ($tabs.length) {
+                $('.wc-tab-title a', $tabs).off('click');
+                $('.wc-tabs a', $tabs).off('click');
                 $tabs.wrapInner('<div class="lakit-wc-tabs--content"></div>');
                 $tabs.find('.wc-tabs').wrapAll('<div class="lakit-wc-tabs--controls"></div>');
                 $tabs.find('.lakit-wc-tabs--controls').prependTo($tabs);
@@ -2145,15 +2187,43 @@ document.addEventListener('DOMContentLoaded', function () {
                 $('.wc-tab-title a', $tabs).wrapInner('<span></span>');
                 $('.wc-tab-title a', $tabs).on('click', function (e) {
                     e.preventDefault();
-                    $tabs.find('.wc-tabs').find('li[aria-controls="' + $(this).attr('href').replace('#', '') + '"]').toggleClass('active').siblings().removeClass('active');
+                    let _controlId = $(this).attr('href').replace('#tab-', '')
+                    $tabs.find('.wc-tabs').find('li#tab-title-' + _controlId).toggleClass('active').siblings().removeClass('active');
                     $(this).closest('.wc-tab').toggleClass('active').siblings().removeClass('active');
                 });
+
+                const maybeCenterPos = ($el) => {
+                    const element = $el.get(0);
+                    const container = element.parentElement;
+                    const elementWidth = element.offsetWidth;
+                    const containerWidth = container.offsetWidth;
+                    const elementOffset = element.offsetLeft;
+                    const scrollPosition = elementOffset - (containerWidth / 2) + (elementWidth / 2);
+                    container.scrollTo({
+                        left: scrollPosition,
+                        behavior: 'smooth'
+                    });
+                }
                 $('.wc-tabs li a', $tabs).on('click', function (e) {
                     var $wrapper = $(this).closest('.wc-tabs-wrapper, .woocommerce-tabs');
                     $wrapper.find($(this).attr('href')).addClass('active').siblings().removeClass('active');
+                    maybeCenterPos($(this).closest('li'))
                 });
                 $('.wc-tabs li', $tabs).removeClass('active');
                 $('.wc-tab-title a', $tabs).first().trigger('click');
+
+                const _wc_tabs = $scope.find('.wc-tabs').first().get(0)
+
+                const checkOverflow = () => {
+                    if(_wc_tabs.scrollWidth > _wc_tabs.clientWidth ){
+                        $tabs.addClass('etab--overflow')
+                    }
+                    else{
+                        $tabs.removeClass('etab--overflow')
+                    }
+                }
+                checkOverflow()
+                window.addEventListener('resize', checkOverflow);
             }
         },
         animatedBoxHandler: function ($scope) {
@@ -2268,6 +2338,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     elm.classList.remove('is-loading');
                     elm.classList.add('template-loaded');
                     elm.classList.add('need-reinit-js');
+                    elm.parentNode.classList.add('p-ajax-template-loaded')
                     LaStudioKits.ajaxTemplateHelper.processInsertData($(elm), templateContent, template_id);
                 });
 
@@ -3249,6 +3320,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 try {
                     $scope.find('.lakit-nav:not(.lakit-nav--vertical-sub-bottom)').hoverIntent({
                         over: function () {
+                            console.log('here..')
                             $(this).addClass(hoverClass);
                         },
                         out: function () {
@@ -3308,7 +3380,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 else{
                     destroyDLMenu();
-                    if(!isActiveMbMenu || LaStudioKits.isEditMode()){
+                    if(!isActiveMbMenu || LaStudioKits.isEditMode() || _has_mobile_bkp === 'all'){
                         setupHoverIntent()
                     }
                 }
@@ -4535,10 +4607,10 @@ document.addEventListener('DOMContentLoaded', function () {
         })
 
         elementorFrontend.hooks.addAction(`frontend/element_ready/lakit-banner-list.default`, function ($scope){
-            if( !$scope.hasClass('lakit-thumbnail-mouseover') ){
-                return;
-            }
-            const setPosCallback = () => {
+            const setPositionCallback = () => {
+                if( !$scope.hasClass('lakit-thumbnail-mouseover') ){
+                    return;
+                }
                 $('.lakit-bannerlist__image', $scope).each(function (){
                     const $this = $(this);
                     const elPos = $this.get(0).getBoundingClientRect();
@@ -4550,8 +4622,20 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 })
             }
-            setPosCallback();
-            window.addEventListener('resize', setPosCallback);
+            setPositionCallback();
+            window.addEventListener('resize', setPositionCallback);
+
+            const maybeCloneItems = () => {
+                if( !$scope.hasClass('lakit--banner-duplicate') ){
+                    return;
+                }
+                const $all_item = $('.lakit-bannerlist__item', $scope);
+                const $list_div = $('.lakit-bannerlist__list', $scope);
+                const $clone_items = $all_item.clone(true, true);
+                $list_div.append($clone_items)
+                $list_div.trigger('lastudio-kit/LazyloadSequenceEffects')
+            }
+            maybeCloneItems();
         } )
 
         elementorFrontend.hooks.addFilter('lastudio-kit/carousel/options', function ( swiperOptions, $scope, carousel_id ){

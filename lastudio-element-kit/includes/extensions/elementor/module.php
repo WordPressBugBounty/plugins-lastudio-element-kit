@@ -104,6 +104,7 @@ class Module extends Module_Base {
         $controls_manager->add_group_control( Controls\Group_Control_Related::get_type(),    new Controls\Group_Control_Related() );
         $controls_manager->add_group_control( Controls\Group_Control_Box_Style::get_type(),  new Controls\Group_Control_Box_Style() );
         $controls_manager->add_group_control( Controls\Group_Control_Box_Shadow::get_type(),  new Controls\Group_Control_Box_Shadow() );
+        $controls_manager->add_group_control( Controls\Group_Control_Typography::get_type(),  new Controls\Group_Control_Typography() );
 
         $controls_manager->register( new Controls\Control_Query() );
         $controls_manager->register( new Controls\Control_Search() );

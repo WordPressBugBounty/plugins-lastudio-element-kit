@@ -455,7 +455,9 @@
                     var fxms = 500;
 
                     if ( ! scrolling || Number( new Date() ) - startT > fxms ) {
-                        e.preventDefault();
+                        if(e.cancelable){
+                            e.preventDefault();
+                        }
                         if (!fade && slider.transitions) {
                             if (!slider.vars.animationLoop) {
                                 dx = dx/((slider.currentSlide === 0 && dx < 0 || slider.currentSlide === slider.last && dx > 0) ? (Math.abs(dx)/cwidth+2) : 1);

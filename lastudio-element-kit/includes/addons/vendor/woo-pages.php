@@ -1329,7 +1329,7 @@ class LaStudioKit_Woo_Pages extends LaStudioKit_Base {
 
     $html = str_replace( [ 'woocommerce-form__label-for-checkbox' ], [ 'woocommerce-form__label-for-checkbox checkbox' ], $html );
 
-    if ( 'woocommerce_checkout' === $this->get_settings_for_display( 'element' ) && ( '<div class="woocommerce"></div>' === $html || '<div class="woocommerce"><div class="woocommerce-notices-wrapper"></div></div>' === $html ) ) {
+    if ( 'woocommerce_checkout' === $element && ( '<div class="woocommerce"></div>' === $html || '<div class="woocommerce"><div class="woocommerce-notices-wrapper"></div></div>' === $html ) ) {
       $html = '<div class="woocommerce">';
       ob_start();
       wc_get_template( 'cart/cart-empty.php' );
@@ -1337,7 +1337,15 @@ class LaStudioKit_Woo_Pages extends LaStudioKit_Base {
       $html .= '</div>';
     }
 
+    if( in_array( $element, ['la_wishlist', 'la_compare'] ) ) {
+        echo '<div class="woocommerce">';
+    }
+
     echo $html;
+
+      if( in_array( $element, ['la_wishlist', 'la_compare'] ) ) {
+          echo '</div>';
+      }
 
     $this->remove_products_post_class_filter();
   }

@@ -157,13 +157,6 @@ class Nested_Carousel extends Widget_Nested_Base {
             'selectors'  => array(
                 '{{WRAPPER}} .swiper-wrapper-{{ID}}' => '--e-c-col:{{VALUE}}',
             ),
-            'frontend_available' => true,
-        ]);
-        $this->update_responsive_control('carousel_to_scroll', [
-            'frontend_available' => true,
-        ]);
-        $this->update_responsive_control('carousel_rows', [
-            'frontend_available' => true,
         ]);
 
         $css_scheme = apply_filters(
@@ -482,6 +475,7 @@ class Nested_Carousel extends Widget_Nested_Base {
             autoHeight: filterVarBoolean(settings['carousel_autoheight']),
             scrollbar: filterVarBoolean(settings['carousel_scrollbar']),
             slidesToShow: getResponsiveValue('carousel_columns', settings),
+            directionbkp: getResponsiveValue('carousel_direction', settings),
         }
 
         if(filterVarBoolean(settings['enable_swiper_item_auto_width'])){

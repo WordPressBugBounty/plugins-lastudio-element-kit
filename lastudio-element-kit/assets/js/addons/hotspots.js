@@ -139,7 +139,13 @@ class LaStudioKit_Hotspots extends elementorModules.frontend.handlers.Base {
         } );
 
         const setupFakePos = () => {
-            this.elements.$tooltip.each(function (index, element){
+
+            let $tooltipA = this.elements.$tooltip;
+            if(this.$element.closest('.swiper-slide').length > 0){
+                $tooltipA = this.$element.closest('.swiper-slide.swiper-slide-visible').find('.lakit-hotspot__tooltip')
+            }
+
+            $tooltipA.each(function (index, element){
                 let $_elFake = jQuery('.elementor-element-fake.elementor-element-'+self.getID()+' .lakit-hotspot__tooltip[data-id='+element.getAttribute('data-id')+']');
                 if(LaStudioKits.isInViewport(element)){
                     self.setupPositionForRelativeToolTip( jQuery(element), $_elFake );
@@ -183,9 +189,7 @@ class LaStudioKit_Hotspots extends elementorModules.frontend.handlers.Base {
     }
 
     setupPositionForRelativeToolTip( $currentElement, $relativeElement ){
-
         let elPos = $currentElement.get(0).getBoundingClientRect();
-
         let cssObj = {
             'left': elPos.left,
             'top': elPos.top,

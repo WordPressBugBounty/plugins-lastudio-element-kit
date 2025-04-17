@@ -33,6 +33,10 @@ class General_Extensions {
 		return $data;
 	}
 
+    /**
+     * @param \Elementor\Element_Base $stack
+     * @return void
+     */
 	public function add_render_attributes( $stack ){
         global $lakit_is_header_loc;
 		$classes = [];

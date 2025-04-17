@@ -1177,11 +1177,28 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 
 		public function ajax_get_elementor_widget( $request ){
 			$helper = \LaStudioKit\Template_Helper::get_instance();
+            $widget_args = $request['widget_args'] ?? [];
+            $wc_filters = [];
+            if(!empty($_GET)){
+                foreach ($_GET as $key => $value){
+                    $_tmp_key = strtolower($key);
+                    if(strpos($_tmp_key, 'filter_') !== false){
+                        $wc_filters[$_tmp_key] = $value;
+                    }
+                }
+            }
+            $is_dev = !empty($request['dev']) && LaStudio_Kit_Helper::string_to_bool($request['dev']);
+            /**
+             * disable cache if is wc filters
+             */
+            if(!empty($wc_filters)){
+                $is_dev = true;
+            }
 			$args = [
 				'template_id' => !empty($request['template_id']) ? absint($request['template_id']) : false,
 				'widget_id' => !empty($request['widget_id']) ? $request['widget_id'] : false,
-				'widget_args' => !empty($request['widget_args']) ? $request['widget_args'] : false,
-				'dev' => !empty($request['dev']) ? $request['dev'] : false
+				'widget_args' => !empty($widget_args) ? $widget_args : false,
+				'dev' => $is_dev
 			];
 			return $helper->widget_callback($args, 'ajax');
 		}

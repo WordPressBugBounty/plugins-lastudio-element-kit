@@ -58,6 +58,14 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
         $menus   = $this->get_available_menus();
         $default = '';
 
+        $text_decoration = [
+            '' => esc_html__( 'Default', 'elementor' ),
+            'underline' => esc_html_x( 'Underline', 'Typography Control', 'elementor' ),
+            'overline' => esc_html_x( 'Overline', 'Typography Control', 'elementor' ),
+            'line-through' => esc_html_x( 'Line Through', 'Typography Control', 'elementor' ),
+            'none' => esc_html__( 'None', 'elementor' ),
+        ];
+
         if ( ! empty( $menus ) ) {
             $ids     = array_keys( $menus );
             $default = $ids[0];
@@ -1119,7 +1127,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
         );
 
         $this->_add_group_control(
-            Group_Control_Typography::get_type(),
+            \LaStudioKitExtensions\Elementor\Controls\Group_Control_Typography::get_type(),
             array(
                 'name'     => 'nav_items_typography',
                 'selector' => '{{WRAPPER}} .lakit-nav-id-{{ID}} > .menu-item-link-top .lakit-nav-link-text',
@@ -1205,7 +1213,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
         );
 
         $this->_add_group_control(
-            Group_Control_Typography::get_type(),
+            \LaStudioKitExtensions\Elementor\Controls\Group_Control_Typography::get_type(),
             array(
                 'name'     => 'nav_items_typography_hover',
                 'selector' => '{{WRAPPER}} .lakit-nav-id-{{ID}}:hover > .menu-item-link-top .lakit-nav-link-text',
@@ -1291,7 +1299,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
         );
 
         $this->_add_group_control(
-            Group_Control_Typography::get_type(),
+            \LaStudioKitExtensions\Elementor\Controls\Group_Control_Typography::get_type(),
             array(
                 'name'     => 'nav_items_typography_active',
                 'selector' => '{{WRAPPER}} .lakit-nav-id-{{ID}}.current-menu-item > .menu-item-link-top .lakit-nav-link-text',
@@ -1557,11 +1565,23 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
             75
         );
 
+        $this->_add_responsive_control(
+            'sub_items_container_padding_1st',
+            array(
+                'label'      => esc_html__( '1st Level Sub Padding', 'lastudio-kit' ),
+                'type'       => Controls_Manager::DIMENSIONS,
+                'size_units' => array( 'px', '%', 'em' ),
+                'selectors'  => array(
+                    '{{WRAPPER}} .lakit-nav-id-{{ID}} > .lakit-nav__sub.lakit-nav-depth-0' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ),
+            ),
+            25
+        );
 
         $this->_add_responsive_control(
             'sub_items_container_padding',
             array(
-                'label'      => esc_html__( 'Padding', 'lastudio-kit' ),
+                'label'      => esc_html__( 'Sub-Level Padding', 'lastudio-kit' ),
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => array( 'px', '%', 'em' ),
                 'selectors'  => array(
@@ -1584,6 +1604,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
                     ),
                 ),
                 'selectors'  => array(
+                    '{{WRAPPER}} .lakit-nav--horizontal .lakit-nav-id-{{ID}} > .menu-item-link' => '--mm-dd-gap: {{SIZE}}{{UNIT}};',
                     '{{WRAPPER}} .lakit-nav--horizontal .lakit-nav-id-{{ID}} > .lakit-nav-depth-0' => 'margin-top: {{SIZE}}{{UNIT}};',
                     '{{WRAPPER}} .lakit-nav--vertical-sub-left-side .lakit-nav-id-{{ID}} > .lakit-nav-depth-0' => 'margin-right: {{SIZE}}{{UNIT}};',
                     '{{WRAPPER}} .lakit-nav--vertical-sub-right-side .lakit-nav-id-{{ID}} > .lakit-nav-depth-0' => 'margin-left: {{SIZE}}{{UNIT}};',
@@ -1630,7 +1651,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
                     ),
                 ),
                 'selectors'  => array(
-                    '{{WRAPPER}} .lakit-nav-depth-0 .lakit-nav-id-{{ID}} > .lakit-nav__sub' => 'margin-left: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .lakit-nav-depth-0 .lakit-nav-id-{{ID}} > .lakit-nav__sub' => '--lakit-nav-lv2-gap:{{SIZE}}{{UNIT}} ;margin-left: {{SIZE}}{{UNIT}};',
                     '{{WRAPPER}} .lakit-nav--vertical-sub-left-side .lakit-nav-depth-0 .lakit-nav-id-{{ID}} > .lakit-nav__sub' => 'margin-right: {{SIZE}}{{UNIT}}; margin-left: 0;',
                 ),
                 'conditions' => array(
@@ -1673,7 +1694,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
         );
 
         $this->_add_group_control(
-            Group_Control_Typography::get_type(),
+            \LaStudioKitExtensions\Elementor\Controls\Group_Control_Typography::get_type(),
             array(
                 'name'     => 'sub_items_typography',
                 'selector' => '{{WRAPPER}} .lakit-nav-id-{{ID}} > .menu-item-link-sub .lakit-nav-link-text',
@@ -2284,7 +2305,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
             array(
                 'label' => esc_html__( 'Width', 'lastudio-kit' ),
                 'type'  => Controls_Manager::SLIDER,
-                'size_units' => array( 'px', '%' ),
+                'size_units' => array( 'px', '%', 'vw', 'custom' ),
                 'range' => array(
                     'px' => array(
                         'min' => 150,
@@ -2365,6 +2386,47 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
 		    )
 	    );
 
+        $this->_add_responsive_control(
+            'mobile_menu_padding',
+            array(
+                'label'      => esc_html__( 'Padding', 'lastudio-kit' ),
+                'type'       => Controls_Manager::DIMENSIONS,
+                'size_units' => array( 'px', '%' ),
+                'selectors'  => array(
+                    '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav-{{ID}}' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ),
+            ),
+            25
+        );
+        $this->_add_group_control(
+            Group_Control_Border::get_type(),
+            array(
+                'name'        => 'mobile_menu_border',
+                'label'       => esc_html__( 'Border', 'lastudio-kit' ),
+                'placeholder' => '1px',
+                'selector'    => '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav-{{ID}}',
+            ),
+            75
+        );
+        $this->_add_group_control(
+            Group_Control_Box_Shadow::get_type(),
+            array(
+                'name'     => 'mobile_menu_box_shadow',
+                'selector' => '{{WRAPPER}} .lakit-active--mbmenu.lakit-mobile-menu-active .lakit-nav-{{ID}}',
+            ),
+            75
+        );
+
+        $this->_add_control(
+            'heading__mobile_lv0',
+            array(
+                'label'     => esc_html__( 'Top-level', 'lastudio-kit' ),
+                'type'      => Controls_Manager::HEADING,
+                'separator' => 'before',
+            ),
+            75
+        );
+
         $this->_add_control(
             'mobile_menu_bg_color',
             array(
@@ -2418,42 +2480,110 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
                 'label' => esc_html__( 'Menu Item Active Background Color', 'lastudio-kit' ),
                 'type'  => Controls_Manager::COLOR,
                 'selectors' => array(
-	                '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav-id-{{ID}}:hover > .menu-item-link-top' => 'background-color: {{VALUE}};',
-	                '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav-id-{{ID}}.current-menu-item > .menu-item-link-top' => 'background-color: {{VALUE}};',
+                    '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav-id-{{ID}}:hover > .menu-item-link-top' => 'background-color: {{VALUE}};',
+                    '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav-id-{{ID}}.current-menu-item > .menu-item-link-top' => 'background-color: {{VALUE}};',
                 ),
             ),
             25
         );
 
-        $this->_add_responsive_control(
-            'mobile_menu_padding',
+        $this->_add_control(
+            'lakit_override_mb_sub',
+            [
+                'label'     => esc_html__( 'Override Sub-level', 'lastudio-kit' ),
+                'type'      => Controls_Manager::SWITCHER,
+                'label_on'  => esc_html__( 'Yes', 'lastudio-kit' ),
+                'label_off' => esc_html__( 'No', 'lastudio-kit' ),
+                'return_value' => 'yes',
+                'default'   => '',
+                'prefix_class' => 'enav-override-submenu-',
+            ]
+        );
+
+
+        $this->_add_control(
+            'heading__mobile_lv1',
             array(
-                'label'      => esc_html__( 'Padding', 'lastudio-kit' ),
-                'type'       => Controls_Manager::DIMENSIONS,
-                'size_units' => array( 'px', '%' ),
-                'selectors'  => array(
-                    '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav-{{ID}}' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                'label'     => esc_html__( 'Sub-level', 'lastudio-kit' ),
+                'type'      => Controls_Manager::HEADING,
+                'separator' => 'before',
+                'condition' => array(
+                    'lakit_override_mb_sub' => 'yes',
+                ),
+            ),
+            75
+        );
+        $this->_add_control(
+            'mv_lv1_menu_bg_color',
+            array(
+                'label' => esc_html__( 'Background color', 'lastudio-kit' ),
+                'type'  => Controls_Manager::COLOR,
+                'selectors' => array(
+                    '{{WRAPPER}} .lakit-active--mbmenu' => '--enav-mb-navsub-bg: {{VALUE}};',
+                ),
+                'condition' => array(
+                    'lakit_override_mb_sub' => 'yes',
                 ),
             ),
             25
         );
-        $this->_add_group_control(
-            Group_Control_Border::get_type(),
+
+        $this->_add_control(
+            'mv_lv1_menu_item_text_color',
             array(
-                'name'        => 'mobile_menu_border',
-                'label'       => esc_html__( 'Border', 'lastudio-kit' ),
-                'placeholder' => '1px',
-                'selector'    => '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav-{{ID}}',
+                'label' => esc_html__( 'Menu Item Color', 'lastudio-kit' ),
+                'type'  => Controls_Manager::COLOR,
+                'selectors' => array(
+                    '{{WRAPPER}} .lakit-active--mbmenu' => '--enav-mb-lv1-color: {{VALUE}};',
+                ),
+                'condition' => array(
+                    'lakit_override_mb_sub' => 'yes',
+                ),
             ),
-            75
+            25
         );
-        $this->_add_group_control(
-            Group_Control_Box_Shadow::get_type(),
+        $this->_add_control(
+            'mv_lv1_menu_item_bg_color',
             array(
-                'name'     => 'mobile_menu_box_shadow',
-                'selector' => '{{WRAPPER}} .lakit-active--mbmenu.lakit-mobile-menu-active .lakit-nav-{{ID}}',
+                'label' => esc_html__( 'Menu Item Background Color', 'lastudio-kit' ),
+                'type'  => Controls_Manager::COLOR,
+                'selectors' => array(
+                    '{{WRAPPER}} .lakit-active--mbmenu' => '--enav-mb-lv1-bg: {{VALUE}};',
+                ),
+                'condition' => array(
+                    'lakit_override_mb_sub' => 'yes',
+                ),
             ),
-            75
+            25
+        );
+
+        $this->_add_control(
+            'mv_lv1_menu_item_text_color_hover',
+            array(
+                'label' => esc_html__( 'Menu Item Active Color', 'lastudio-kit' ),
+                'type'  => Controls_Manager::COLOR,
+                'selectors' => array(
+                    '{{WRAPPER}} .lakit-active--mbmenu' => '--enav-mb-lv1-color-active: {{VALUE}};',
+                ),
+                'condition' => array(
+                    'lakit_override_mb_sub' => 'yes',
+                ),
+            ),
+            25
+        );
+        $this->_add_control(
+            'mv_lv1_menu_item_bg_color_hover',
+            array(
+                'label' => esc_html__( 'Menu Item Active Background Color', 'lastudio-kit' ),
+                'type'  => Controls_Manager::COLOR,
+                'selectors' => array(
+                    '{{WRAPPER}} .lakit-active--mbmenu' => '--enav-mb-lv1-bg-active: {{VALUE}};',
+                ),
+                'condition' => array(
+                    'lakit_override_mb_sub' => 'yes',
+                ),
+            ),
+            25
         );
 
         $this->_add_control(

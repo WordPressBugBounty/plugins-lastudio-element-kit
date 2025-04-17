@@ -181,7 +181,7 @@ class Header_Vertical {
             'lakit_header_vertical_disable_on',
             array(
                 'label'   => esc_html__( 'Disable Vertical Header On', 'lastudio-kit' ),
-                'type'    => Controls_Manager::SELECT,
+                'type'    => \Elementor\Controls_Manager::SELECT,
                 'default' => 'tablet',
                 'options' => lastudio_kit_helper()->get_active_breakpoints(false, true),
                 'condition' => array(
@@ -259,6 +259,21 @@ class Header_Vertical {
                 'separator' => 'before',
 			]
 		);
+        $stack->add_control(
+            'lakit_doc_header_transparency_disable_on',
+            [
+                'label' => esc_html__( 'Disable on', 'lastudio-kit' ),
+                'type' => \Elementor\Controls_Manager::SELECT,
+                'description' => esc_html__( 'Note: Choose at which breakpoint the header transparent will be automatically disabled.', 'lastudio-kit' ),
+                'options' => [
+                        'none' => esc_html__( 'None', 'lastudio-kit' )
+                    ] + lastudio_kit_helper()->get_active_breakpoints(false, true),
+                'default' => 'none',
+                'condition' => [
+                    'lakit_doc_enable_header_transparency' => 'yes'
+                ]
+            ]
+        );
 		$stack->add_control(
 			'lakit_doc_header_transparency_note',
 			[
@@ -520,13 +535,30 @@ class Header_Vertical {
 		preg_match('/elementor-page-(\d+)/i', $tmp, $matches);
 		if(!empty($matches[1])){
 			$settings = get_post_meta( $matches[1], '_elementor_page_settings', true );
-			if(!empty($settings['lakit_doc_enable_header_transparency']) && $settings['lakit_doc_enable_header_transparency'] == 'yes'){
+            $enable_h_transparency = $settings['lakit_doc_enable_header_transparency'] ?? '';
+            $disable_on = $settings['lakit_doc_header_transparency_disable_on'] ?? 'none';
+            $swap_logo = $settings['lakit_doc_swap_logo'] ?? '';
+			if($enable_h_transparency === 'yes'){
 				$classes[] = 'lakitdoc-enable-header-transparency';
 				$classes[] = 'lakitdoc-h-t';
-				if(!empty($settings['lakit_doc_swap_logo']) && $settings['lakit_doc_swap_logo'] == 'yes'){
+				if($swap_logo === 'yes'){
 					$classes[] = 'lakitdoc-swap-logo';
 					$classes[] = 'lakitdoc-s-l';
 				}
+                if(!empty($disable_on)){
+                    $breakpoints = lastudio_kit_helper()->get_active_breakpoints(false, false);
+                    if(isset($breakpoints[$disable_on])){
+                        $classes[] = 'lakitdoc-ht-bkp-'.esc_attr($breakpoints[$disable_on]);
+                        if(wp_is_mobile()){
+                            if (($key = array_search('lakitdoc-enable-header-transparency', $classes)) !== false) {
+                                unset($classes[$key]);
+                            }
+                            if (($key = array_search('lakitdoc-h-t', $classes)) !== false) {
+                                unset($classes[$key]);
+                            }
+                        }
+                    }
+                }
 			}
             $classes[] = 'lakit--enabled';
 		}
@@ -536,7 +568,7 @@ class Header_Vertical {
 
     public function wp_body_open(){
         ?>
-        <script>document?.body?.classList?.remove('lakit-nojs')</script>
+        <script>const lakitCheckHeaderTransparency=()=>{document.body.classList.remove("lakit-nojs");let e=document.body.className.match(/lakitdoc-ht-bkp-(\d+)/i);e=e?.length>1?parseInt(e[1]):0,e>0&&(window.innerWidth>e?document.body.classList.add("lakitdoc-enable-header-transparency","lakitdoc-h-t"):document.body.classList.remove("lakitdoc-enable-header-transparency","lakitdoc-h-t"))};lakitCheckHeaderTransparency(),window.addEventListener("resize",lakitCheckHeaderTransparency);</script>
         <?php
     }
 

@@ -1,3 +1,6 @@
+.enable-c-height-true .lakit-bannerlist__link:hover .lakit-bannerlist__image .lakit-bannerlist__image-instance, .lakit-bannerlist__link:hover .lakit-bannerlist__image {
+  padding: var(--lakit-bannerlist-image-hover-padding, var(--lakit-bannerlist-image-padding))
+}
 .lakit-bannerlist {
   --e_bnl-text-align: center;
   --e_bnl-align: center;
@@ -28,7 +31,8 @@
 }
 .lakit-bannerlist__image:before {
   content: '';
-  display: block
+  display: block;
+  padding-bottom: var(--e_bnl-pb, 0)
 }
 .lakit-bannerlist__image-instance {
   width: 100%;
@@ -45,11 +49,11 @@
   transform: scale(var(--lakit-bannerlist-image-scale-hover, 1.15))
 }
 .lakit-bannerlist__link:hover .lakit-bannerlist__image {
-  padding: var(--lakit-bannerlist-image-hover-padding, var(--lakit-bannerlist-image-padding));
   border-radius: var(--lakit-bannerlist-image-hover-radius, var(--lakit-bannerlist-image-radius))
 }
 .lakit-bannerlist__content-inner {
   width: var(--lakit-bannerlist-content-width, auto);
+  height: var(--lakit-bannerlist-content-height, auto);
   max-width: 100%;
   padding: var(--lakit-bannerlist-content-padding, 0);
   margin: var(--lakit-bannerlist-content-margin, 0);
@@ -68,9 +72,6 @@
 }
 .enable-c-height-true .lakit-bannerlist__image .lakit-bannerlist__image-instance {
   padding: var(--lakit-bannerlist-image-padding)
-}
-.enable-c-height-true .lakit-bannerlist__link:hover .lakit-bannerlist__image .lakit-bannerlist__image-instance {
-  padding: var(--lakit-bannerlist-image-hover-padding, var(--lakit-bannerlist-image-padding))
 }
 .lakit-bannerlist.layout-type-overlay .lakit-bannerlist__content {
   position: absolute;
@@ -141,7 +142,7 @@
 }
 .lakit-bannerlist__inner {
   text-align: var(--e_bnl-text-align);
-  transition: all .3s
+  transition: .3s
 }
 .bannerlist--preset-flat02 .lakit-bannerlist__link {
   display: flex;
@@ -162,10 +163,10 @@
   padding-bottom: 0 !important
 }
 .lakit-bannerlist__icon {
-  display: inline-flex;
+  display: inline-flex
 }
 .lakit-bannerlist__icon svg {
   width: 1em;
   height: auto;
-  vertical-align: top;
+  vertical-align: top
 }

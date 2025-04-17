@@ -74,6 +74,9 @@ class Module extends \Elementor\Core\Base\Module {
 			case 'nav_menu':
                 $content = $this->render_nav_menu($nav_menu, $inline);
                 break;
+            case 'brand_list':
+                $content = $this->render_brand_filter($type, $show_count);
+                break;
         }
         return $content;
     }
@@ -191,6 +194,7 @@ class Module extends \Elementor\Core\Base\Module {
                 'total'    => $main_query->found_posts,
                 'per_page' => $main_query->get('posts_per_page'),
                 'current'  => $paginated ? (int) max( 1, $main_query->get( 'paged', 1 ) ) : 1,
+                'orderedby' => ''
             );
             wc_get_template( 'loop/result-count.php', $args );
         }
@@ -535,6 +539,40 @@ class Module extends \Elementor\Core\Base\Module {
         return ob_get_clean();
     }
 
+    protected function render_brand_filter( $query_type = '', $show_count = false  ){
+
+        if(empty($query_type)){
+            $query_type = 'and';
+        }
+
+        $_chosen_attributes = \WC_Query::get_layered_nav_chosen_attributes();
+        $taxonomy           = 'product_brand';
+
+        if ( ! taxonomy_exists( $taxonomy ) ) {
+            return '';
+        }
+
+        $terms = get_terms( $taxonomy, array( 'hide_empty' => '1' ) );
+
+        if ( 0 === count( $terms ) ) {
+            return '';
+        }
+
+        ob_start();
+
+        $found = $this->layered_nav_brand_list( $terms, $taxonomy, $query_type, $show_count );
+
+        // Force found when option is selected - do not force found on taxonomy attributes.
+        if ( ! is_tax() && is_array( $_chosen_attributes ) && array_key_exists( $taxonomy, $_chosen_attributes ) ) {
+            $found = true;
+        }
+
+        if(!$found){
+            return '';
+        }
+        return ob_get_clean();
+    }
+
     protected function render_activate_filters(){
 
         ob_start();
@@ -746,7 +784,7 @@ class Module extends \Elementor\Core\Base\Module {
      * @return int
      */
     protected function get_current_term_slug() {
-        return absint( is_tax() ? get_queried_object()->slug : 0 );
+        return is_tax() ? get_queried_object()->slug : '';
     }
 
     protected function layered_nav_list( $terms, $taxonomy, $query_type, $show_count ) {
@@ -932,5 +970,92 @@ class Module extends \Elementor\Core\Base\Module {
         $base_shop_url = add_query_arg(null, null);
         $base_shop_url = remove_query_arg(array('page', 'paged', 'mode_view', 'la_doing_ajax'), $base_shop_url);
         return preg_replace( '/\/page\/\d+/', '', $base_shop_url );
+    }
+
+    protected function layered_nav_brand_list( $terms, $taxonomy, $query_type, $show_count ) {
+        // List display.
+
+        echo '<ul class="lakit-woofilters-ul">';
+
+        $filter_name = 'filter_product_brand';
+
+        $term_counts        = $this->get_filtered_term_product_counts( wp_list_pluck( $terms, 'term_id' ), $taxonomy, $query_type );
+        $_chosen_attributes = [];
+        $found              = false;
+        $base_link          = $this->get_current_url();
+        if( !empty($_GET[$filter_name]) ){
+            $_chosen_attributes = wp_parse_id_list(wc_clean( wp_unslash( $_GET[$filter_name] ) ));
+        }
+
+        foreach ( $terms as $term ) {
+            $current_values = ! empty( $_chosen_attributes ) ? $_chosen_attributes : array();
+            $option_is_set  = in_array( $term->term_id, $current_values, true );
+            $count          = $term_counts[$term->term_id] ?? 0;
+
+            // Skip the term for the current archive.
+            if ( $this->get_current_term_id() === $term->term_id ) {
+                continue;
+            }
+
+            // Only show options with count > 0.
+            if ( 0 < $count ) {
+                $found = true;
+            }
+            elseif ( 0 === $count && ! $option_is_set ) {
+                continue;
+            }
+
+            $current_filter = $current_values;
+
+            if ( ! in_array( $term->term_id, $current_filter, true ) ) {
+                $current_filter[] = $term->term_id;
+            }
+
+            $link = remove_query_arg( $filter_name, $base_link );
+
+            // Add current filters to URL.
+            foreach ( $current_filter as $key => $value ) {
+                // Exclude query arg for current term archive term.
+                if ( $value === $this->get_current_term_id() ) {
+                    unset( $current_filter[ $key ] );
+                }
+
+                // Exclude self so filter can be unset on click.
+                if ( $option_is_set && $value === $term->term_id ) {
+                    unset( $current_filter[ $key ] );
+                }
+            }
+
+            if ( ! empty( $current_filter ) ) {
+                $link = add_query_arg(
+                    array(
+                        'filtering'  => '1',
+                        $filter_name => implode( ',', $current_filter ),
+                    ),
+                    $link
+                );
+            }
+
+            if ( $count > 0 || $option_is_set ) {
+                $link      = apply_filters( 'woocommerce_layered_nav_link', $link, $term, $taxonomy );
+                $term_html = '<a rel="nofollow" href="' . esc_url( $link ) . '">' . esc_html( $term->name ) . '</a>';
+            } else {
+                $link      = false;
+                $term_html = '<span>' . esc_html( $term->name ) . '</span>';
+            }
+
+            if($show_count){
+                $term_html .= ' ' . apply_filters( 'woocommerce_layered_nav_count', '<span class="count">' . absint( $count ) . '</span>', $count, $term );
+            }
+
+            echo '<li class="' . ( $option_is_set ? 'active' : '' ) . '">';
+            // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.EscapeOutput.OutputNotEscaped
+            echo apply_filters( 'woocommerce_layered_nav_brand_html', $term_html, $term, $link, $count );
+            echo '</li>';
+        }
+
+        echo '</ul>';
+
+        return $found;
     }
 }

@@ -135,6 +135,48 @@ class LaStudioKit_Subscribe_Form extends LaStudioKit_Base {
             )
         );
 
+        $repeater->add_responsive_control(
+            'order',
+            [
+                'label'      => esc_html__( 'Order', 'lastudio-kit' ),
+                'type'       => Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'range'      => array(
+                    'px' => array(
+                        'min' => -10,
+                        'max' => 10,
+                    ),
+                ),
+                'selectors'  => array(
+                    '{{WRAPPER}} {{CURRENT_ITEM}}'=> 'order: {{SIZE}};',
+                ),
+            ]
+        );
+
+        $repeater->add_responsive_control(
+            'width',
+            [
+                'label'      => esc_html__( 'Width', 'lastudio-kit' ),
+                'type'       => Controls_Manager::SLIDER,
+                'size_units' => array(
+                    'px', 'em', '%',
+                ),
+                'range'      => array(
+                    'px' => array(
+                        'min' => 10,
+                        'max' => 1000,
+                    ),
+                    '%' => array(
+                        'min' => 0,
+                        'max' => 100,
+                    ),
+                ),
+                'selectors'  => array(
+                    '{{WRAPPER}} {{CURRENT_ITEM}}.lakit-subscribe-form__input'=> 'width: {{SIZE}}{{UNIT}};',
+                ),
+            ]
+        );
+
         $this->add_control(
             'additional_fields',
             [
@@ -236,42 +278,148 @@ class LaStudioKit_Subscribe_Form extends LaStudioKit_Base {
             )
         );
 
-        $this->add_control(
-            'layout',
-            array(
-                'label'   => esc_html__( 'Layout', 'lastudio-kit' ),
-                'type'    => Controls_Manager::SELECT,
-                'default' => 'inline',
-                'options' => array(
-                    'inline' => esc_html__( 'Inline', 'lastudio-kit' ),
-                    'block'  => esc_html__( 'Block', 'lastudio-kit' ),
+        if( lastudio_kit()->get_theme_support('elementor::newsletter-v2') ){
+            $this->add_responsive_control(
+                'layout',
+                [
+                    'label' => esc_html_x( 'Layout', 'Flex Container Control', 'lastudio-kit'),
+                    'type' => Controls_Manager::CHOOSE,
+                    'options' => [
+                        'inline' => [
+                            'title' => esc_html_x( 'Inline', 'Flex Container Control', 'lastudio-kit' ),
+                            'icon' => 'eicon-arrow-right',
+                        ],
+                        'block' => [
+                            'title' => esc_html_x( 'Block', 'Flex Container Control', 'lastudio-kit' ),
+                            'icon' => 'eicon-arrow-down',
+                        ],
+                    ],
+                    'selectors_dictionary' => [
+                        'inline'    => '--lakit-newsletter-direction: row;',
+                        'block'     => '--lakit-newsletter-direction: column;',
+                    ],
+                    'selectors' => [
+                        '{{WRAPPER}}' => '{{VALUE}};',
+                    ]
+                ]
+            );
+            $this->add_responsive_control(
+                'v2_justify_content',
+                [
+                    'label' => esc_html_x( 'Justify Content', 'Flex Container Control', 'lastudio-kit' ),
+                    'type' => Controls_Manager::CHOOSE,
+                    'label_block' => true,
+                    'default' => '',
+                    'options' => [
+                        'flex-start' => [
+                            'title' => esc_html_x( 'Flex Start', 'Flex Container Control', 'lastudio-kit' ),
+                            'icon' => 'eicon-flex eicon-justify-start-h',
+                        ],
+                        'center' => [
+                            'title' => esc_html_x( 'Center', 'Flex Container Control', 'lastudio-kit' ),
+                            'icon' => 'eicon-flex eicon-justify-center-h',
+                        ],
+                        'flex-end' => [
+                            'title' => esc_html_x( 'Flex End', 'Flex Container Control', 'lastudio-kit' ),
+                            'icon' => 'eicon-flex eicon-justify-end-h',
+                        ],
+                        'space-between' => [
+                            'title' => esc_html_x( 'Space Between', 'Flex Container Control', 'lastudio-kit' ),
+                            'icon' => 'eicon-flex eicon-justify-space-between-h',
+                        ],
+                        'space-around' => [
+                            'title' => esc_html_x( 'Space Around', 'Flex Container Control', 'lastudio-kit' ),
+                            'icon' => 'eicon-flex eicon-justify-space-around-h',
+                        ],
+                        'space-evenly' => [
+                            'title' => esc_html_x( 'Space Evenly', 'Flex Container Control', 'lastudio-kit' ),
+                            'icon' => 'eicon-flex eicon-justify-space-evenly-h',
+                        ],
+                    ],
+                    'selectors' => [
+                        '{{WRAPPER}}' => '--lakit-newsletter-justify-content: {{VALUE}};',
+                    ],
+                ]
+            );
+            $this->add_responsive_control(
+                'v2_align_items',
+                [
+                    'label' => esc_html_x( 'Align Items', 'Flex Container Control', 'lastudio-kit' ),
+                    'type' => Controls_Manager::CHOOSE,
+                    'label_block' => true,
+                    'default' => '',
+                    'options' => [
+                        'flex-start' => [
+                            'title' => esc_html_x( 'Start', 'Flex Container Control', 'lastudio-kit' ),
+                            'icon' => 'eicon-flex eicon-align-start-v',
+                        ],
+                        'center' => [
+                            'title' => esc_html_x( 'Center', 'Flex Container Control', 'lastudio-kit' ),
+                            'icon' => 'eicon-flex eicon-align-center-v',
+                        ],
+                        'flex-end' => [
+                            'title' => esc_html_x( 'Flex End', 'Flex Container Control', 'lastudio-kit' ),
+                            'icon' => 'eicon-flex eicon-align-end-v',
+                        ],
+                        'stretch' => [
+                            'title' => esc_html_x( 'Stretch', 'Flex Container Control', 'lastudio-kit' ),
+                            'icon' => 'eicon-flex eicon-align-stretch-v',
+                        ],
+                    ],
+                    'selectors' => [
+                        '{{WRAPPER}}' => '--lakit-newsletter-align-items: {{VALUE}};',
+                    ],
+                ]
+            );
+            $this->add_responsive_control(
+                'gap',
+                [
+                    'label' => 'Gaps',
+                    'type' => Controls_Manager::GAPS,
+                    'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
+                    'selectors'  => array(
+                        '{{WRAPPER}}' => '--lakit-newsletter-gap: {{ROW}}{{UNIT}} {{COLUMN}}{{UNIT}};',
+                    ),
+                ]
+            );
+        }
+        else{
+            $this->add_control(
+                'layout',
+                array(
+                    'label'   => esc_html__( 'Layout', 'lastudio-kit' ),
+                    'type'    => Controls_Manager::SELECT,
+                    'default' => 'inline',
+                    'options' => array(
+                        'inline' => esc_html__( 'Inline', 'lastudio-kit' ),
+                        'block'  => esc_html__( 'Block', 'lastudio-kit' ),
+                    )
                 )
-            )
-        );
-
-        $this->add_responsive_control(
-            'container_width',
-            array(
-                'label'      => esc_html__( 'Width', 'lastudio-kit' ),
-                'type'       => Controls_Manager::SLIDER,
-                'size_units' => array(
-                    'px', 'em', '%',
-                ),
-                'range'      => array(
-                    'px' => array(
-                        'min' => 100,
-                        'max' => 1000,
+            );
+            $this->add_responsive_control(
+                'container_width',
+                array(
+                    'label'      => esc_html__( 'Width', 'lastudio-kit' ),
+                    'type'       => Controls_Manager::SLIDER,
+                    'size_units' => array(
+                        'px', 'em', '%',
                     ),
-                    '%' => array(
-                        'min' => 0,
-                        'max' => 100,
+                    'range'      => array(
+                        'px' => array(
+                            'min' => 100,
+                            'max' => 1000,
+                        ),
+                        '%' => array(
+                            'min' => 0,
+                            'max' => 100,
+                        ),
                     ),
-                ),
-                'selectors'  => array(
-                    '{{WRAPPER}} ' . $css_scheme['instance'] => 'width: {{SIZE}}{{UNIT}};',
-                ),
-            )
-        );
+                    'selectors'  => array(
+                        '{{WRAPPER}} ' . $css_scheme['instance'] => 'width: {{SIZE}}{{UNIT}};',
+                    ),
+                )
+            );
+        }
 
         $this->add_responsive_control(
             'container_padding',
@@ -437,15 +585,15 @@ class LaStudioKit_Subscribe_Form extends LaStudioKit_Base {
                 'options' => array(
                     'flex-start' => array(
                         'title' => esc_html__( 'Left', 'lastudio-kit' ),
-                        'icon'  => 'eicon-arrow-left',
+                        'icon'  => 'eicon-h-align-left',
                     ),
                     'center' => array(
                         'title' => esc_html__( 'Center', 'lastudio-kit' ),
-                        'icon'  => 'eicon-text-align-center',
+                        'icon'  => 'eicon-h-align-center',
                     ),
                     'flex-end' => array(
                         'title' => esc_html__( 'Right', 'lastudio-kit' ),
-                        'icon'  => 'eicon-arrow-right',
+                        'icon'  => 'eicon-h-align-right',
                     ),
                 ),
                 'condition' => array(
@@ -453,6 +601,31 @@ class LaStudioKit_Subscribe_Form extends LaStudioKit_Base {
                 ),
                 'selectors'  => array(
                     '{{WRAPPER}} ' . $css_scheme['input']  => 'align-self: {{VALUE}};',
+                ),
+            )
+        );
+
+        $this->add_responsive_control(
+            'input_text_alignment',
+            array(
+                'label'   => esc_html__( 'Text Alignment', 'lastudio-kit' ),
+                'type'    => Controls_Manager::CHOOSE,
+                'options' => array(
+                    'left' => array(
+                        'title' => esc_html__( 'Left', 'lastudio-kit' ),
+                        'icon'  => 'eicon-text-align-left',
+                    ),
+                    'center' => array(
+                        'title' => esc_html__( 'Center', 'lastudio-kit' ),
+                        'icon'  => 'eicon-text-align-center',
+                    ),
+                    'right' => array(
+                        'title' => esc_html__( 'Right', 'lastudio-kit' ),
+                        'icon'  => 'eicon-text-align-right',
+                    ),
+                ),
+                'selectors'  => array(
+                    '{{WRAPPER}} ' . $css_scheme['input']  => 'text-align: {{VALUE}};',
                 ),
             )
         );
@@ -691,6 +864,58 @@ class LaStudioKit_Subscribe_Form extends LaStudioKit_Base {
             )
         );
 
+        $this->add_responsive_control(
+            'button_width',
+            array(
+                'label'      => esc_html__( 'Width', 'lastudio-kit' ),
+                'type'       => Controls_Manager::SLIDER,
+                'size_units' => array(
+                    'px', 'em', '%',
+                ),
+                'range'      => array(
+                    'px' => array(
+                        'min' => 0,
+                        'max' => 1000,
+                    ),
+                    '%' => array(
+                        'min' => 0,
+                        'max' => 100,
+                    ),
+                ),
+                'selectors'  => array(
+                    '{{WRAPPER}} ' . $css_scheme['submit'] => 'width: {{SIZE}}{{UNIT}};',
+                ),
+            )
+        );
+
+        $this->add_responsive_control(
+            'button_alignment',
+            array(
+                'label'   => esc_html__( 'Alignment', 'lastudio-kit' ),
+                'type'    => Controls_Manager::CHOOSE,
+                'options' => array(
+                    'flex-start' => array(
+                        'title' => esc_html__( 'Left', 'lastudio-kit' ),
+                        'icon'  => 'eicon-h-align-left',
+                    ),
+                    'center' => array(
+                        'title' => esc_html__( 'Center', 'lastudio-kit' ),
+                        'icon'  => 'eicon-h-align-center',
+                    ),
+                    'flex-end' => array(
+                        'title' => esc_html__( 'Right', 'lastudio-kit' ),
+                        'icon'  => 'eicon-h-align-right',
+                    ),
+                ),
+                'condition' => array(
+                    'layout' => 'block',
+                ),
+                'selectors'  => array(
+                    '{{WRAPPER}} ' . $css_scheme['submit']  => 'align-self: {{VALUE}};',
+                ),
+            )
+        );
+
         $this->add_control(
             'add_button_icon',
             array(
@@ -719,6 +944,34 @@ class LaStudioKit_Subscribe_Form extends LaStudioKit_Base {
 			    ]
 		    ]
 	    );
+        $this->add_responsive_control(
+            'button_icon_pos',
+            array(
+                'label'   => esc_html__( 'Icon Position', 'lastudio-kit' ),
+                'type'    => Controls_Manager::CHOOSE,
+                'options' => array(
+                    'left' => array(
+                        'title' => esc_html__( 'Left', 'lastudio-kit' ),
+                        'icon'  => 'eicon-h-align-left',
+                    ),
+                    'right' => array(
+                        'title' => esc_html__( 'Right', 'lastudio-kit' ),
+                        'icon'  => 'eicon-h-align-right',
+                    ),
+                ),
+                'condition' => [
+                    'add_button_icon' => 'yes'
+                ],
+                'selectors_dictionary' => [
+                    'left'    => 'order: -9',
+                    'right'     => 'order: 9',
+                ],
+                'selectors'  => array(
+                    '{{WRAPPER}} ' . $css_scheme['submit'] . ' .elementor-icon'  => '{{VALUE}};',
+                ),
+            )
+        );
+
 
         $this->add_responsive_control(
             'button_icon_size',
@@ -766,58 +1019,6 @@ class LaStudioKit_Subscribe_Form extends LaStudioKit_Base {
                 ),
                 'selectors'  => array(
                     '{{WRAPPER}} .elementor-icon' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-                ),
-            )
-        );
-
-        $this->add_responsive_control(
-            'button_width',
-            array(
-                'label'      => esc_html__( 'Width', 'lastudio-kit' ),
-                'type'       => Controls_Manager::SLIDER,
-                'size_units' => array(
-                    'px', 'em', '%',
-                ),
-                'range'      => array(
-                    'px' => array(
-                        'min' => 0,
-                        'max' => 1000,
-                    ),
-                    '%' => array(
-                        'min' => 0,
-                        'max' => 100,
-                    ),
-                ),
-                'selectors'  => array(
-                    '{{WRAPPER}} ' . $css_scheme['submit'] => 'width: {{SIZE}}{{UNIT}};',
-                ),
-            )
-        );
-
-        $this->add_responsive_control(
-            'button_alignment',
-            array(
-                'label'   => esc_html__( 'Alignment', 'lastudio-kit' ),
-                'type'    => Controls_Manager::CHOOSE,
-                'options' => array(
-                    'flex-start' => array(
-                        'title' => esc_html__( 'Left', 'lastudio-kit' ),
-                        'icon'  => 'eicon-arrow-left',
-                    ),
-                    'center' => array(
-                        'title' => esc_html__( 'Center', 'lastudio-kit' ),
-                        'icon'  => 'eicon-text-align-center',
-                    ),
-                    'flex-end' => array(
-                        'title' => esc_html__( 'Right', 'lastudio-kit' ),
-                        'icon'  => 'eicon-arrow-right',
-                    ),
-                ),
-                'condition' => array(
-                    'layout' => 'block',
-                ),
-                'selectors'  => array(
-                    '{{WRAPPER}} ' . $css_scheme['submit']  => 'align-self: {{VALUE}};',
                 ),
             )
         );
@@ -1084,15 +1285,15 @@ class LaStudioKit_Subscribe_Form extends LaStudioKit_Base {
                 'options' => array(
                     'flex-start' => array(
                         'title' => esc_html__( 'Left', 'lastudio-kit' ),
-                        'icon'  => 'eicon-arrow-left',
+                        'icon'  => 'eicon-h-align-left',
                     ),
                     'center' => array(
                         'title' => esc_html__( 'Center', 'lastudio-kit' ),
-                        'icon'  => 'eicon-text-align-center',
+                        'icon'  => 'eicon-h-align-center',
                     ),
                     'flex-end' => array(
                         'title' => esc_html__( 'Right', 'lastudio-kit' ),
-                        'icon'  => 'eicon-arrow-right',
+                        'icon'  => 'eicon-h-align-right',
                     ),
                 ),
                 'selectors'  => array(
@@ -1367,19 +1568,26 @@ class LaStudioKit_Subscribe_Form extends LaStudioKit_Base {
 
         foreach ( $additional_filds as $key => $data ) {
 
-            $type        = $data['type'];
-            $placeholder = $data['placeholder'];
+            $_id         = $data['_id'] ?? '';
+            $type        = $data['type'] ?? '';
+            $placeholder = $data['placeholder'] ?? '';
 
-            $data = $default_fields_data[ $type ];
-
-            if ( ! empty( $placeholder ) ) {
-                $data['placeholder'] = $placeholder;
+            if(!isset($default_fields_data[ $type ])){
+                continue;
+            }
+            $attr_data = $default_fields_data[ $type ];
+            $_class = 'elementor-repeater-item-' . esc_attr($_id);
+            if(isset($attr_data['class'])){
+                $attr_data['class'][] = $_class;
             }
 
-            $this->add_render_attribute( $key, $data );?>
+            if ( ! empty( $placeholder ) ) {
+                $attr_data['placeholder'] = $placeholder;
+            }
+
+            $this->add_render_attribute( $key, $attr_data );?>
             <input <?php $this->print_render_attribute_string( $key ); ?>/><?php
         }
-
     }
 
     /**

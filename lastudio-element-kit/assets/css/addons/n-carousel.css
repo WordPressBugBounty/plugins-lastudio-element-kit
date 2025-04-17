@@ -21,7 +21,7 @@
   --padding-bottom: initial;
   --padding-left: initial
 }
-.lakit-carousel-v2 > .lakit-carousel > .lakit-carousel__dots{
+.lakit-carousel-v2 .lakit-carousel > .lakit-carousel__dots{
   height: -moz-max-content;
   height: max-content;
   left: calc(var(--e-dot-h-position) + var(--e-dot-h-offset));
@@ -39,7 +39,7 @@
   height: auto !important;
   right: auto !important;
 }
-.lakit-carousel-v2 > .lakit-carousel > .lakit-carousel__dots .swiper-pagination-bullet{
+.lakit-carousel-v2 .lakit-carousel > .lakit-carousel__dots .swiper-pagination-bullet{
   --swiper-pagination-bullet-width: var(--e-dot-width);
   --swiper-pagination-bullet-height: var(--e-dot-height);
   --bullet_width: var(--e-dot-width);
@@ -52,7 +52,7 @@
   background-color: var(--e-dot-color, var(--lakit-three-color));
   border-radius: var(--e-dot-radius)
 }
-.lakit-carousel-v2 > .lakit-carousel > .lakit-carousel__dots .swiper-pagination-bullet-active-main{
+.lakit-carousel-v2 .lakit-carousel > .lakit-carousel__dots .swiper-pagination-bullet-active-main{
   --swiper-pagination-bullet-width: var(--e-dot-active-width, var(--e-dot-width));
   --swiper-pagination-bullet-height: var(--e-dot-active-height, var(--e-dot-height));
   --bullet_width: var(--e-dot-active-width, var(--e-dot-width));

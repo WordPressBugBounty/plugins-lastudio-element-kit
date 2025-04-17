@@ -765,6 +765,10 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
                     'px' => array(
                         'min' => 50,
                         'max' => 2000,
+                    ),
+                    '%' => array(
+                        'min' => 0,
+                        'max' => 200,
                     )
                 ),
                 'size_units' => ['px', '%', 'vh', 'vw'],
@@ -2735,6 +2739,10 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
                     'px' => array(
                         'min' => 50,
                         'max' => 2000,
+                    ),
+                    '%' => array(
+                        'min' => 0,
+                        'max' => 200,
                     )
                 ),
                 'size_units' => ['px', '%', 'vh', 'vw'],
@@ -4381,13 +4389,43 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
             ]
         );
 
-        $this->_add_control(
-            '_zone_4_heading_button',
+        $this->_end_controls_section();
+    }
+
+    protected function v2_style_image_zone_5(){
+        $this->_start_controls_section(
+            'section_style__image_zone_5',
             [
-                'label' => esc_html__( 'Buttons', 'lastudio-kit' ),
-                'type' => Controls_Manager::HEADING,
-                'separator' => 'before',
+                'label' => esc_html__( 'Product Zone Content - Buttons', 'lastudio-kit' ),
+                'tab' => Controls_Manager::TAB_STYLE,
             ]
+        );
+        $this->_add_control(
+            'zone_5_hide_on',
+            [
+                'label'        => esc_html__( 'Hide on', 'lastudio-kit' ),
+                'type'         => Controls_Manager::SELECT2,
+                'options'      => [
+                    'desktop' => esc_html__( 'Desktop', 'lastudio-kit' ),
+                    'laptop' => esc_html__( 'Laptop', 'lastudio-kit' ),
+                    'tablet' => esc_html__( 'Tablet', 'lastudio-kit' ),
+                    'mobile_extra' => esc_html__( 'Mobile Extra', 'lastudio-kit' ),
+                    'mobile' => esc_html__( 'Mobile', 'lastudio-kit' ),
+                ],
+                'multiple' => true,
+            ]
+        );
+
+        $this->_add_responsive_control(
+            'zone_5_margin',
+            array(
+                'label'       => esc_html__( 'Zone margin', 'lastudio-kit' ),
+                'type'        => Controls_Manager::DIMENSIONS,
+                'size_units'  => array( 'px', 'em', '%' ),
+                'selectors'   => array(
+                    '{{WRAPPER}} .lakitp-zone-d .product_item--buttons' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}',
+                ),
+            )
         );
 
         $this->_start_controls_tabs( 'zone_4_action_tabs' );
@@ -5028,6 +5066,17 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
                 'selectors' => [
                     '{{WRAPPER}} .product_item--short_description' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}',
                 ]
+            ]
+        );
+
+        $this->_add_responsive_control(
+            'desc_maxline',
+            [
+                'label' => esc_html__( 'Max Lines', 'lastudio-kit' ),
+                'type' => Controls_Manager::SLIDER,
+                'selectors' => [
+                    '{{WRAPPER}}' => '--lakit-zone-descmaxline: {{SIZE}}',
+                ],
             ]
         );
 
@@ -5901,6 +5950,8 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
         $this->v2_style_image_zone_2();
         $this->v2_style_image_zone_3();
         $this->v2_style_image_zone_4();
+        $this->v2_style_image_zone_5();
+
         $this->v2_style_title();
         $this->v2_style_price();
         $this->v2_style_rating();
@@ -6039,6 +6090,7 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
                 'zone_2_hide_on' => $this->get_settings_for_display('zone_2_hide_on'),
                 'zone_3_hide_on' => $this->get_settings_for_display('zone_3_hide_on'),
                 'zone_4_hide_on' => $this->get_settings_for_display('zone_4_hide_on'),
+                'zone_5_hide_on' => $this->get_settings_for_display('zone_5_hide_on'),
             ];
         }
 

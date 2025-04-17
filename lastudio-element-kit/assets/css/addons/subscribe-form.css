@@ -91,3 +91,13 @@
 .lakit-subscribe-form--block-layout .lakit-subscribe-form__input-group .lakit-subscribe-form__fields {
 	width: 100%;
 }
+.lakit-subscribe-v2 .lakit-subscribe-form__fields{
+	flex-direction: var(--lakit-newsletter-direction, row);
+	gap: var(--lakit-newsletter-gap, 0);
+	justify-content: var(--lakit-newsletter-justify-content);
+	align-items: var(--lakit-newsletter-align-items);
+}
+.lakit-subscribe-v2 .lakit-subscribe-form__input{
+	width: auto;
+	flex-grow: 1;
+}

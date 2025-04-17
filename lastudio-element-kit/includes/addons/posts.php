@@ -1017,8 +1017,7 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
                     'unit' => 'px'
                 ],
                 'selectors'  => [
-                    '{{WRAPPER}} ' . $css_scheme['link'] => 'padding-bottom: {{SIZE}}{{UNIT}};',
-                    '{{WRAPPER}} .postformat-content .postformat--gallery span' => 'padding-bottom: {{SIZE}}{{UNIT}};'
+                    '{{WRAPPER}}' => '--lakit-posts-image-height: {{SIZE}}{{UNIT}};'
                 ],
                 'condition'  => [
                     'enable_custom_image_height!' => ''

@@ -31,9 +31,9 @@
 	font-size: 15px
 }
 .lakit-gmap .gm-style .gm-style-iw-c .gm-style-iw-d {
-	padding: 1em
+	padding: 2em 1em 1em
 }
-.lakit-gmap .gm-style > div:nth-child(2) > div:nth-child(1):before {
+.lakit-gmap .gm-style > div:nth-child(1) > div:nth-child(1):before {
 	background: var(--gmap-overlay-color);
 	content: '';
 	position: absolute;
@@ -44,4 +44,9 @@
 	left: -100vw;
 	top: -100vh;
 	opacity: var(--gmap-overlay-opacity);
+}
+.lakit-gmap .gm-style-iw-chr {
+	position: absolute;
+	right: -10px;
+	top: -10px;
 }

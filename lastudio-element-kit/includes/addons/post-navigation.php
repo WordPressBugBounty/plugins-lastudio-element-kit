@@ -510,7 +510,7 @@ class LaStudioKit_Post_Navigation extends LaStudioKit_Base
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => ['px', '%', 'em', 'custom'],
                 'selectors' => [
-                    '{{WRAPPER}} .post-navigation__arrow-menu' => 'font-size: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .elementor-post-navigation__menu .post-navigation__arrow-menu' => 'font-size: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );
@@ -737,9 +737,7 @@ class LaStudioKit_Post_Navigation extends LaStudioKit_Base
 
         ?>
         <div class="elementor-post-navigation">
-            <div class="elementor-post-navigation__prev elementor-post-navigation__link">
-                <?php previous_post_link('%link', $prev_arrow . '<span class="elementor-post-navigation__link__prev">' . $prev_label . $prev_title . '</span>', $in_same_term, '', $taxonomy); ?>
-            </div>
+            <div class="elementor-post-navigation__prev elementor-post-navigation__link"><?php previous_post_link('%link', $prev_arrow . '<span class="elementor-post-navigation__link__prev">' . $prev_label . $prev_title . '</span>', $in_same_term, '', $taxonomy); ?></div>
             <?php if ('yes' === $settings['show_menu']) : ?>
                 <div class="elementor-post-navigation__menu elementor-post-navigation__link">
                     <a <?php $this->print_render_attribute_string('menu_link'); ?>>
@@ -755,9 +753,7 @@ class LaStudioKit_Post_Navigation extends LaStudioKit_Base
                     <div class="elementor-post-navigation__separator"></div>
                 </div>
             <?php endif; ?>
-            <div class="elementor-post-navigation__next elementor-post-navigation__link">
-                <?php next_post_link('%link', '<span class="elementor-post-navigation__link__next">' . $next_label . $next_title . '</span>' . $next_arrow, $in_same_term, '', $taxonomy); ?>
-            </div>
+            <div class="elementor-post-navigation__next elementor-post-navigation__link"><?php next_post_link('%link', '<span class="elementor-post-navigation__link__next">' . $next_label . $next_title . '</span>' . $next_arrow, $in_same_term, '', $taxonomy); ?></div>
         </div>
         <?php
     }

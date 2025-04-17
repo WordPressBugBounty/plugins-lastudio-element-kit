@@ -466,9 +466,16 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
             if($current >= $total_pages){
                 $class_replaced .= ' nothingtoshow';
             }
-
+        }
+        $unique_id = \wc_get_loop_prop('lakit_unique_id');
+        if(!empty($unique_id)){
+            $page_key = 'product-page-' . $unique_id;
+        }
+        else{
+            $page_key = 'page';
         }
 
+        $output = str_replace('<nav', '<nav data-ajax_request_id="'. esc_attr($page_key) .'"', $output);
         $output = str_replace('<ul', $loadmore_html . '<ul', $output);
         $output = str_replace('woocommerce-pagination', $class_replaced, $output);
 	    $output = str_replace('/page/1/', '/', $output);
@@ -624,6 +631,8 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
                     break;
 
                 case 'product_action':
+                    $zone_5_hide_on = !empty($this->get_setting_zone_content('zone_5_hide_on')) ? ' elementor-hidden-' . join(' elementor-hidden-', $this->get_setting_zone_content('zone_5_hide_on')) : '';
+                    $el_class .= $zone_5_hide_on;
                     $item_html = $this->v2_loop_actions( $el_class, $zoneID );
                     $html .= apply_filters('lastudio-kit/products/zone_item_html', $item_html, $el_class, $setting);
                     break;

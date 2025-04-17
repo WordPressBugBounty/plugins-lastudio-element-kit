@@ -197,6 +197,7 @@ class LaStudioKit_Woo_Filters extends LaStudioKit_Base {
 			'result_count'      => esc_html__('Result Count', 'lastudio-kit'),
 			'product_attribute' => esc_html__('Product Attribute', 'lastudio-kit'),
 			'active_filters'    => esc_html__('Active Filters', 'lastudio-kit'),
+            'brand_list'          => esc_html__('Brand[List]', 'lastudio-kit'),
 		]);
 
         $filter_type_json = wp_json_encode($filter_type);
@@ -317,7 +318,7 @@ class LaStudioKit_Woo_Filters extends LaStudioKit_Base {
                 ],
                 'default' => 'and',
                 'condition' => [
-                    'filter_source' => 'product_attribute',
+                    'filter_source' => ['product_attribute']
                 ],
             ]
         );
@@ -332,7 +333,7 @@ class LaStudioKit_Woo_Filters extends LaStudioKit_Base {
                 'default'      => '',
                 'return_value' => 'yes',
                 'condition' => [
-                    'filter_source' => ['cat_list', 'cat_dropdown', 'product_attribute'],
+                    'filter_source' => ['cat_list', 'cat_dropdown', 'product_attribute', 'brand_list'],
                 ],
             ]
         );
@@ -370,7 +371,7 @@ class LaStudioKit_Woo_Filters extends LaStudioKit_Base {
                     'terms' => [
                         [
                             'terms' => [
-                                ['name' => 'filter_source', 'operator' => 'in', 'value' => ['cat_list', 'tag_list', 'price_list', 'sort_by_list', 'nav_menu']]
+                                ['name' => 'filter_source', 'operator' => 'in', 'value' => ['cat_list', 'tag_list', 'price_list', 'sort_by_list', 'nav_menu', 'brand_list']]
                             ]
                         ],
                         [
@@ -1597,7 +1598,9 @@ class LaStudioKit_Woo_Filters extends LaStudioKit_Base {
 	            if($filter['filter_source'] === 'nav_menu'){
 		            $el_class .= ' lakit-wfi-source_cat_list';
 	            }
-
+                if($filter['filter_source'] === 'brand_list'){
+                    $el_class .= ' lakit-wfi-source_product_attribute';
+                }
                 if(!empty($filter['type'])){
                     $el_class .= ' lakit-wfi-type_' . $filter['type'];
                 }

@@ -1116,7 +1116,6 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'default' => '1',
                 'options' => lastudio_kit_helper()->get_select_range(20),
                 'condition' => array(
-                    $column_dependency => '1',
                     'enable_carousel' => 'yes'
                 ),
             )
@@ -1151,6 +1150,34 @@ abstract class LaStudioKit_Base extends Widget_Base
 			    ),
                 'condition' => [
                     'enable_carousel' => 'yes'
+                ]
+		    )
+	    );
+
+        $this->_add_responsive_control(
+		    'carousel_overflow_pos',
+		    array(
+			    'label' => esc_html__('Visible', 'lastudio-kit'),
+			    'type' => Controls_Manager::SELECT,
+                'options' => [
+                    'both' => esc_html__('Both', 'lastudio-kit'),
+                    'left' => esc_html__('Left', 'lastudio-kit'),
+                    'right' => esc_html__('Right', 'lastudio-kit'),
+                    'none' => esc_html__('None', 'lastudio-kit'),
+                ],
+                'condition' => [
+                    'enable_carousel' => 'yes',
+                    'carousel_overflow' => 'yes',
+                    'carousel_direction' => 'horizontal'
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .lakit-carousel-inner.sw--horizontal' => '{{VALUE}}',
+                ],
+                'selectors_dictionary' => [
+                    'both' => 'clip-path: inset(-50% -200% -50% -200%)',
+                    'left' => 'clip-path: inset(-50% 0 -50% -200%)',
+                    'right' => 'clip-path: inset(-50% -200% -50% 0)',
+                    'none' => 'clip-path: inset(-50% 0 -50% 0)',
                 ]
 		    )
 	    );
@@ -1381,7 +1408,7 @@ abstract class LaStudioKit_Base extends Widget_Base
             array(
                 'label' => esc_html__('Effect', 'lastudio-kit'),
                 'type' => Controls_Manager::SELECT,
-                'description' => esc_html__('The `Fade` option does not work if `slides to show` option is `1`', 'lastudio-kit'),
+                'description' => esc_html__('The `Fade` option does not work if `slides to show` option is not `1`', 'lastudio-kit'),
                 'default' => 'slide',
                 'options' => array(
                     'slide' => esc_html__('Slide', 'lastudio-kit'),
@@ -1476,6 +1503,21 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'step' => 0.1,
                 'default' => 1,
                 'condition' => $coverflow_conditions,
+            )
+        );
+
+        $this->_add_control(
+            'carousel_creative_translate',
+            array(
+                'label' => esc_html__('Creative Effect Transform', 'lastudio-kit'),
+                'type' => Controls_Manager::NUMBER,
+                'min' => 0,
+                'max' => 200,
+                'step' => 1,
+                'default' => 100,
+                'condition' => [
+                    'carousel_effect' => 'creative',
+                ],
             )
         );
 
@@ -2376,6 +2418,11 @@ abstract class LaStudioKit_Base extends Widget_Base
 
         $carousel_autoheight = isset($settings['carousel_autoheight']) ? $settings['carousel_autoheight'] : false;
 
+        $carousel_creative_translate = $this->get_settings_for_display('carousel_creative_translate');
+        if(is_null($carousel_creative_translate)){
+            $carousel_creative_translate = 100;
+        }
+
         $options = array(
             'slidesToScroll' => lastudio_kit_helper()->get_attribute_with_all_breakpoints('carousel_to_scroll', $settings),
             'rows' => $rows,
@@ -2402,6 +2449,9 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'depth' => $this->get_settings_for_display('carousel_coverflow__depth'),
                 'modifier' => $this->get_settings_for_display('carousel_coverflow__modifier'),
                 'scale' => $this->get_settings_for_display('carousel_coverflow__scale'),
+            ],
+            'creativeEffect' => [
+                'translateX' => absint($carousel_creative_translate)
             ],
             'dotType' => $settings['carousel_dot_type'],
             'direction' => $carousel_direction,
@@ -3102,7 +3152,7 @@ abstract class LaStudioKit_Base extends Widget_Base
             foreach ($filters as $filter_id) {
                 $termObj = get_term($filter_id);
                 if(!is_wp_error($termObj)){
-                    $output .= sprintf('<div class="lakit-masonry_filter-item" data-count="%3$s" data-filter="term-%1$s">%2$s</div>', esc_attr($filter_id), $termObj->name, $termObj->count);
+                    $output .= sprintf('<div class="lakit-masonry_filter-item" data-count="%3$s" data-filter="term-%1$s" data-termid="%1$s" data-taxname="%4$s">%2$s</div>', esc_attr($filter_id), esc_html($termObj->name), esc_attr($termObj->count), esc_attr($termObj->taxonomy));
                 }
             }
             $output .= '</div>';
@@ -3716,6 +3766,110 @@ abstract class LaStudioKit_Base extends Widget_Base
         $this->end_controls_tab();
         $this->end_controls_tabs();
 
+        $this->_end_controls_section();
+
+        $bar_conditions = [
+            'carousel_scrollbar!' => '',
+            'enable_carousel!' => '',
+        ];
+
+        $this->_start_controls_section(
+            'carousel_scrollbar_style_section',
+            array(
+                'label' => esc_html__('Carousel Scrollbar', 'lastudio-kit'),
+                'tab' => Controls_Manager::TAB_STYLE,
+                'show_label' => false,
+                'condition' => $bar_conditions
+            )
+        );
+        $this->_add_responsive_control(
+            '_carousel_scrollbar__width',
+            array(
+                'label' => esc_html__('Width', 'lastudio-kit'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px', 'em', '%', 'custom'],
+                'selectors' => array(
+                    '{{WRAPPER}}' => '--swiper-scrollbar-width: {{SIZE}}{{UNIT}};',
+                ),
+            )
+        );
+        $this->_add_responsive_control(
+            '_carousel_scrollbar__height',
+            array(
+                'label' => esc_html__('Height', 'lastudio-kit'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px', 'em', '%', 'custom'],
+                'selectors' => array(
+                    '{{WRAPPER}}' => '--swiper-scrollbar-height: {{SIZE}}{{UNIT}};',
+                ),
+            )
+        );
+
+        $this->_add_responsive_control(
+            '_carousel_scrollbar_drag__width',
+            array(
+                'label' => esc_html__('Draggable Width', 'lastudio-kit'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px', 'em', '%', 'custom'],
+                'selectors' => array(
+                    '{{WRAPPER}}' => '--swiper-scrollbar-drag-width: {{SIZE}}{{UNIT}};',
+                ),
+            )
+        );
+        $this->_add_responsive_control(
+            '_carousel_scrollbar_drag__height',
+            array(
+                'label' => esc_html__('Draggable Height', 'lastudio-kit'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px', 'em', '%', 'custom'],
+                'selectors' => array(
+                    '{{WRAPPER}}' => '--swiper-scrollbar-drag-height: {{SIZE}}{{UNIT}};',
+                ),
+            )
+        );
+
+        $this->_add_control(
+            '_carousel_scrollbar__color1',
+            array(
+                'label' => esc_html__('Color Normal', 'lastudio-kit'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => array(
+                    '{{WRAPPER}} .lakit-carousel__scrollbar' => 'background: {{VALUE}}',
+                ),
+            )
+        );
+        $this->_add_control(
+            '_carousel_scrollbar__color2',
+            array(
+                'label' => esc_html__('Color Active', 'lastudio-kit'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => array(
+                    '{{WRAPPER}} .swiper-scrollbar-drag' => 'background: {{VALUE}}',
+                ),
+            )
+        );
+        $this->_add_responsive_control(
+            '_carousel_scrollbar__margin',
+            array(
+                'label' => __('Margin', 'lastudio-kit'),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => array('px', '%', 'em', 'vw', 'vh', 'custom'),
+                'selectors' => array(
+                    '{{WRAPPER}} .lakit-carousel__scrollbar' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ),
+            )
+        );
+        $this->_add_responsive_control(
+            '_carousel_scrollbar__radius',
+            array(
+                'label' => __('Border Radius', 'lastudio-kit'),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => array('px', '%'),
+                'selectors' => array(
+                    '{{WRAPPER}} .lakit-carousel__scrollbar, {{WRAPPER}} .swiper-scrollbar-drag' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ),
+            )
+        );
         $this->_end_controls_section();
     }
 

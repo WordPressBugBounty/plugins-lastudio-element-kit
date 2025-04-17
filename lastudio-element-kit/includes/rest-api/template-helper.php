@@ -421,10 +421,16 @@ class Template_Helper {
     }
 
     public function paginate_links( $link ){
+        la_log([
+            'here....1' => $link
+        ]);
+
 
         $custom_paged_key = isset($_REQUEST['lakitpagedkey']) ? $_REQUEST['lakitpagedkey'] : false;
 
         $link = remove_query_arg(['_', 'lakitpagedkey', 'lakit-ajax', '_nonce', 'actions'], $link);
+        $old_link = $link;
+
         $curl = add_query_arg( null, null, false );
         $curl = remove_query_arg(['_', 'lakitpagedkey', 'lakit-ajax', '_nonce', 'actions'], $curl);
 
@@ -432,8 +438,18 @@ class Template_Helper {
             $curl = remove_query_arg($custom_paged_key, $curl);
         }
         $curl = esc_url_raw( $curl );
+
+
         $link = str_replace($curl, '', $link);
         $link = str_replace('&', '?', $link);
+
+//        la_log([
+//            '$curl' => $curl,
+//            '$old_link' => $old_link,
+//            '$link' => $link
+//        ]);
+
+        return $old_link;
 
         return $link;
     }

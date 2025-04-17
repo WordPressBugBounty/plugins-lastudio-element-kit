@@ -445,7 +445,7 @@ class LaStudioKit_Instagram_Feed extends LaStudioKit_Base {
                 'label'   => esc_html__( 'Columns', 'lastudio-kit' ),
                 'type'    => Controls_Manager::SELECT,
                 'default' => 3,
-                'options' => lastudio_kit_helper()->get_select_range( 6 ),
+                'options' => lastudio_kit_helper()->get_select_range( 10 ),
                 'condition' => array(
                     'layout_type' => ['grid']
                 ),
