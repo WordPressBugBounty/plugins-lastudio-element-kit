@@ -631,3 +631,31 @@ add_filter('elementor/query/lakit_avoid_duplicate', function($wp_query, $widget)
     $wp_query->set( 'post__not_in', $post__not_in );
     return $wp_query;
 }, 20, 2);
+
+add_filter('elementor/query/lakit_event_startdate_asc', function( $wp_query, $widget){
+    $wp_query->set( 'meta_key', 'event_start_date' );
+    $wp_query->set( 'orderby', 'meta_value_num' );
+    $wp_query->set( 'order', 'ASC' );
+    return $wp_query;
+}, 20, 2);
+
+add_filter('elementor/query/lakit_event_startdate_desc', function( $wp_query, $widget){
+    $wp_query->set( 'meta_key', 'event_start_date' );
+    $wp_query->set( 'orderby', 'meta_value_num' );
+    $wp_query->set( 'order', 'DESC' );
+    return $wp_query;
+}, 20, 2);
+
+add_filter('elementor/query/lakit_event_enddate_asc', function( $wp_query, $widget){
+    $wp_query->set( 'meta_key', 'event_end_date' );
+    $wp_query->set( 'orderby', 'meta_value_num' );
+    $wp_query->set( 'order', 'ASC' );
+    return $wp_query;
+}, 20, 2);
+
+add_filter('elementor/query/lakit_event_enddate_desc', function( $wp_query, $widget){
+    $wp_query->set( 'meta_key', 'event_end_date' );
+    $wp_query->set( 'orderby', 'meta_value_num' );
+    $wp_query->set( 'order', 'DESC' );
+    return $wp_query;
+}, 20, 2);

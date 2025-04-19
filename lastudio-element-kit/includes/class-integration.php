@@ -107,6 +107,8 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 //            add_filter( 'style_loader_src', [ $this, 'override_e_animation_src' ], 20, 2 );
 
             add_action( 'elementor/frontend/before_enqueue_scripts', [ $this, 'enqueue_frontend_scripts' ] );
+
+            add_filter( 'woocommerce_add_to_cart_redirect', [ $this, 'woocommerce_add_to_cart_redirect' ], 100, 1 );
         }
 
 		/**
@@ -493,8 +495,9 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 	            'local_ttl'      => apply_filters('lastudio-kit/cache-management/local-time-to-life', !$template_cache ? 120 : (60 * 60 * 24)),
 	            'themeName'      => get_template(),
 	            'i18n'           => [
-                    'swatches_more_text' => lastudio_kit_settings()->get('swatches_swatches_more_text', ''),
-                    'swatches_max_item' => lastudio_kit_settings()->get('swatches_swatches_max_item', ''),
+                    'swatches_more_text'    => lastudio_kit_settings()->get('swatches_swatches_more_text', ''),
+                    'swatches_max_item'     => lastudio_kit_settings()->get('swatches_swatches_max_item', ''),
+                    'cart_group_msg'        => lastudio_kit_settings()->get('cart_group_msg', esc_html__( 'Please choose the quantity of items you wish to add to your cart&hellip;', 'woocommerce' ))
                 ],
 	            'ajaxNonce'      => lastudio_kit()->ajax_manager->create_nonce(),
 	            'useFrontAjax'   => 'true',
@@ -1655,6 +1658,13 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
             return [
                 'styles' => $styles
             ];
+        }
+
+        public function woocommerce_add_to_cart_redirect( $url ){
+            if( isset( $_REQUEST['lakit_buynow'] ) ){
+                $url = wc_get_checkout_url();
+            }
+            return $url;
         }
 	}
 

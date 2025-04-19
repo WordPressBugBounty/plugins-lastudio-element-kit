@@ -24,6 +24,8 @@ class LaStudioKit_Woo_Single_Product_AddToCart extends LaStudioKit_Base
             $this->add_style_depends('lastudio-kit-woocommerce');
             $this->add_script_depends('lastudio-kit-base');
         }
+        wp_register_script(  'lakit-buynow' , lastudio_kit()->plugin_url('assets/js/addons/buynow.min.js') , [],  lastudio_kit()->get_version() , true );
+        $this->add_script_depends('lakit-buynow');
     }
 
     public function get_name()
@@ -166,8 +168,17 @@ class LaStudioKit_Woo_Single_Product_AddToCart extends LaStudioKit_Base
         /**
          * Buy now
          */
+        $product_url       = $product->add_to_cart_url();
+        $checkout_url       = wc_get_checkout_url();
+        if($product->is_type('simple')){
+            $product_url = add_query_arg([
+                'add-to-cart' => $product->get_id(),
+                'lakit_buynow' => 'yes'
+            ], $checkout_url);
+        }
         $bn_icon            = $this->_get_icon_setting($this->get_settings_for_display('bn_icon'));
         $bn_normal_text     = $this->get_settings_for_display('bn_text');
+        $btn_format     = '<a data-product_id="%1$s" class="%2$s" href="%3$s" data-type="%5$s" data-checkout="%6$s">%4$s</a>';
         if(!empty($bn_icon) || !empty($bn_normal_text)){
             $bn_classes = ['lakit-core-buynow', 'button', 'e-btn'];
             $bn_html    = '';
@@ -182,7 +193,9 @@ class LaStudioKit_Woo_Single_Product_AddToCart extends LaStudioKit_Base
                 $product->get_id(),
                 esc_attr(join(' ', $bn_classes)),
                 esc_url($product_url),
-                $bn_html
+                $bn_html,
+                $product->get_type(),
+                esc_url($checkout_url)
             );
         }
         return $btn_output;
