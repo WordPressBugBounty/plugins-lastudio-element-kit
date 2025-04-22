@@ -1518,6 +1518,24 @@ class LaStudioKit_Slides extends LaStudioKit_Base {
         $slide_count = 0;
 
         $btn_icon =  $this->_get_icon_setting( $this->get_settings_for_display('selected_btn_icon'), '<span class="elementor-button-icon">%s</span>' );
+        $kses_allows = [
+            'div' => [
+                'style'    => true,
+                'class'  => true,
+            ],
+            'strong' => [
+                'style'    => true,
+                'class'  => true,
+            ],
+            'span' => [
+                'style'    => true,
+                'class'  => true,
+            ],
+            'br' => [
+                'style'    => true,
+                'class'  => true,
+            ],
+        ];
 
         foreach ( $settings['slides'] as $slide ) {
             $slide_html = '';
@@ -1538,7 +1556,7 @@ class LaStudioKit_Slides extends LaStudioKit_Base {
                 if ( 'button' === $slide['link_click'] ) {
                     $btn_element = 'a';
                     $btn_attributes = $this->get_render_attribute_string( $link_instance);
-                    $tmp_html = '<a '.$btn_attributes.'>'.$slide['heading'].'</a>';
+                    $tmp_html = '<a '.$btn_attributes.'>'. wp_kses($slide['heading'], $kses_allows) .'</a>';
                 } else {
                     $slide_element = 'a';
                     $slide_attributes = $this->get_render_attribute_string( $link_instance );
@@ -1553,23 +1571,23 @@ class LaStudioKit_Slides extends LaStudioKit_Base {
             $slide_html .= '<div class="lakit-slide-content">';
 
             if ( $slide['subheading'] ) {
-                $slide_html .= '<div class="lakit-slide-subheading" data-swiper-parallax="-300" data-swiper-parallax-opacity="0">' . $slide['subheading'] . '</div>';
+                $slide_html .= '<div class="lakit-slide-subheading" data-swiper-parallax="-300" data-swiper-parallax-opacity="0">' . wp_kses($slide['subheading'], $kses_allows) . '</div>';
             }
 
             if ( $slide['heading'] ) {
-                $slide_html .= '<div class="lakit-slide-heading"  data-swiper-parallax="-250" data-swiper-parallax-opacity="0">' . $slide['heading'] . '</div>';
+                $slide_html .= '<div class="lakit-slide-heading"  data-swiper-parallax="-250" data-swiper-parallax-opacity="0">' . wp_kses($slide['heading'], $kses_allows) . '</div>';
             }
 
             if ( $slide['description'] ) {
-                $slide_html .= '<div class="lakit-slide-description"  data-swiper-parallax="-200" data-swiper-parallax-opacity="0">' . $slide['description'] . '</div>';
+                $slide_html .= '<div class="lakit-slide-description"  data-swiper-parallax="-200" data-swiper-parallax-opacity="0">' . wp_kses($slide['description'], $kses_allows) . '</div>';
             }
 
             if ( $slide['subdescription1'] ) {
-                $slide_html .= '<div class="lakit-slide-subdescription lakit-slide-subdescription1"  data-swiper-parallax="-150" data-swiper-parallax-opacity="0">' . $slide['subdescription1'] . '</div>';
+                $slide_html .= '<div class="lakit-slide-subdescription lakit-slide-subdescription1"  data-swiper-parallax="-150" data-swiper-parallax-opacity="0">' . wp_kses($slide['subdescription1'], $kses_allows) . '</div>';
             }
 
             if ( $slide['button_text'] ) {
-                $btn_text = '<span class="elementor-button-text">'.$slide['button_text'].'</span>';
+                $btn_text = '<span class="elementor-button-text">'. wp_kses($slide['button_text'], $kses_allows) .'</span>';
                 $slide_html .= sprintf('<%1$s data-swiper-parallax="-100" data-swiper-parallax-opacity="0" %3$s>%2$s</%1$s>',
                     $btn_element,
                     $btn_text . $btn_icon,
@@ -1578,13 +1596,13 @@ class LaStudioKit_Slides extends LaStudioKit_Base {
             }
 
             if ( $slide['subdescription2'] ) {
-                $slide_html .= '<div class="lakit-slide-subdescription lakit-slide-subdescription2"  data-swiper-parallax="-50" data-swiper-parallax-opacity="0">' . $slide['subdescription2'] . '</div>';
+                $slide_html .= '<div class="lakit-slide-subdescription lakit-slide-subdescription2"  data-swiper-parallax="-50" data-swiper-parallax-opacity="0">' . wp_kses($slide['subdescription2'], $kses_allows ). '</div>';
             }
 
             $ken_class = '';
 
             if ( '' != $slide['background_ken_burns'] ) {
-                $ken_class = ' elementor-ken-' . $slide['zoom_direction'];
+                $ken_class = ' elementor-ken-' . esc_attr($slide['zoom_direction']);
             }
 
             $slide_html .= '</div>';
@@ -1594,7 +1612,7 @@ class LaStudioKit_Slides extends LaStudioKit_Base {
                 $slide_bg .= '<div class="elementor-background-overlay"></div>';
             }
             $slide_html = $slide_bg . '<' . $slide_element . ' ' . $slide_attributes . ' class="lakit-slide-inner">' . $slide_html . '</' . $slide_element . '>';
-            $slides[] = '<div class="elementor-repeater-item-' . $slide['_id'] . (isset($slide['el_class']) ? ' ' . $slide['el_class'] : '')  . ' swiper-slide">' . $slide_html . '</div>';
+            $slides[] = '<div class="elementor-repeater-item-' . esc_attr($slide['_id']) . (isset($slide['el_class']) ? ' ' .esc_attr($slide['el_class']) : '')  . ' swiper-slide">' . $slide_html . '</div>';
             $slide_count++;
         }
 
