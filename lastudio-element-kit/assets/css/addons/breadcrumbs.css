@@ -87,3 +87,6 @@
 body.home .elementor-widget-lakit-breadcrumbs:not(.lakit-breadcrumbs-on-front-yes):not(.elementor-element-edit-mode) {
 	display: none
 }
+.lakit-breadcrumbs__item:last-child{
+	display: inline
+}

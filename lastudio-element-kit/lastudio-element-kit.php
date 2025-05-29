@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       LA-Studio Element Kit for Elementor
  * Description:       Additional widgets for Elementor page builder. It has 60 highly customizable widgets
- * Version:           1.5.2
+ * Version:           1.5.3
  * Author:            LA-Studio
  * Author URI:        https://la-studioweb.com/
  * License:           GPL-2.0+
@@ -59,7 +59,7 @@ if(!class_exists('LaStudio_Kit')){
          *
          * @var string
          */
-        private $version = '1.5.2';
+        private $version = '1.5.3';
 
         /**
          * Framework component
@@ -514,8 +514,7 @@ if(!class_exists('LaStudio_Kit')){
         	$mappings = [
         		'LaStudio_Kit_Ajax_Manager' => 'includes/modules/ajax/manager.php',
         		'LaStudioKitThemeBuilder_AdminApp' => 'includes/modules/admin-app/admin-app.php',
-        		'Elementor\LaStudioKit_Base' => 'includes/base/class-widget-base.php',
-        		'Elementor\LaStudioKit_Base_Carousel_Trait' => 'includes/base/base-carousel-trait.php',
+        		'Elementor\LaStudioKit_Base' => 'includes/base/class-widget-base.php'
 	        ];
 
         	if( array_key_exists( $class, $mappings ) ){
@@ -795,4 +794,7 @@ add_action('woocommerce_init', function (){
 	if(is_admin() && (isset($_GET['action']) && $_GET['action'] === 'elementor')){
 		lastudiokit__remove_object_class_filter('wp_print_scripts', 'Automattic\WooCommerce\Blocks\Payments\Api', 'verify_payment_methods_dependencies', 1);
 	}
+    if( !empty($_GET['filter_product_brand']) && class_exists('WC_Brands', false) ){
+        lastudiokit__remove_object_class_filter('woocommerce_layered_nav_term_html', 'WC_Brands', 'woocommerce_brands_update_layered_nav_link', 10);
+    }
 });

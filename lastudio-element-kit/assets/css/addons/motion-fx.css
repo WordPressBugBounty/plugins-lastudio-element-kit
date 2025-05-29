@@ -11,6 +11,9 @@
   -o-transition-duration: 1s;
   transition-duration: 1s;
 }
+.elementor-motion-effects-element {
+  transform-origin: var(--e-transform-origin-y) var(--e-transform-origin-x);
+}
 .elementor-motion-effects-container{
   position: absolute;
   top: 0;
@@ -33,6 +36,9 @@
 }
 .e-con .elementor-motion-effects-layer{
   pointer-events: none;
+}
+.elementor-element.elementor-motion-effects-element {
+  transition: none !important;
 }
 /*.e-con.elementor-motion-effects-element-type-background:before {*/
 /*  z-index: 1;*/

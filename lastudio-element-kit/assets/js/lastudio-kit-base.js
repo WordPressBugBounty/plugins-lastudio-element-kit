@@ -437,8 +437,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            const isNestedCarousel = $scope.hasClass('elementor-widget-lakit-n-carousel')
-
             const $swiperContainer = $carousel.find('>.swiper-container, >div>.swiper-container').first();
 
             if ($swiperContainer.length === 0) {
@@ -725,7 +723,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 swiperOptions.slideToClickedSlide = true;
             }
 
-            const Swiper = elementorFrontend.utils.swiper;
+            const Swiper = LaStudioKits.utils.Swiper;
+            // const Swiper = elementorFrontend.utils.swiper;
 
             $('.swiper-slide .lakit-has-entrance-animation', $scope).each(function (){
                 const _settings = $(this).data('settings');
@@ -1434,23 +1433,30 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 })
                 .on('click', '[data-lakit-element-link]', function (e) {
-                    var $wrapper = $(this),
-                        data = $wrapper.data('lakit-element-link'),
-                        id = $wrapper.data('id'),
-                        anchor = document.createElement('a'),
+                    let $wrapper = $(this),
+                        data     = $wrapper.data('lakit-element-link'),
+                        id       = $wrapper.data('id'),
+                        anchor   = document.createElement('a'),
                         anchorReal;
 
-                    anchor.id = 'lastudio-wrapper-link-' + id;
-                    anchor.href = data.url;
-                    anchor.target = data.is_external ? '_blank' : '_self';
-                    anchor.rel = data.nofollow ? 'nofollow noreferer' : '';
-                    anchor.style.display = 'none';
+                    const allowProtocols = ['http:', 'https:', 'mailto:','tel:','webcal:', 'skype:', 'viber:']
 
-                    document.body.appendChild(anchor);
+                    try {
+                        const safeURL = new URL(data.url, window.location.href);
+                        if (!allowProtocols.includes(safeURL.protocol)) {
+                            return;
+                        }
+                        anchor.href          = safeURL.href;
+                        anchor.id            = 'lakit-wrapper-link-' + id;
+                        anchor.target        = data.is_external ? '_blank' : '_self';
+                        anchor.rel           = data.nofollow ? 'nofollow noreferer' : '';
+                        anchor.style.display = 'none';
+                        document.body.appendChild(anchor);
 
-                    anchorReal = document.getElementById(anchor.id);
-                    anchorReal.click();
-                    anchorReal.remove();
+                        anchorReal = document.getElementById(anchor.id);
+                        anchorReal.click();
+                        anchorReal.remove();
+                    } catch (err) {}
                 })
                 .on('click', '.lakit-search__popup-trigger,.lakit-search__popup-close', function (e) {
                     e.preventDefault();
@@ -1500,6 +1506,13 @@ document.addEventListener('DOMContentLoaded', function () {
                         var win_w = $(window).width(),
                             selector = $isotope_container.data('lakitmasonry_itemselector'),
                             active_on = masonrySettings.disable_on;
+
+                        if(win_w%2!==0){
+                            $isotope_container.addClass('lakit--m-even');
+                        }
+                        else{
+                            $isotope_container.removeClass('lakit--m-even');
+                        }
 
                         var _needParse = false;
                         if(0 > parseInt($isotope_container.css('margin-left'))){
@@ -1661,7 +1674,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 tag.type = 'text/css';
                 tag.media = 'all';
                 tag.onload = function () {
-                    resolve(style);
+                    resolve(true);
                 };
                 tag.onerror = function () {
                     reject(`Can not load css file "${uri}"`);
@@ -1685,7 +1698,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 tag.id = script + '-js';
                 tag.async = async;
                 tag.onload = function () {
-                    resolve(script);
+                    resolve(true);
                     if ("function" == typeof callback && "number" != typeof callback.nodeType) {
                         callback();
                     }
@@ -2925,6 +2938,32 @@ document.addEventListener('DOMContentLoaded', function () {
                 }, data);
                 self.send();
             }
+        },
+
+        utils: {
+            Swiper: function (container, config){
+                if (container instanceof jQuery) {
+                    container = container[0];
+                }
+                function createSwiperInstance(_container, _config){
+                    const SwiperSource = window.Swiper;
+                    return new SwiperSource(_container, _config);
+                }
+                return new Promise(resolve => {
+                    if ('undefined' === typeof Swiper) {
+                        if(!LaStudioKits.addedScripts.hasOwnProperty('swiper')){
+                            LaStudioKits.addedAssetsPromises.push(LaStudioKits.loadScriptAsync('swiper', LaStudioKitSettings.resources.swiperjs, '', true))
+                        }
+                        Promise.all(LaStudioKits.addedAssetsPromises).then(() => {
+                            resolve(createSwiperInstance(container, config));
+                        })
+                        return;
+                    }
+                    else{
+                        resolve(createSwiperInstance(container, config));
+                    }
+                });
+            }
         }
     }
 
@@ -2944,7 +2983,8 @@ document.addEventListener('DOMContentLoaded', function () {
             'lakit-team-member',
             'lakit-testimonials',
             'lakit-wooproducts',
-            'lakit-give-form-grid'
+            'lakit-give-form-grid',
+            'lakit-instagram-feed'
         ];
 
         const masonryWidgets = [
@@ -2958,7 +2998,8 @@ document.addEventListener('DOMContentLoaded', function () {
             'lakit-team-member',
             'lakit-testimonials',
             'lakit-wooproducts',
-            'lakit-give-form-grid'
+            'lakit-give-form-grid',
+            'lakit-instagram-feed'
         ];
 
         carouselWidgets.forEach( _w => {
@@ -4151,41 +4192,6 @@ document.addEventListener('DOMContentLoaded', function () {
 (function ($) {
 
     "use strict";
-
-    function init_price_filter() {
-        if ( typeof woocommerce_price_slider_params === 'undefined' ) {
-            return false;
-        }
-
-        $( 'input#min_price, input#max_price' ).hide();
-        $( '.price_slider, .price_label' ).show();
-
-        var min_price = $( '.price_slider_amount #min_price' ).data( 'min' ),
-            max_price = $( '.price_slider_amount #max_price' ).data( 'max' ),
-            current_min_price = $( '.price_slider_amount #min_price' ).val(),
-            current_max_price = $( '.price_slider_amount #max_price' ).val();
-
-        $( '.price_slider:not(.ui-slider)' ).slider({
-            range: true,
-            animate: true,
-            min: min_price,
-            max: max_price,
-            values: [ current_min_price, current_max_price ],
-            create: function() {
-                $( '.price_slider_amount #min_price' ).val( current_min_price );
-                $( '.price_slider_amount #max_price' ).val( current_max_price );
-                $( document.body ).trigger( 'price_slider_create', [ current_min_price, current_max_price ] );
-            },
-            slide: function( event, ui ) {
-                $( 'input#min_price' ).val( ui.values[0] );
-                $( 'input#max_price' ).val( ui.values[1] );
-                $( document.body ).trigger( 'price_slider_slide', [ ui.values[0], ui.values[1] ] );
-            },
-            change: function( event, ui ) {
-                $( document.body ).trigger( 'price_slider_change', [ ui.values[0], ui.values[1] ] );
-            }
-        });
-    }
 
     $(document)
         .on('mouseover', '.lakit-custom-dropdown, .lasf-custom-dropdown', function (){

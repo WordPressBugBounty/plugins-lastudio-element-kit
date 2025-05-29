@@ -1042,7 +1042,9 @@
 
                     if ('element' === type && !['section', 'container'].includes(elementType)) {
                         $dimensionsElement = $element;
-                        $element = $element.find('> [class*="elementor-"]');
+                        if($element.find('> [class*="elementor-"]:not(.elementor-element-overlay)').length > 0){
+                            $element = $element.find('> [class*="elementor-"]:not(.elementor-element-overlay)');
+                        }
                     }
 
                     var options = {
@@ -2132,7 +2134,6 @@
                 key: 'onInit',
                 value: function onInit() {
                     this.$element = this.getSettings('$targetElement');
-
                     this.refresh();
                 }
             }]);

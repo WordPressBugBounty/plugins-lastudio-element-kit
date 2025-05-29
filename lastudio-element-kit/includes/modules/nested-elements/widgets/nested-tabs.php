@@ -1823,7 +1823,24 @@ class Nested_Tabs extends Widget_Nested_Base {
                 "$nested_tab_control_id .lakit-ntab-icon" => 'border-color: {{VALUE}};',
             ],
         ] );
-
+        $this->add_responsive_control( 'icon_opacity', [
+            'label' => esc_html__( 'Opacity', 'lastudio-kit' ),
+            'type' => Controls_Manager::SLIDER,
+            'range' => [
+                'px' => [
+                    'min' => 0,
+                    'max' => 1,
+                    'step' => 0.01,
+                ],
+            ],
+            'default' => [
+                'unit' => 'px',
+            ],
+            'size_units' => [ 'px' ],
+            'selectors' => [
+                '{{WRAPPER}}' => '--n-tabs-icon-opacity: {{SIZE}}',
+            ],
+        ] );
 
         $this->end_controls_tab();
 
@@ -1857,6 +1874,24 @@ class Nested_Tabs extends Widget_Nested_Base {
                 "$nested_tab_control_id:not( .e-active ):hover .lakit-ntab-icon" => 'border-color: {{VALUE}};',
             ],
         ] );
+        $this->add_responsive_control( 'icon_opacity_hover', [
+            'label' => esc_html__( 'Opacity', 'lastudio-kit' ),
+            'type' => Controls_Manager::SLIDER,
+            'range' => [
+                'px' => [
+                    'min' => 0,
+                    'max' => 1,
+                    'step' => 0.01,
+                ],
+            ],
+            'default' => [
+                'unit' => 'px',
+            ],
+            'size_units' => [ 'px' ],
+            'selectors' => [
+                '{{WRAPPER}}' => '--n-tabs-icon-opacity-hover: {{SIZE}}',
+            ],
+        ] );
 
         $this->end_controls_tab();
 
@@ -1888,6 +1923,24 @@ class Nested_Tabs extends Widget_Nested_Base {
             'type' => Controls_Manager::COLOR,
             'selectors' => [
                 "$nested_tab_control_id.e-active .lakit-ntab-icon" => 'border-color: {{VALUE}};',
+            ],
+        ] );
+        $this->add_responsive_control( 'icon_opacity_active', [
+            'label' => esc_html__( 'Opacity', 'lastudio-kit' ),
+            'type' => Controls_Manager::SLIDER,
+            'range' => [
+                'px' => [
+                    'min' => 0,
+                    'max' => 1,
+                    'step' => 0.01,
+                ],
+            ],
+            'default' => [
+                'unit' => 'px',
+            ],
+            'size_units' => [ 'px' ],
+            'selectors' => [
+                '{{WRAPPER}}' => '--n-tabs-icon-opacity-active: {{SIZE}}',
             ],
         ] );
 

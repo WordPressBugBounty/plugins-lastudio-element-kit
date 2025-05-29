@@ -381,9 +381,20 @@ class LaStudioKit_Search extends LaStudioKit_Base {
             50
         );
         $this->_add_control(
+            'form_dropdown_bgcolor',
+            array(
+                'label'  => esc_html__( 'Dropdown Background Color', 'lastudio-kit' ),
+                'type'   => Controls_Manager::COLOR,
+                'selectors' => array(
+                    '{{WRAPPER}} ' . $css_scheme['form_dropdown'] => 'background-color: {{VALUE}}',
+                ),
+            ),
+            25
+        );
+        $this->_add_control(
             'form_dropdown_color',
             array(
-                'label'  => esc_html__( 'Dropdown Color', 'lastudio-kit' ),
+                'label'  => esc_html__( 'Dropdown Text Color', 'lastudio-kit' ),
                 'type'   => Controls_Manager::COLOR,
                 'selectors' => array(
                     '{{WRAPPER}} ' . $css_scheme['form_dropdown'] => 'color: {{VALUE}}',

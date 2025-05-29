@@ -12,6 +12,7 @@ use Elementor\Group_Control_Background;
 use Elementor\Group_Control_Border;
 use Elementor\Group_Control_Box_Shadow;
 use Elementor\LaStudioKit_Base;
+use Elementor\Utils;
 
 
 class Portfolio_Gallery extends LaStudioKit_Base {
@@ -460,15 +461,21 @@ class Portfolio_Gallery extends LaStudioKit_Base {
 
         $image_item = $item[ $key ];
 
-        if ( ! empty( $image_item['id'] ) && wp_attachment_is_image($image_item['id']) ) {
+        if ( ! empty( $image_item['id'] ) ) {
             $image_data = wp_get_attachment_image_src( $image_item['id'], 'full' );
-
-            $params[] = apply_filters('lastudio_wp_get_attachment_image_url', $image_data[0]);
-            $params[] = $image_data[1];
-            $params[] = $image_data[2];
+            if( !empty($image_data) ){
+                $params[] = apply_filters('lastudio_wp_get_attachment_image_url', $image_data[0]);
+                $params[] = $image_data[1];
+                $params[] = $image_data[2];
+            }
+            else{
+                $params[] = isset($image_item['url']) ? esc_url($image_item['url']) : Utils::get_placeholder_image_src();
+                $params[] = 1200;
+                $params[] = 800;
+            }
         }
         else {
-            $params[] = $image_item['url'];
+            $params[] = isset($image_item['url']) ? esc_url($image_item['url']) : Utils::get_placeholder_image_src();
             $params[] = 1200;
             $params[] = 800;
         }

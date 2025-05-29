@@ -2663,8 +2663,17 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
 		    [
 			    'name' => 'image_shadow',
 			    'selector' => '{{WRAPPER}} .product_item--thumbnail',
+                'label' => esc_html__( 'Box Shadow', 'elementor' ),
 		    ]
 	    );
+        $this->add_group_control(
+            Group_Control_Box_Shadow::get_type(),
+            [
+                'name' => 'image_shadow_hover',
+                'selector' => '{{WRAPPER}} .product_item--inner:hover .product_item--thumbnail',
+                'label' => esc_html__( 'Hover Box Shadow', 'lastudio-kit' ),
+            ]
+        );
 
 		$this->_add_control(
 		    'section_style___heading2',
@@ -4731,6 +4740,17 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
             ]
         );
 
+        $this->_add_responsive_control(
+            'title_maxline',
+            [
+                'label' => esc_html__( 'Max Lines', 'lastudio-kit' ),
+                'type' => Controls_Manager::SLIDER,
+                'selectors' => [
+                    '{{WRAPPER}}' => '--lakit-zone-titlemaxline: {{SIZE}}',
+                ],
+            ]
+        );
+
         $this->_end_controls_section();
     }
 
@@ -6072,12 +6092,12 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
         $carousel_settings = $this->get_advanced_carousel_options('columns', $unique_id, $settings);
 
         $settings['lakit_extra_settings'] = [
-            'carousel_settings' => $carousel_settings,
-            'masonry_settings'  => $masonry_settings,
-            'masonry_filter'  => $masonry_filter,
-            'carousel_dot_html' => $carousel_dot_html,
-            'carousel_arrow_html' => $carousel_arrow_html,
-            'carousel_scrollbar_html' => $carousel_scrollbar_html,
+            'carousel_settings'         => $carousel_settings,
+            'masonry_settings'          => $masonry_settings,
+            'masonry_filter'            => $masonry_filter,
+            'carousel_dot_html'         => $carousel_dot_html,
+            'carousel_arrow_html'       => $carousel_arrow_html,
+            'carousel_scrollbar_html'   => $carousel_scrollbar_html,
         ];
         if( lastudio_kit()->get_theme_support('elementor::product-grid-v2') ) {
             $settings['lakit_v2_settings'] = [

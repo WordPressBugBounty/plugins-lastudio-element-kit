@@ -2938,6 +2938,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
         return apply_filters( 'lastudio-kit/nav-menu/dropdown-icons', array(
             'lastudioicon-down-arrow'          => esc_html__( 'Angle', 'lastudio-kit' ),
             'lastudioicon-small-triangle-down' => esc_html__( 'Triangle', 'lastudio-kit' ),
+            'lakit-i-triangle-down'            => esc_html__( 'Triangle 2', 'lastudio-kit' ),
             'lastudioicon-arrow-down'          => esc_html__( 'Arrow', 'lastudio-kit' ),
             'lastudioicon-i-add'               => esc_html__( 'Plus', 'lastudio-kit' ),
             'lastudioicon-i-add-2'             => esc_html__( 'Plus 2', 'lastudio-kit' ),

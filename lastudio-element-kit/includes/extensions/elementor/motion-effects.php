@@ -107,11 +107,11 @@ class Motion_Effects
     }
 
     private function is_assets_loader_exist() {
-        return ! ! lastudio_kit()->elementor()->assets_loader;
+        return !!lastudio_kit()->elementor()->assets_loader;
     }
 
     public function register_enqueue_scripts() {
-        if(false && lastudio_kit()->elementor()->experiments->is_feature_active('e_element_cache')){
+        if(lastudio_kit()->elementor()->experiments->is_feature_active('e_element_cache')){
             wp_enqueue_script('lastudio-kit-motion-fx');
         }
     }
@@ -120,6 +120,10 @@ class Motion_Effects
         wp_enqueue_script('lastudio-kit-motion-fx');
     }
 
+    /**
+     * @param \Elementor\Element_Base $element
+     * @return void
+     */
     public function enqueue_in_widget($element) {
         $motion_groups = [
             'motion_fx_motion_fx_mouse',

@@ -421,10 +421,6 @@ class Template_Helper {
     }
 
     public function paginate_links( $link ){
-        la_log([
-            'here....1' => $link
-        ]);
-
 
         $custom_paged_key = isset($_REQUEST['lakitpagedkey']) ? $_REQUEST['lakitpagedkey'] : false;
 

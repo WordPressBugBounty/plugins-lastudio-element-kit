@@ -236,6 +236,28 @@ class LaStudioKit_Register extends LaStudioKit_Base {
             )
         );
 
+        $this->_add_control(
+            'show_extra_html',
+            array(
+                'label'        => esc_html__( 'Extra Content', 'lastudio-kit' ),
+                'type'         => Controls_Manager::SWITCHER,
+                'label_on'     => esc_html__( 'Yes', 'lastudio-kit' ),
+                'label_off'    => esc_html__( 'No', 'lastudio-kit' ),
+                'return_value' => 'yes',
+                'default'      => '',
+            )
+        );
+        $this->add_control(
+            'extra_html_a',
+            array(
+                'label'   => esc_html__( 'Extra Content', 'lastudio-kit' ),
+                'type'    => Controls_Manager::WYSIWYG,
+                'condition' => array(
+                    'show_extra_html' => 'yes',
+                ),
+            )
+        );
+
         $this->_end_controls_section();
 
         $this->_start_controls_section(
@@ -298,7 +320,7 @@ class LaStudioKit_Register extends LaStudioKit_Base {
                 'selectors' => array(
                     '{{WRAPPER}} .lakit-register__input::-webkit-input-placeholder' => 'color: {{VALUE}};',
                     '{{WRAPPER}} .lakit-register__input::-moz-placeholder'          => 'color: {{VALUE}}',
-                    '{{WRAPPER}} .lakit-register__input:-ms-input-placeholder'      => 'color: {{VALUE}}',
+                    '{{WRAPPER}} .lakit-register__input::-ms-input-placeholder'      => 'color: {{VALUE}}',
                 ),
             ),
             25
@@ -676,6 +698,89 @@ class LaStudioKit_Register extends LaStudioKit_Base {
                 ),
             ),
             50
+        );
+
+        $this->_end_controls_section();
+
+        $this->_start_controls_section(
+            'register_extra_style',
+            array(
+                'label'      => esc_html__( 'HTML', 'lastudio-kit' ),
+                'tab'        => Controls_Manager::TAB_STYLE,
+                'show_label' => false,
+                'condition' => array(
+                    'show_extra_html' => 'yes',
+                ),
+            )
+        );
+
+        $this->_add_group_control(
+            Group_Control_Typography::get_type(),
+            array(
+                'name'     => 'extra_a_typography',
+                'selector' => '{{WRAPPER}} .lakit-register__extra_a'
+            ),
+            50
+        );
+
+        $this->_add_control(
+            'extra_a_color',
+            array(
+                'label'  => esc_html__( 'Text Color', 'lastudio-kit' ),
+                'type'   => Controls_Manager::COLOR,
+                'selectors' => array(
+                    '{{WRAPPER}} .lakit-register__extra_a' => 'color: {{VALUE}}',
+                ),
+            ),
+            25
+        );
+
+        $this->_add_control(
+            'extra_a_link_color',
+            array(
+                'label'  => esc_html__( 'Link Color', 'lastudio-kit' ),
+                'type'   => Controls_Manager::COLOR,
+                'selectors' => array(
+                    '{{WRAPPER}} .lakit-register__extra_a a' => 'color: {{VALUE}}',
+                ),
+            ),
+            25
+        );
+        $this->_add_control(
+            'extra_a_link_color_hover',
+            array(
+                'label'  => esc_html__( 'Link Hover Color', 'lastudio-kit' ),
+                'type'   => Controls_Manager::COLOR,
+                'selectors' => array(
+                    '{{WRAPPER}} .lakit-register__extra_a a:hover' => 'color: {{VALUE}}',
+                ),
+            ),
+            25
+        );
+        $this->_add_responsive_control(
+            'extra_a_padding',
+            array(
+                'label'      => esc_html__( 'Padding', 'lastudio-kit' ),
+                'type'       => Controls_Manager::DIMENSIONS,
+                'size_units' => array( 'px', '%', 'em' ),
+                'selectors'  => array(
+                    '{{WRAPPER}} .lakit-register__extra_a' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ),
+            ),
+            50
+        );
+
+        $this->_add_responsive_control(
+            'extra_a_margin',
+            array(
+                'label'      => esc_html__( 'Margin', 'lastudio-kit' ),
+                'type'       => Controls_Manager::DIMENSIONS,
+                'size_units' => array( 'px', '%', 'em' ),
+                'selectors'  => array(
+                    '{{WRAPPER}} .lakit-register__extra_a' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ),
+            ),
+            25
         );
 
         $this->_end_controls_section();

@@ -1044,14 +1044,21 @@ class LaStudioKit_Instagram_Feed extends LaStudioKit_Base {
 
         $image_item = $item[ $key ];
 
-        if ( ! empty( $image_item['id'] ) && wp_attachment_is_image($image_item['id']) ) {
+        if ( ! empty( $image_item['id'] ) ) {
             $image_data = wp_get_attachment_image_src( $image_item['id'], 'full' );
-
-            $params[] = apply_filters('lastudio_wp_get_attachment_image_url', $image_data[0]);
-            $params[] = $image_data[1];
-            $params[] = $image_data[2];
-        } else {
-            $params[] = esc_url($image_item['url'] ?? '');
+            if( !empty($image_data) ){
+                $params[] = apply_filters('lastudio_wp_get_attachment_image_url', $image_data[0]);
+                $params[] = $image_data[1];
+                $params[] = $image_data[2];
+            }
+            else{
+                $params[] = isset($image_item['url']) ? esc_url($image_item['url']) : Utils::get_placeholder_image_src();
+                $params[] = 1200;
+                $params[] = 800;
+            }
+        }
+        else {
+            $params[] = isset($image_item['url']) ? esc_url($image_item['url']) : Utils::get_placeholder_image_src();
             $params[] = 1200;
             $params[] = 800;
         }
@@ -1091,15 +1098,22 @@ class LaStudioKit_Instagram_Feed extends LaStudioKit_Base {
      */
     public function render_gallery() {
         $settings = $this->get_settings_for_display();
+        $hashtag_settings = $this->get_settings_for_display('hashtag');
+        $use_insta_graph_api_settings = $this->get_settings_for_display('use_insta_graph_api');
+        $layout_type = $this->get_settings_for_display('layout_type');
+        $cache_timeout_settings = $this->get_settings_for_display('cache_timeout');
 
-        if ( 'hashtag' === $settings['endpoint'] ) {
+        // Endpoint.
+        $endpoint = $this->sanitize_endpoint();
 
-            if ( empty( $settings['hashtag'] ) ) {
+        if ( 'hashtag' === $endpoint ) {
+
+            if ( empty( $hashtag_settings ) ) {
                 $this->print_notice( esc_html__( 'Please, enter #hashtag.', 'lastudio-kit' ) );
                 return;
             }
 
-            if ( ! empty( $settings['use_insta_graph_api'] ) ) {
+            if ( ! empty( $use_insta_graph_api_settings ) ) {
                 $business_account_config = $this->get_business_account_config();
 
                 if ( empty( $business_account_config['token'] || empty( $business_account_config['user_id'] ) ) ) {
@@ -1109,7 +1123,7 @@ class LaStudioKit_Instagram_Feed extends LaStudioKit_Base {
             }
         }
 
-        if ( 'self' === $settings['endpoint'] && ! $this->get_access_token() ) {
+        if ( 'self' === $endpoint && ! $this->get_access_token() ) {
             $this->print_notice( esc_html__( 'Please, enter Access Token.', 'lastudio-kit' ) );
             return;
         }
@@ -1118,17 +1132,16 @@ class LaStudioKit_Instagram_Feed extends LaStudioKit_Base {
         $col_class = '';
 
         $enable_carousel  = filter_var($this->get_settings_for_display('enable_carousel'), FILTER_VALIDATE_BOOLEAN);
-        if($enable_carousel){
-            $col_class .= ' swiper-slide';
-        }
-        if ( 'grid' == $settings['layout_type'] || 'masonry' == $settings['layout_type'] ) {
+        $enable_masonry  = filter_var($this->get_settings_for_display('enable_masonry'), FILTER_VALIDATE_BOOLEAN);
+
+        if( $layout_type === 'grid' || $enable_masonry ){
             $col_class = lastudio_kit_helper()->col_new_classes('columns', $settings);
         }
+        if($enable_carousel && !$enable_masonry){
+            $col_class = ' swiper-slide';
+        }
 
-        // Endpoint.
-        $endpoint = $this->sanitize_endpoint();
-
-        switch ( $settings['cache_timeout'] ) {
+        switch ( $cache_timeout_settings ) {
             case 'none':
                 $cache_timeout = 1;
                 break;
@@ -1154,20 +1167,22 @@ class LaStudioKit_Instagram_Feed extends LaStudioKit_Base {
                 break;
         }
 
+        $order_by_settings = $this->get_settings_for_display('order_by');
+
         $this->config = array(
             'endpoint'            => $endpoint,
-            'target'              => ( 'hashtag' === $endpoint ) ? sanitize_text_field( $settings[ $endpoint ] ) : 'users',
-            'posts_counter'       => $settings['posts_counter'],
-            'post_link'           => filter_var( $settings['post_link'], FILTER_VALIDATE_BOOLEAN ),
-            'post_link_type'      => $settings['post_link_type'],
-            'photo_size'          => $settings['photo_size'],
-            'post_caption'        => filter_var( $settings['post_caption'], FILTER_VALIDATE_BOOLEAN ),
-            'post_caption_length' => ! empty( $settings['post_caption_length'] ) ? $settings['post_caption_length'] : 50,
-            'post_comments_count' => filter_var( $settings['post_comments_count'], FILTER_VALIDATE_BOOLEAN ),
-            'post_likes_count'    => filter_var( $settings['post_likes_count'], FILTER_VALIDATE_BOOLEAN ),
+            'target'              => ( 'hashtag' === $endpoint ) ? sanitize_text_field( $hashtag_settings ) : 'users',
+            'posts_counter'       => $this->get_settings_for_display('posts_counter'),
+            'post_link'           => filter_var( $this->get_settings_for_display('post_link'), FILTER_VALIDATE_BOOLEAN ),
+            'post_link_type'      => $this->get_settings_for_display('post_link_type'),
+            'photo_size'          => $this->get_settings_for_display('photo_size'),
+            'post_caption'        => filter_var( $this->get_settings_for_display('post_caption'), FILTER_VALIDATE_BOOLEAN ),
+            'post_caption_length' => ! empty( $this->get_settings_for_display('post_caption_length') ) ? $this->get_settings_for_display('post_caption_length') : 50,
+            'post_comments_count' => filter_var( $this->get_settings_for_display('post_comments_count'), FILTER_VALIDATE_BOOLEAN ),
+            'post_likes_count'    => filter_var( $this->get_settings_for_display('post_likes_count'), FILTER_VALIDATE_BOOLEAN ),
             'cache_timeout'       => $cache_timeout,
-            'use_graph_api'       => isset( $settings['use_insta_graph_api'] ) ? filter_var( $settings['use_insta_graph_api'], FILTER_VALIDATE_BOOLEAN ) : false,
-            'order_by'            => ! empty( $settings['order_by'] ) ? $settings['order_by'] : 'recent_media',
+            'use_graph_api'       => filter_var( $use_insta_graph_api_settings, FILTER_VALIDATE_BOOLEAN ),
+            'order_by'            => ! empty( $order_by_settings ) ? $order_by_settings : 'recent_media',
         );
 
         $posts = $this->get_posts( $this->config );
@@ -1791,7 +1806,8 @@ class LaStudioKit_Instagram_Feed extends LaStudioKit_Base {
      * @return string
      */
     public function sanitize_endpoint() {
-        return in_array( $this->get_settings( 'endpoint' ) , array( 'hashtag', 'self' ) ) ? $this->get_settings( 'endpoint' ) : 'hashtag';
+        $endpoint = $this->get_settings_for_display('endpoint');
+        return in_array( $endpoint , array( 'hashtag', 'self' ) ) ? $endpoint : 'self';
     }
 
     /**
@@ -1817,12 +1833,11 @@ class LaStudioKit_Instagram_Feed extends LaStudioKit_Base {
      */
     public function get_access_token() {
         if ( ! $this->access_token ) {
-            $source = $this->get_settings( 'access_token_source' );
-
+            $source = $this->get_settings_for_display( 'access_token_source' );
             if ( 'custom' === $source ) {
-                $this->access_token = $this->get_settings( 'custom_access_token' );
+                $this->access_token = $this->get_settings_for_display( 'custom_access_token' );
             } else {
-                $this->access_token = lastudio_kit_settings()->get( 'insta_access_token' );
+                $this->access_token = $this->get_access_token_from_settings();
             }
         }
 

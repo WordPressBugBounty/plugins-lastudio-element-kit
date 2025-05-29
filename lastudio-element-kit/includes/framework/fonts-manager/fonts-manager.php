@@ -86,7 +86,9 @@ if ( ! class_exists( 'CX_Fonts_Manager' ) ) {
 		 */
 		public function prepare_fonts() {
 			$font_url = $this->get_fonts_url();
-			wp_enqueue_style( 'lakit-google-fonts-' . $this->args['prefix'], $font_url, lastudio_kit()->get_version() );
+            if(!empty($font_url)){
+                wp_enqueue_style( 'lakit-google-fonts-' . $this->args['prefix'], $font_url, lastudio_kit()->get_version() );
+            }
 		}
 
 		/**

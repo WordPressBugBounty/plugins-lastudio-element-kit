@@ -553,8 +553,8 @@ class LaStudioKit_Google_Maps extends LaStudioKit_Base {
 
                 $current = array(
                     'position' => $this->get_location_coord( $pin['pin_address'] ),
-                    'desc'     => $pin['pin_desc'],
-                    'state'    => $pin['pin_state'],
+                    'desc'     => esc_attr($pin['pin_desc']),
+                    'state'    => esc_attr($pin['pin_state']),
                 );
 
                 if ( ! empty( $pin['pin_image']['url'] ) ) {
@@ -565,12 +565,10 @@ class LaStudioKit_Google_Maps extends LaStudioKit_Base {
             }
 
         }
+        $this->add_render_attribute( 'map-data', 'data-pins', wp_json_encode( $pins ) );
+        $this->add_render_attribute( 'map-data', 'class', 'lakit-gmap' );
 
-        $this->add_render_attribute( 'map-pins', 'data-pins', wp_json_encode( $pins ) );
-
-        ?>
-        <div class="lakit-gmap" <?php $this->print_render_attribute_string( 'map-data' ) ?> <?php $this->print_render_attribute_string( 'map-pins' ) ?>></div>
-        <?php
+        echo sprintf( '<div %s></div>', $this->get_render_attribute_string( 'map-data' ) );
     }
 
     /**

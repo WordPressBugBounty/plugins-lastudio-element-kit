@@ -14,13 +14,13 @@ class Element_Visibility {
 		add_action('elementor/element/container/section_layout/after_section_end', [ $this, 'init_module' ]);
 
         add_filter( 'elementor/widget/render_content', [ $this, 'content_change' ], 999, 2 );
-//        add_filter( 'elementor/section/render_content', [ $this, 'content_change' ], 999, 2 );
-//        add_filter( 'elementor/container/render_content', [ $this, 'content_change' ], 999, 2 );
 
         add_filter( 'elementor/frontend/section/should_render', [ $this, 'item_should_render' ], 10, 2 );
         add_filter( 'elementor/frontend/widget/should_render', [ $this, 'item_should_render' ], 10, 2 );
         add_filter( 'elementor/frontend/repeater/should_render', [ $this, 'item_should_render' ], 10, 2 );
         add_filter( 'elementor/frontend/container/should_render', [ $this, 'item_should_render' ], 10, 2 );
+
+        add_filter('elementor/element/is_dynamic_content', [ $this, 'filter_check_e_cache' ], 10, 3);
     }
 
     private function get_roles() {
@@ -219,6 +219,13 @@ class Element_Visibility {
         }
 
         return true;
+    }
+
+    public function filter_check_e_cache($is_dynamic_content, $raw_data, $instance){
+        if( !empty($raw_data['settings']['lakit_vlogic_enabled']) && filter_var($raw_data['settings']['lakit_vlogic_enabled'], FILTER_VALIDATE_BOOLEAN) ){
+            $is_dynamic_content = true;
+        }
+        return $is_dynamic_content;
     }
 
 }

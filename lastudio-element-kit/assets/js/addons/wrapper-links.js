@@ -9,17 +9,24 @@
                 anchor   = document.createElement('a'),
                 anchorReal;
 
-            anchor.id            = 'lakit-wrapper-link-' + id;
-            anchor.href          = data.url;
-            anchor.target        = data.is_external ? '_blank' : '_self';
-            anchor.rel           = data.nofollow ? 'nofollow noreferer' : '';
-            anchor.style.display = 'none';
+            const allowProtocols = ['http:', 'https:', 'mailto:','tel:','webcal:', 'skype:', 'viber:']
 
-            document.body.appendChild(anchor);
+            try {
+                const safeURL = new URL(data.url, window.location.href);
+                if (!allowProtocols.includes(safeURL.protocol)) {
+                    return;
+                }
+                anchor.href          = safeURL.href;
+                anchor.id            = 'lakit-wrapper-link-' + id;
+                anchor.target        = data.is_external ? '_blank' : '_self';
+                anchor.rel           = data.nofollow ? 'nofollow noreferer' : '';
+                anchor.style.display = 'none';
+                document.body.appendChild(anchor);
 
-            anchorReal = document.getElementById(anchor.id);
-            anchorReal.click();
-            anchorReal.remove();
+                anchorReal = document.getElementById(anchor.id);
+                anchorReal.click();
+                anchorReal.remove();
+            } catch (err) {}
         });
     });
 

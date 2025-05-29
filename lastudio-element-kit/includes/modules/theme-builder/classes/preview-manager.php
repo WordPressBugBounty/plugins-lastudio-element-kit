@@ -10,6 +10,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Preview_Manager {
 
+    public static $preview_documents = [];
+
 	public function __construct() {
 		add_filter( 'elementor/query/get_query_args/current_query', [ $this, 'filter_query_control_args' ] );
 		add_filter( 'elementor/theme/posts_archive/query_posts/query_vars', [ $this, 'filter_query_control_args' ] );
@@ -41,7 +43,16 @@ class Preview_Manager {
 	 * @return array
 	 */
 	public function filter_query_control_args( $query_vars ) {
-		$document = lastudio_kit()->elementor()->documents->get_doc_or_auto_save( get_the_ID() );
+
+        $current_post_id = get_the_ID();
+
+        if( isset( self::$preview_documents[ $current_post_id ] ) ) {
+            $document = self::$preview_documents[ $current_post_id ];
+        }
+        else{
+            $document = lastudio_kit()->elementor()->documents->get_doc_or_auto_save( $current_post_id );
+            self::$preview_documents[ $current_post_id ] = $document;
+        }
 
 		if ( $document && $document instanceof Theme_Document ) {
 			$query_vars = $document->get_preview_as_query_args();
@@ -55,7 +66,14 @@ class Preview_Manager {
 	 */
 	public function switch_to_preview_query() {
 		$current_post_id = get_the_ID();
-		$document = lastudio_kit()->elementor()->documents->get_doc_or_auto_save( $current_post_id );
+
+        if( isset( self::$preview_documents[ $current_post_id ] ) ) {
+            $document = self::$preview_documents[ $current_post_id ];
+        }
+        else{
+            $document = lastudio_kit()->elementor()->documents->get_doc_or_auto_save( $current_post_id );
+            self::$preview_documents[ $current_post_id ] = $document;
+        }
 
 		if ( ! $document || ! $document instanceof Theme_Document ) {
 			return;

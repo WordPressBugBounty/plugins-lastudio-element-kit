@@ -68,7 +68,10 @@
   --n-tabs-divider-pos-top: initial;
   --n-tabs-divider-pos-bottom: 0;
   --n-tabs-divider-transform: translateX(-50%); /*!** top **!*//*!** left **!*//*!** right **!*/
-  max-width: 100%
+  --n-tabs-icon-opacity: 1;
+  --n-tabs-icon-opacity-hover: var(--n-tabs-icon-opacity);
+  --n-tabs-icon-opacity-active: var(--n-tabs-icon-opacity);
+  max-width: 100%;
 }
 .lakit-ntabs {
   display: var(--n-tabs-display);
@@ -119,13 +122,22 @@
   height: 0;
   opacity: 0
 }
+.lakit-ntab-icon{
+  opacity: var(--n-tabs-icon-opacity)
+}
+.lakit-ntab-title:hover .lakit-ntab-icon{
+  opacity: var(--n-tabs-icon-opacity-hover)
+}
+.lakit-ntab-title.e-active .lakit-ntab-icon{
+  opacity: var(--n-tabs-icon-opacity-active)
+}
 .lakit-ntab-icon, .lakit-ntab-t_icon {
   display: flex;
   align-items: center;
   flex-direction: column;
   order: var(--n-tabs-icon-order);
   font-size: var(--n-tabs-icon-size);
-  color: var(--n-tabs-icon-color)
+  color: var(--n-tabs-icon-color);
 }
 .lakit-ntab-icon svg, .lakit-ntab-t_icon svg {
   width: 1em;
@@ -294,15 +306,11 @@
 }
 .lakit-ntabs-content-item > .e-con {
   padding-left: 0;
-  padding-right: 0;
+  padding-right: 0
 }
-
 .etab--overflow > .lakit-ntabs-heading {
-  overflow: auto;
+  overflow: auto
 }
-.rtl .etab--overflow > .lakit-ntabs-heading {
-
-}
-.etab--overflow > .lakit-ntabs-heading .ntabs--title{
-  white-space: pre;
+.etab--overflow > .lakit-ntabs-heading .ntabs--title {
+  white-space: pre
 }

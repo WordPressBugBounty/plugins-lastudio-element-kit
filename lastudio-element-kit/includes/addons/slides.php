@@ -1523,6 +1523,12 @@ class LaStudioKit_Slides extends LaStudioKit_Base {
                 'style'    => true,
                 'class'  => true,
             ],
+            'a' => [
+                'style'    => true,
+                'class'  => true,
+                'href'  => true,
+                'target'  => true,
+            ],
             'strong' => [
                 'style'    => true,
                 'class'  => true,

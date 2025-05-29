@@ -29,7 +29,14 @@ $email    = ! empty( $_POST['email'] ) ? esc_attr( wp_unslash( $_POST['email'] )
 		</p>
 	<?php endif; ?>
 <?php endif; ?>
-	<?php do_action( 'lakit_register_form' ); ?>
+    <?php
+    if( 'yes' === $this->get_settings_for_display('show_extra_html') ){
+        $extra_html_a = $this->get_settings_for_display('extra_html_a');
+        echo sprintf('<div class="lakit-register__extra lakit-register__extra_a">%1$s</div>', wp_kses_post($extra_html_a));
+    }
+    ?>
+
+    <?php do_action( 'lakit_register_form' ); ?>
 
   <?php
     if(shortcode_exists('Heateor_Social_Login')){

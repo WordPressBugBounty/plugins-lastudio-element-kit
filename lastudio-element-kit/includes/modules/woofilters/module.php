@@ -75,7 +75,7 @@ class Module extends \Elementor\Core\Base\Module {
                 $content = $this->render_nav_menu($nav_menu, $inline);
                 break;
             case 'brand_list':
-                $content = $this->render_brand_filter($type, $show_count);
+                $content = $this->render_brand_filter($query_type, $show_count);
                 break;
         }
         return $content;
@@ -539,19 +539,22 @@ class Module extends \Elementor\Core\Base\Module {
         return ob_get_clean();
     }
 
-    protected function render_brand_filter( $query_type = '', $show_count = false  ){
-
-        if(empty($query_type)){
-            $query_type = 'and';
+    protected function get_brand_chosen_attributes()
+    {
+        // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        if ( ! empty( $_GET['filter_product_brand'] ) ) {
+            $filter_product_brand = wc_clean( wp_unslash( $_GET['filter_product_brand'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            return array_map( 'intval', explode( ',', $filter_product_brand ) );
         }
 
-        $_chosen_attributes = \WC_Query::get_layered_nav_chosen_attributes();
-        $taxonomy           = 'product_brand';
+        return array();
+    }
 
+    protected function render_brand_filter( $query_type = '', $show_count = false  ){
+        $taxonomy           = 'product_brand';
         if ( ! taxonomy_exists( $taxonomy ) ) {
             return '';
         }
-
         $terms = get_terms( $taxonomy, array( 'hide_empty' => '1' ) );
 
         if ( 0 === count( $terms ) ) {
@@ -561,11 +564,6 @@ class Module extends \Elementor\Core\Base\Module {
         ob_start();
 
         $found = $this->layered_nav_brand_list( $terms, $taxonomy, $query_type, $show_count );
-
-        // Force found when option is selected - do not force found on taxonomy attributes.
-        if ( ! is_tax() && is_array( $_chosen_attributes ) && array_key_exists( $taxonomy, $_chosen_attributes ) ) {
-            $found = true;
-        }
 
         if(!$found){
             return '';
@@ -972,6 +970,74 @@ class Module extends \Elementor\Core\Base\Module {
         return preg_replace( '/\/page\/\d+/', '', $base_shop_url );
     }
 
+    /**
+     * Count products within certain terms, taking the main WP query into consideration.
+     *
+     * @param  array  $term_ids Term IDs.
+     * @param  string $taxonomy Taxonomy.
+     * @param  string $query_type Query type.
+     * @return array
+     */
+    protected function get_filtered_brand_product_counts($term_ids, $taxonomy, $query_type = 'and') {
+        global $wpdb;
+
+        $tax_query  = \WC_Query::get_main_tax_query();
+        $meta_query = \WC_Query::get_main_meta_query();
+
+        if ( 'or' === $query_type ) {
+            foreach ( $tax_query as $key => $query ) {
+                if ( is_array( $query ) && $taxonomy === $query['taxonomy'] ) {
+                    unset( $tax_query[ $key ] );
+                }
+            }
+        }
+
+        $meta_query     = new \WP_Meta_Query( $meta_query );
+        $tax_query      = new \WP_Tax_Query( $tax_query );
+        $meta_query_sql = $meta_query->get_sql( 'post', $wpdb->posts, 'ID' );
+        $tax_query_sql  = $tax_query->get_sql( $wpdb->posts, 'ID' );
+
+        // Generate query.
+        $query             = array();
+        $query['select']   = "SELECT COUNT( DISTINCT {$wpdb->posts}.ID ) as term_count, terms.term_id as term_count_id";
+        $query['from']     = "FROM {$wpdb->posts}";
+        $query['join']     = "
+			INNER JOIN {$wpdb->term_relationships} AS term_relationships ON {$wpdb->posts}.ID = term_relationships.object_id
+			INNER JOIN {$wpdb->term_taxonomy} AS term_taxonomy USING( term_taxonomy_id )
+			INNER JOIN {$wpdb->terms} AS terms USING( term_id )
+			" . $tax_query_sql['join'] . $meta_query_sql['join'];
+        $query['where']    = "
+			WHERE {$wpdb->posts}.post_type IN ( 'product' )
+			AND {$wpdb->posts}.post_status = 'publish'
+			" . $tax_query_sql['where'] . $meta_query_sql['where'] . '
+			AND terms.term_id IN (' . implode( ',', array_map( 'absint', $term_ids ) ) . ')
+		';
+        $query['group_by'] = 'GROUP BY terms.term_id';
+        $query             = apply_filters( 'woocommerce_get_filtered_term_product_counts_query', $query ); // phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment
+        $query             = implode( ' ', $query );
+
+        // We have a query - let's see if cached results of this query already exist.
+        $query_hash = md5( $query );
+
+        $cache = apply_filters( 'woocommerce_layered_nav_count_maybe_cache', true ); // phpcs:ignore WooCommerce.Commenting.CommentHooks.MissingHookComment
+        if ( true === $cache ) {
+            $cached_counts = (array) get_transient( 'wc_layered_nav_counts_' . sanitize_title( $taxonomy ) );
+        } else {
+            $cached_counts = array();
+        }
+
+        if ( ! isset( $cached_counts[ $query_hash ] ) ) {
+            $results                      = $wpdb->get_results( $query, ARRAY_A ); // @codingStandardsIgnoreLine
+            $counts                       = array_map( 'absint', wp_list_pluck( $results, 'term_count', 'term_count_id' ) );
+            $cached_counts[ $query_hash ] = $counts;
+            if ( true === $cache ) {
+                set_transient( 'wc_layered_nav_counts_' . sanitize_title( $taxonomy ), $cached_counts, HOUR_IN_SECONDS );
+            }
+        }
+
+        return array_map( 'absint', (array) $cached_counts[ $query_hash ] );
+    }
+
     protected function layered_nav_brand_list( $terms, $taxonomy, $query_type, $show_count ) {
         // List display.
 
@@ -979,8 +1045,9 @@ class Module extends \Elementor\Core\Base\Module {
 
         $filter_name = 'filter_product_brand';
 
-        $term_counts        = $this->get_filtered_term_product_counts( wp_list_pluck( $terms, 'term_id' ), $taxonomy, $query_type );
-        $_chosen_attributes = [];
+        $term_counts        = $this->get_filtered_brand_product_counts( wp_list_pluck( $terms, 'term_id' ), $taxonomy, $query_type );
+
+        $_chosen_attributes = $this->get_brand_chosen_attributes();
         $found              = false;
         $base_link          = $this->get_current_url();
         if( !empty($_GET[$filter_name]) ){

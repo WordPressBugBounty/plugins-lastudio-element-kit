@@ -397,9 +397,13 @@ body .lakit-dots-h-align-left .lakit-carousel__dots {
   inset: 0;
   filter: blur(50px)
 }
+.lakit-arrow--showonhover-yes .lakit-carousel:not(:hover) .lakit-arrow {
+  opacity: 0;
+  visibility: hidden
+}
 .lakit-arrow {
   position: absolute;
-  display: flex;
+  display: var(--lakit-carousel-arrow-d, flex);
   justify-content: center;
   align-items: center;
   cursor: pointer;
@@ -412,7 +416,9 @@ body .lakit-dots-h-align-left .lakit-carousel__dots {
   line-height: 50px;
   font-size: 16px;
   border: 0;
-  text-align: center
+  text-align: center;
+  opacity: var(--lakit-carousel-arrow-o, 1);
+  visibility: var(--lakit-carousel-arrow-v, inherit)
 }
 .lakit-arrow.swiper-button-disabled {
   pointer-events: none;
@@ -583,6 +589,9 @@ body .lakit-dots-h-align-left .lakit-carousel__dots {
 }
 .lakit-masonry_filter-item.active, .lakit-masonry_filter-item:hover, .lakit-tabs-new-template-link {
   color: var(--lakit-primary-color)
+}
+.elementor-location-header .elementor-icon-list-item a, .enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__item--mega .elementor[data-elementor-type] .elementor-icon-list-item span[class^=elementor-icon], .lakit-nav__sub-mega .elementor-heading-title, .lakitdoc-h-t .elementor-location-header > .e-parent:not(.elementor-sticky--effects) .elementor-lakit-menucart .lakit-cart__heading-link > span, .lakitdoc-h-t .lakit-site-wrapper > .elementor-location-header > .e-parent:not(.elementor-sticky--effects) .main-color:not(.ignore-docs-style) .lakit-blocks-icon, .lakitdoc-h-t .lakit-site-wrapper > .elementor-location-header > .e-parent:not(.elementor-sticky--effects) .main-color:not(.ignore-docs-style) .lakit-hamburger-panel__toggle-icon, .lakitdoc-h-t .lakit-site-wrapper > .elementor-location-header > .e-parent:not(.elementor-sticky--effects) .main-color:not(.ignore-docs-style) .lakit-hamburger-panel__toggle-label {
+  color: inherit
 }
 .lakit_position_top_left {
   top: 0;
@@ -1284,14 +1293,14 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
   transition-timing-function: cubic-bezier(0.17, 0.67, 0.83, 0.67);
   padding: 15px
 }
-.lakit-nav__item>.menu-item-link:before{
+.lakit-nav__item > .menu-item-link:before {
   content: '';
   position: absolute;
   left: 0;
   top: 100%;
   width: 100%;
   height: var(--mm-dd-gap, 0);
-  pointer-events: none;
+  pointer-events: none
 }
 .lakit-mobile-menu.lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__sub {
   position: static;
@@ -1532,9 +1541,6 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
   min-height: 100%;
   color: var(--mm-subitem-color)
 }
-.elementor-location-header .elementor-icon-list-item a, .lakit-nav__sub-mega .elementor-heading-title, .lakitdoc-h-t .elementor-location-header > .e-parent:not(.elementor-sticky--effects) .elementor-lakit-menucart .lakit-cart__heading-link > span, .lakitdoc-h-t .lakit-site-wrapper > .elementor-location-header > .e-parent:not(.elementor-sticky--effects) .main-color:not(.ignore-docs-style) .lakit-blocks-icon, .lakitdoc-h-t .lakit-site-wrapper > .elementor-location-header > .e-parent:not(.elementor-sticky--effects) .main-color:not(.ignore-docs-style) .lakit-hamburger-panel__toggle-icon, .lakitdoc-h-t .lakit-site-wrapper > .elementor-location-header > .e-parent:not(.elementor-sticky--effects) .main-color:not(.ignore-docs-style) .lakit-hamburger-panel__toggle-label {
-  color: inherit
-}
 .lakit-nav__sub-mega a {
   color: var(--mm-subitem-color);
   background-color: var(--mm-subitem-bg)
@@ -1599,7 +1605,7 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
 .lakit-nav-line-animation-dot .menu-item-link-depth-0 > .lakit-nav-link-inner:after, .lakit-nav-line-animation-dotl .menu-item-link-depth-0 > .lakit-nav-link-inner:after, .lakit-nav-line-animation-dotl .menu-item-link-depth-0 > .lakit-nav-link-inner:before {
   right: calc(100% + .4em)
 }
-.actionzone-a-hover-yes .product_item--inner:hover .lakitp-zone-a, .actionzone-b-hover-yes .product_item--inner:hover .lakitp-zone-b, .actionzone-c-hover-yes .product_item--inner:hover .lakitp-zone-c, .lakit--js-ready .woocommerce-product-gallery, .lakit-nav-line-animation-dot .current-menu-item > .menu-item-link-depth-0 > .lakit-nav-link-inner:after, .lakit-nav-line-animation-dot .lakit-nav__item:hover > .menu-item-link-depth-0 > .lakit-nav-link-inner:after, .lakit-nav-line-animation-dotl .current-menu-item > .menu-item-link-depth-0 > .lakit-nav-link-inner:after, .lakit-nav-line-animation-dotl .lakit-nav__item:hover > .menu-item-link-depth-0 > .lakit-nav-link-inner:after, .lakit-nav-line-animation-dotlr .current-menu-item > .menu-item-link-depth-0 > .lakit-nav-link-inner:after, .lakit-nav-line-animation-dotlr .lakit-nav__item:hover > .menu-item-link-depth-0 > .lakit-nav-link-inner:after, .lakit-nav-line-animation-dotr .current-menu-item > .menu-item-link-depth-0 > .lakit-nav-link-inner:after, .lakit-nav-line-animation-dotr .lakit-nav__item:hover > .menu-item-link-depth-0 > .lakit-nav-link-inner:after, .prod-qv-wrap .woocommerce-product-gallery .woocommerce-product-gallery__image[data-media-attach-type=threesixty] img, body .woocommerce-product-gallery {
+.actionzone-a-hover-yes .product_item--inner:hover .lakitp-zone-a, .actionzone-b-hover-yes .product_item--inner:hover .lakitp-zone-b, .actionzone-c-hover-yes .product_item--inner:hover .lakitp-zone-c, .lakit--js-ready .woocommerce-product-gallery, .lakit-nav-line-animation-dot .current-menu-item > .menu-item-link-depth-0 > .lakit-nav-link-inner:after, .lakit-nav-line-animation-dot .lakit-nav__item:hover > .menu-item-link-depth-0 > .lakit-nav-link-inner:after, .lakit-nav-line-animation-dotl .current-menu-item > .menu-item-link-depth-0 > .lakit-nav-link-inner:after, .lakit-nav-line-animation-dotl .lakit-nav__item:hover > .menu-item-link-depth-0 > .lakit-nav-link-inner:after, .lakit-nav-line-animation-dotlr .current-menu-item > .menu-item-link-depth-0 > .lakit-nav-link-inner:after, .lakit-nav-line-animation-dotlr .lakit-nav__item:hover > .menu-item-link-depth-0 > .lakit-nav-link-inner:after, .lakit-nav-line-animation-dotr .current-menu-item > .menu-item-link-depth-0 > .lakit-nav-link-inner:after, .lakit-nav-line-animation-dotr .lakit-nav__item:hover > .menu-item-link-depth-0 > .lakit-nav-link-inner:after, .lakit-product-images .woocommerce-product-gallery.js--is_ready .flex-viewport, .lakit-product-images .woocommerce-product-gallery.js--is_ready ol, .prod-qv-wrap .woocommerce-product-gallery .woocommerce-product-gallery__image[data-media-attach-type=threesixty] img, body .woocommerce-product-gallery {
   opacity: 1
 }
 .lakit-nav-line-animation-dotl .menu-item-link-depth-0 > .lakit-nav-link-inner:before, .lakit-nav-line-animation-dotlr .menu-item-link-depth-0 > .lakit-nav-link-inner:before {
@@ -1651,15 +1657,16 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
   background-color: var(--lakit-doc-headerts-bg-color) !important;
   box-shadow: none
 }
-.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget.include-docs-style .elementor-icon svg{
-  fill: currentColor;
+.elementor-button-icon svg, .elementor-icon svg path[fill*="#"], .lakit-btn--icon svg, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget.include-docs-style .elementor-icon svg, svg.e-font-icon-svg, svg.lakit-font-icon-svg, svg[fill=none] g[fill] path:not([fill]) {
+  fill: currentColor
 }
-.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget.include-docs-style .elementor-icon,
-.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-icon:not(.ignore-docs-style), .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget-icon-list:not(.ignore-docs-style) .elementor-icon-list-item, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .main-color:not(.ignore-docs-style) {
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget.include-docs-style .elementor-icon{
+  border-color: inherit
+}
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-icon:not(.ignore-docs-style), .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget-icon-list:not(.ignore-docs-style) .elementor-icon-list-item, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget.include-docs-style .elementor-icon, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .main-color:not(.ignore-docs-style) {
   color: var(--lakit-doc-headerts-link-color, var(--lakit-secondary-color))
 }
-.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget.include-docs-style .elementor-icon:hover,
-.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-icon:hover:not(.ignore-docs-style), .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget-icon-list:not(.ignore-docs-style) .elementor-icon-list-item:hover, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .main-color:not(.ignore-docs-style):hover {
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-icon:hover:not(.ignore-docs-style), .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget-icon-list:not(.ignore-docs-style) .elementor-icon-list-item:hover, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget.include-docs-style .elementor-icon:hover, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .main-color:not(.ignore-docs-style):hover {
   color: var(--lakit-doc-headerts-link-hover-color, var(--lakit-primary-color))
 }
 .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-heading-title:not(.ignore-docs-style), .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-lakit-search:not(.ignore-docs-style) .lakit-search__form .lakit-search__field, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget-text-editor:not(.ignore-docs-style) {
@@ -1838,7 +1845,13 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
 }
 .lakitp-zone-item.product_item--title {
   font-size: 1em;
-  margin: 0
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: var(--lakit-zone-titlemaxline, 10);
+  line-clamp: var(--lakit-zone-titlemaxline, 10);
+  -webkit-box-orient: vertical
 }
 .actionzone-a-toggle-yes .lakitp-zone-a:not(:hover), .actionzone-b-toggle-yes .lakitp-zone-b:not(:hover) {
   width: auto !important
@@ -1851,6 +1864,8 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
   --lakit-item-padding-right: 10px;
   --lakit-item-padding-bottom: 0px;
   --lakit-item-padding-left: 0;
+  --lakit-carousel-item-left-space: var(--lakit-item-padding-left);
+  --lakit-carousel-item-right-space: var(--lakit-item-padding-right);
   max-width: 100%
 }
 .lakit-products.lakit-masonry-wrapper, .lastudio-kit ul.products.ul_products_v2.lakit-products__list:not(.swiper-wrapper) {
@@ -2085,10 +2100,6 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
 }
 .ul_products_v2.products-list-inverse .lakit-product:nth-child(2n) .product_item--inner .lakitp-zone-d {
   margin-left: auto !important
-}
-.lakit-arrow--showonhover-yes .lakit-carousel:not(:hover) .lakit-arrow {
-  opacity: 0;
-  visibility: hidden
 }
 .lakit-embla__arrow {
   position: absolute;
@@ -2734,13 +2745,10 @@ body .e-con-inner > .elementor-widget-spacer > .elementor-widget-container > .el
 .lakit-hamburger-panel ::-webkit-scrollbar-corner {
   background: 0 0
 }
-.elementor-button-icon svg, .elementor-icon svg path[fill*="#"], .lakit-btn--icon svg, svg.e-font-icon-svg, svg.lakit-font-icon-svg, svg[fill=none] g[fill] path:not([fill]) {
-  fill: currentColor
-}
 .elementor-element .elementor-widget-container.elementor-motion-effects-element {
   transition: background .3s, border .3s, border-radius .3s, box-shadow .3s
 }
-.elementor-widget-divider--view-line_icon .elementor-divider, .elementor-widget-divider--view-line_text .elementor-divider, .lakit-posts.preset-grid-1 .lakit-posts__thumbnail {
+.elementor-widget-divider--view-line_icon .elementor-divider, .elementor-widget-divider--view-line_text .elementor-divider, .lakit-posts.preset-grid-1 .lakit-posts__thumbnail, .lakit-product-images:not(.layout-type-6):not(.layout-type-5) .woocommerce-product-gallery:not(.js--is_ready) {
   overflow: hidden
 }
 .lakit-ajax-result-count {
@@ -2748,9 +2756,9 @@ body .e-con-inner > .elementor-widget-spacer > .elementor-widget-container > .el
   margin-bottom: 1em;
   display: none
 }
-.lakit-masonry-wrapper:not(.lakit-masonry--cover-bg) .lakit-masonry--con {
-  margin-left: -1px !important;
-  margin-right: -1px !important
+.lakit-masonry-wrapper.lakit--m-even .lakit-masonry--con {
+  margin-left: -0.5px !important;
+  margin-right: -0.5px !important;
 }
 .lastudio-kit .lakit-product-images ol.flex-control-nav.flex-control-thumbs li[data-type]:after {
   font-family: LaStudioIcons;
@@ -2818,6 +2826,10 @@ body .e-con-inner > .elementor-widget-spacer > .elementor-widget-container > .el
 .marquee-text .elementor-heading-title {
   white-space: nowrap;
   overflow: hidden;
+  animation: 20s linear infinite lakit_marqueetext
+}
+.heading--marquee .elementor-heading-title {
+  white-space: nowrap;
   animation: 20s linear infinite lakit_marqueetext
 }
 @keyframes lakit_marqueetext {
@@ -3117,7 +3129,8 @@ body .e-con-inner > .elementor-widget-spacer > .elementor-widget-container > .el
   border-width: 0
 }
 .lastudio-kit .lakit-product-images div.images.woocommerce-product-gallery {
-  opacity: 1 !important
+  opacity: 1 !important;
+  transition: none !important
 }
 [data-widget_type="lakit-google-maps.default"] .lakit-gmap-message .lakit-gmap-message__dammy-map {
   background-image: url("../images/dummy-map.png")
@@ -3462,7 +3475,7 @@ body:not(.e-has-header-sticky) .lakit-ntabs-heading.e--sticky {
   display: flex;
   flex-flow: row wrap
 }
-.lakit-posts__meta__item {
+.lakit-posts__meta__item, .lakit-wrap-core-wl-cp {
   display: flex;
   align-items: center
 }
@@ -3516,14 +3529,11 @@ body:not(.e-has-header-sticky) .lakit-ntabs-heading.e--sticky {
 .lakit-product-images.layout-type-2 > .woocommerce-product-gallery:has(.flex-viewport):after, .lakit-product-images.layout-type-3 > .woocommerce-product-gallery:has(.flex-viewport):after {
   display: none
 }
-.e-con.elementor-motion-effects-element:before, .flex-direction-nav:not(.js--is_ready), .lakit-navmb-onlymenu-yes .lakit-mobile-menu.lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__mobile-trigger, .lakit-product-images:not(.layout-type-6):not(.layout-type-5) .woocommerce-product-gallery__wrapper > .woocommerce-product-gallery__image:not(:first-child) {
+.e-con.elementor-motion-effects-element:before, .elementor-lakit-wooproduct-images .flex-direction-nav a.flex-disabled, .flex-direction-nav:not(.js--is_ready), .lakit-navmb-onlymenu-yes .lakit-mobile-menu.lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__mobile-trigger, .lakit-product-images:not(.layout-type-6):not(.layout-type-5) .woocommerce-product-gallery__wrapper > .woocommerce-product-gallery__image:not(:first-child), .lakitp-zone-item--row:empty {
   display: none
 }
 .lakit-product-images .woocommerce-product-gallery .woocommerce-product-gallery__image {
   max-width: calc(1px * var(--singleproduct-thumbs-maxwidth))
-}
-.lakit-product-images:not(.layout-type-6):not(.layout-type-5) .woocommerce-product-gallery:not(.js--is_ready) {
-  overflow: hidden
 }
 .lakit-navmb-onlymenu-yes .lakit-mobile-menu.lakit-nav-wrap.lakit-active--mbmenu .lakit-nav {
   display: block
@@ -3565,9 +3575,6 @@ body:not(.e-has-header-sticky) .lakit-ntabs-heading.e--sticky {
 body .elementor-widget-lakit-hotspots.elementor-widget-empty {
   background-color: transparent
 }
-.lakitp-zone-item--row:empty {
-  display: none
-}
 .elementor-image-box-wrapper {
   display: flex;
   flex-direction: var(--e-imb-direction, column);
@@ -3580,16 +3587,16 @@ body .elementor-widget-lakit-hotspots.elementor-widget-empty {
   display: -webkit-box;
   -webkit-line-clamp: var(--lakit-zone-descmaxline, 10);
   line-clamp: var(--lakit-zone-descmaxline, 10);
-  -webkit-box-orient: vertical;
+  -webkit-box-orient: vertical
 }
 .lakit-product-images.no-gallery {
   --singleproduct-thumbs-width: 0;
-  --singleproduct-image-spacing: 0;
+  --singleproduct-image-spacing: 0
 }
 .elementor-lakit-wooproduct-addtocart .lakit-btn--icon svg {
   width: 1em;
   height: 1em;
-  vertical-align: top;
+  vertical-align: top
 }
 .e-btn {
   display: flex;
@@ -3602,18 +3609,7 @@ body .elementor-widget-lakit-hotspots.elementor-widget-empty {
 }
 .elementor-lakit-wooproduct-addtocart .lakit-btn--icon {
   font-size: var(--e-iconsize, 1em);
-  transform: translateY(var(--e-iconvspace, 0px));
-}
-.lakit-wrap-core-wl-cp {
-  display: flex;
-  align-items: center;
-}
-.lastudio-kit .lakit-product-images div.images.woocommerce-product-gallery {
-  transition: none !important;
-}
-.lakit-product-images .woocommerce-product-gallery.js--is_ready ol,
-.lakit-product-images .woocommerce-product-gallery.js--is_ready .flex-viewport {
-  opacity: 1;
+  transform: translateY(var(--e-iconvspace, 0))
 }
 .elementor-lakit-wooproduct-images {
   --e-prev-arrow-v-position: 50%;
@@ -3641,7 +3637,7 @@ body .elementor-widget-lakit-hotspots.elementor-widget-empty {
   --e-arrow-hover-width: var(--e-arrow-width);
   --e-arrow-hover-height: var(--e-arrow-height);
   --e-arrow-hover-scale: 1;
-  --e-arrow-hover-opacity: 1;
+  --e-arrow-hover-opacity: 1
 }
 .lakit-arrow--showonhover-yes.elementor-lakit-wooproduct-images .woocommerce-product-gallery:not(:hover) {
   --e-arrow-opacity: 0
@@ -3655,21 +3651,18 @@ body .elementor-widget-lakit-hotspots.elementor-widget-empty {
   opacity: var(--e-arrow-opacity);
   display: flex;
   align-items: center;
-  justify-content: center;
-}
-.elementor-lakit-wooproduct-images .flex-direction-nav a.flex-disabled {
-  display: none;
+  justify-content: center
 }
 .elementor-lakit-wooproduct-images .flex-direction-nav a:before {
   font-size: var(--e-arrow-iconsize);
-  line-height: 1;
+  line-height: 1
 }
 .elementor-lakit-wooproduct-images .flex-direction-nav a:hover {
   color: var(--e-arrow-hover-color);
   background: var(--e-arrow-hover-bgcolor);
   width: var(--e-arrow-hover-width);
   height: var(--e-arrow-hover-height);
-  opacity: var(--e-arrow-hover-opacity);
+  opacity: var(--e-arrow-hover-opacity)
 }
 .elementor-lakit-wooproduct-images .flex-direction-nav a:hover:before {
   font-size: var(--e-arrow-hover-iconsize)
@@ -3677,86 +3670,104 @@ body .elementor-widget-lakit-hotspots.elementor-widget-empty {
 .elementor-lakit-wooproduct-images .flex-direction-nav a.flex-prev {
   left: calc(var(--e-prev-arrow-h-position) + var(--e-prev-arrow-h-offset));
   top: calc(var(--e-prev-arrow-v-position) + var(--e-prev-arrow-v-offset));
-  transform: translate(var(--e-prev-arrow-h-transform), var(--e-prev-arrow-v-transform)) scale(var(--e-arrow-scale));
+  transform: translate(var(--e-prev-arrow-h-transform), var(--e-prev-arrow-v-transform)) scale(var(--e-arrow-scale))
 }
 .elementor-lakit-wooproduct-images .flex-direction-nav a.flex-prev:hover {
-  transform: translate(var(--e-prev-arrow-h-transform), var(--e-prev-arrow-v-transform)) scale(var(--e-arrow-hover-scale));
+  transform: translate(var(--e-prev-arrow-h-transform), var(--e-prev-arrow-v-transform)) scale(var(--e-arrow-hover-scale))
 }
 .elementor-lakit-wooproduct-images .flex-direction-nav a.flex-next {
   left: calc(var(--e-next-arrow-h-position) + var(--e-next-arrow-h-offset));
   top: calc(var(--e-next-arrow-v-position) + var(--e-next-arrow-v-offset));
   transform: translate(var(--e-next-arrow-h-transform), var(--e-next-arrow-v-transform)) scale(var(--e-arrow-scale));
-  right: auto;
+  right: auto
 }
 .elementor-lakit-wooproduct-images .flex-direction-nav a.flex-next:hover {
-  transform: translate(var(--e-next-arrow-h-transform), var(--e-next-arrow-v-transform)) scale(var(--e-arrow-hover-scale));
+  transform: translate(var(--e-next-arrow-h-transform), var(--e-next-arrow-v-transform)) scale(var(--e-arrow-hover-scale))
 }
-.elementor-lakit-wooproduct-images .layout-type-2 .flex-direction-nav a.flex-prev{
-  margin-left: calc(var(--singleproduct-thumbs-width) + var(--singleproduct-image-spacing));
+.elementor-lakit-wooproduct-images .layout-type-2 .flex-direction-nav a.flex-prev, .elementor-lakit-wooproduct-images .layout-type-3 .flex-direction-nav a.flex-next {
+  margin-left: calc(var(--singleproduct-thumbs-width) + var(--singleproduct-image-spacing))
 }
-.elementor-lakit-wooproduct-images .layout-type-3 .flex-direction-nav a.flex-next{
-  margin-left: calc(var(--singleproduct-thumbs-width) + var(--singleproduct-image-spacing));
-}
-.elementor-lakit-gposts.active-object-fit .postformat-content .postformat--gallery span,
-.elementor-lakit-gposts.active-object-fit .lakit-posts__thumbnail-link {
+.elementor-lakit-gposts.active-object-fit .lakit-posts__thumbnail-link, .elementor-lakit-gposts.active-object-fit .postformat-content .postformat--gallery span {
   padding-bottom: var(--lakit-posts-image-height, 0)
 }
-.enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__sub.lakit-nav-depth-1{
-  max-width: calc(100% - var(--lakit-nav-lv2-gap, 0));
+.enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__sub.lakit-nav-depth-1 {
+  max-width: calc(100% - var(--lakit-nav-lv2-gap, 0))
 }
-.enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav--clone > .lakit-nav__sub,
-.enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__item:not(.lakit-nav__item--mega) > .lakit-nav__sub{
+.enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav--clone > .lakit-nav__sub, .enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__item:not(.lakit-nav__item--mega) > .lakit-nav__sub {
   background-color: var(--enav-mb-navsub-bg);
   --enav2_n_tcolor: var(--enav-mb-lv1-color);
   --enav2_n_bgcolor: var(--enav-mb-lv1-bg);
   --enav2_a_tcolor: var(--enav-mb-lv1-color-active);
-  --enav2_a_bgcolor: var(--enav-mb-lv1-bg-active);
+  --enav2_a_bgcolor: var(--enav-mb-lv1-bg-active)
 }
-.enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__item--mega .elementor[data-elementor-type] > .e-con.e-parent{
-  background-color: var(--enav-mb-navsub-bg);
+.enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__item--mega .elementor[data-elementor-type] > .e-con.e-parent {
+  background-color: var(--enav-mb-navsub-bg)
 }
-.enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__item--mega .elementor[data-elementor-type] .elementor-icon-list-item{
+.enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__item--mega .elementor[data-elementor-type] .elementor-icon-list-item {
   color: var(--enav-mb-lv1-color);
-  background-color: var(--enav-mb-lv1-bg);
+  background-color: var(--enav-mb-lv1-bg)
 }
-.enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__item--mega .elementor[data-elementor-type] .elementor-icon-list-item.current-menu-item{
+.enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__item--mega .elementor[data-elementor-type] .elementor-icon-list-item.current-menu-item {
   color: var(--enav-mb-lv1-color-active);
-  background-color: var(--enav-mb-lv1-bg-active);
+  background-color: var(--enav-mb-lv1-bg-active)
 }
-.enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__item--mega .elementor[data-elementor-type] .elementor-icon-list-item span[class^="elementor-icon"]{
-  color: inherit;
-}
-.enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__item--mega .elementor-icon-list-icon svg{
+.enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__item--mega .elementor-icon-list-icon svg {
   color: currentColor;
-  fill: currentColor;
+  fill: currentColor
 }
-.enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__item--mega .elementor-widget-heading .elementor-heading-title{
-  color: var(--enav-mb-lv1-color);
+.enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__item--mega .elementor-widget-heading .elementor-heading-title {
+  color: var(--enav-mb-lv1-color)
 }
-.enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__item--mega .elementor-divider{
-  --divider-color: var(--enav-mb-lv1-color);
+.enav-override-submenu-yes .lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__item--mega .elementor-divider {
+  --divider-color: var(--enav-mb-lv1-color)
 }
 .lakit-active--mbmenu .lakit-nav__sub.lakit-nav__sub-mega {
-  margin-top: 0 !important;
+  margin-top: 0 !important
 }
 .lakit--banner-duplicate .lakit-bannerlist__list {
   flex-wrap: nowrap;
   will-change: transform;
-  animation: lakit-marquee-100 20s linear infinite;
+  animation: 20s linear infinite lakit-marquee-100
 }
 @keyframes lakit-marquee-100 {
   0% {
-    transform: translateX(0);
+    transform: translateX(0)
   }
   100% {
-    transform: translateX(-100%);
+    transform: translateX(-100%)
   }
 }
 @keyframes lakit-marquee-50 {
   0% {
-    transform: translateX(0);
+    transform: translateX(0)
   }
   100% {
-    transform: translateX(-50%);
+    transform: translateX(-50%)
   }
+}
+.lakit-i-triangle-down:before {
+  content: '';
+  width: 0;
+  height: 0;
+  border-left: .6em solid transparent;
+  border-right: .6em solid transparent;
+  border-top: .8em solid currentColor;
+  vertical-align: middle
+}
+.lakit-search__submit-icon {
+  line-height: 0;
+  display: flex
+}
+.elementor-widget-spacer > .elementor-spacer > .elementor-spacer-inner {
+  height: var(--spacer-size) !important;
+}
+.elementor-lakit-search .lakit-search__label{
+  margin-bottom: 0
+}
+.elementor-icon-list-items {
+  list-style: none;
+  margin: 0;
+}
+.elementor-element.elementor-motion-effects-element {
+  transition: none !important;
 }

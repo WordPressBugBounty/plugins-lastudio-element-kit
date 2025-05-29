@@ -318,7 +318,7 @@ class LaStudioKit_Woo_Filters extends LaStudioKit_Base {
                 ],
                 'default' => 'and',
                 'condition' => [
-                    'filter_source' => ['product_attribute']
+                    'filter_source' => ['product_attribute', 'brand_list']
                 ],
             ]
         );

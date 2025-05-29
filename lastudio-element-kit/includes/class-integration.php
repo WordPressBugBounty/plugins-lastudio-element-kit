@@ -67,6 +67,9 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
             add_action( 'elementor/frontend/after_enqueue_scripts', array( $this, 'frontend_enqueue_js' ), 10 );
             add_action( 'wp_enqueue_scripts', array( $this, 'frontend_enqueue_later' ), 1000 );
 
+            add_action( 'elementor/frontend/after_register_scripts', array( $this, 'frontend_override_js' ), 20 );
+
+
             $this->sys_messages = apply_filters( 'lastudio-kit/popups_sys_messages', array(
                 'invalid_mail'                => esc_html__( 'Please, provide valid mail', 'lastudio-kit' ),
                 'mailchimp'                   => esc_html__( 'Please, set up MailChimp API key and List ID', 'lastudio-kit' ),
@@ -511,6 +514,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 	                'popupjs'           => lastudio_kit()->plugin_url('includes/modules/popup/assets/js/popup.min.js'),
 	                'popupcss'          => lastudio_kit()->plugin_url('includes/modules/popup/assets/css/popup.min.css'),
                     'odometerjs'        => lastudio_kit()->plugin_url('assets/js/lib/odometer.min.js'),
+                    'swiperjs'          => lastudio_kit()->plugin_url('assets/js/lib/swiper.min.js'),
                 ],
 	            'recaptchav3'       => $this->is_active_recaptchav3() ? $this->get_recaptchav3_site_key() : '',
             ];
@@ -538,25 +542,42 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 
 			wp_add_inline_script('wc-single-product', $this->product_image_flexslider_vars(), 'before');
 
-			if(filter_var(lastudio_kit_settings()->get_option('disable-gutenberg-block', ''), FILTER_VALIDATE_BOOLEAN)){
-				wp_dequeue_style( 'wp-block-library' );
-				wp_dequeue_style( 'wp-block-library-theme' );
-				wp_dequeue_style( 'classic-theme-styles' );
-				wp_deregister_style( 'wc-blocks-style' );
-				wp_dequeue_style( 'wc-blocks-style' ); // Remove WooCommerce block CSS
-				wp_dequeue_style( 'wc-all-blocks-style' ); // Remove WooCommerce block CSS
-				wp_deregister_script('wp-embed');
-				wp_deregister_script('thickbox');
-				wp_dequeue_style('thickbox');
+            $disable_gutenberg_block_css = lastudio_kit_settings()->get_option('disable-gutenberg-block', '');
+
+			if($disable_gutenberg_block_css === 'enabled'){
+                wp_dequeue_style( 'wp-block-library' );
+                wp_dequeue_style( 'wp-block-library-theme' );
+                wp_dequeue_style( 'classic-theme-styles' );
+                wp_deregister_style( 'wc-blocks-style' );
+                wp_dequeue_style( 'wc-blocks-style' );
+                wp_dequeue_style( 'wc-all-blocks-style' );
+                wp_deregister_script('wp-embed');
+                wp_deregister_script('thickbox');
+                wp_dequeue_style('thickbox');
 			}
 			if( ! $this->in_elementor() ){
 				wp_dequeue_style( 'elementor-icons' );
 				wp_deregister_style( 'elementor-icons' );
+                wp_dequeue_style( 'elementor-common' );
+				wp_deregister_style( 'elementor-common' );
 			}
+
+            $css = '
+                @media screen and ( max-width: 782px ) { html { margin-top: 0 !important; } }
+            ';
+            wp_add_inline_style( 'admin-bar', $css );
         }
 
-        public function frontend_render_script(){
-
+        public function frontend_override_js()
+        {
+            wp_deregister_script('swiper');
+            wp_register_script(
+                'swiper',
+                lastudio_kit()->plugin_url('assets/js/lib/swiper.min.js'),
+                [],
+                '8.4.5',
+                true
+            );
         }
 
         /**
@@ -1618,6 +1639,20 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
                 'has_flip' => true,
                 'url'   => lastudio_kit()->plugin_url('assets/shapes/custom-07.svg'),
                 'path'   => lastudio_kit()->plugin_path('assets/shapes/custom-07.svg'),
+            ];
+            $additional_shapes['lakit-shape-08'] = [
+                'title' => esc_html_x( 'LaKit Shape 08', 'Shapes', 'lastudio-kit' ),
+                'has_negative' => true,
+                'has_flip' => true,
+                'url'   => lastudio_kit()->plugin_url('assets/shapes/custom-08.svg'),
+                'path'   => lastudio_kit()->plugin_path('assets/shapes/custom-08.svg'),
+            ];
+            $additional_shapes['lakit-shape-09'] = [
+                'title' => esc_html_x( 'LaKit Shape 09', 'Shapes', 'lastudio-kit' ),
+                'has_negative' => true,
+                'has_flip' => true,
+                'url'   => lastudio_kit()->plugin_url('assets/shapes/custom-09.svg'),
+                'path'   => lastudio_kit()->plugin_path('assets/shapes/custom-09.svg'),
             ];
             return $additional_shapes;
         }

@@ -279,8 +279,12 @@ add_action('elementor/element/icon-list/section_icon_style/before_section_end', 
     $element->end_injection();
     $element->update_control('icon_color', [
         'selectors' => [
-            '{{WRAPPER}} .elementor-icon-list-icon i' => 'color: {{VALUE}};',
-            '{{WRAPPER}} .elementor-icon-list-icon svg' => 'fill: {{VALUE}};color: {{VALUE}};',
+            '{{WRAPPER}} .elementor-icon-list-icon :is(i, svg)' => 'fill: {{VALUE}};color: {{VALUE}};',
+        ]
+    ]);
+    $element->update_control('icon_color_hover', [
+        'selectors' => [
+            '{{WRAPPER}} .elementor-icon-list-item:hover :is(i, svg)' => 'fill: {{VALUE}};color: {{VALUE}};',
         ]
     ]);
 }, 10 );
@@ -512,29 +516,14 @@ add_action('elementor/element/image-box/section_style_box/before_section_end', f
         ],
     ]);
 });
+add_action('elementor/element/image-box/section_style_image/before_section_end', function ( \Elementor\Controls_Stack $element){
+    $element->update_responsive_control('image_size', [
+        'selectors' => [
+            '{{WRAPPER}} .elementor-image-box-wrapper .elementor-image-box-img' => 'width: {{SIZE}}{{UNIT}}; flex: 0 0 {{SIZE}}{{UNIT}};',
+        ],
+    ]);
+});
 add_action('elementor/element/image-box/section_style_content/before_section_end', function ( $element ){
-//    $element->add_responsive_control(
-//        'content_padding',
-//        [
-//            'label' => esc_html__( 'Content Padding', 'lastudio-kit' ),
-//            'type' => \Elementor\Controls_Manager::DIMENSIONS,
-//            'size_units' => [ 'px', '%', 'em' ],
-//            'selectors' => [
-//                '{{WRAPPER}} .elementor-image-box-content' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-//            ]
-//        ]
-//    );
-//    $element->add_responsive_control(
-//        'content_margin',
-//        [
-//            'label' => esc_html__( 'Content Margin', 'lastudio-kit' ),
-//            'type' => \Elementor\Controls_Manager::DIMENSIONS,
-//            'size_units' => [ 'px', '%', 'em' ],
-//            'selectors' => [
-//                '{{WRAPPER}} .elementor-image-box-content' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-//            ]
-//        ]
-//    );
 	$element->add_control(
 		'title_hover_color',
 		[

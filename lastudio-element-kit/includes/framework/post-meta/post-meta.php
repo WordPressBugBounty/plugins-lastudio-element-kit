@@ -675,6 +675,11 @@ if ( ! class_exists( 'Cherry_X_Post_Meta' ) ) {
         public function sanitize_meta( $key = '', $value = null, $fields = null ) {
 
             $fields = ! $fields ? $this->args['fields'] : $fields;
+
+            if(!isset($fields[ $key ])){
+                return $value;
+            }
+
             $field  = $fields[ $key ];
 
             if ( 'repeater' === $field['type'] && ! empty( $field['fields'] ) && is_array( $value ) ) {

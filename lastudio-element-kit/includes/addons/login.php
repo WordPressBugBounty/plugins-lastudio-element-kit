@@ -198,6 +198,20 @@ class LaStudioKit_Login extends LaStudioKit_Base {
         );
 
         $this->_add_control(
+            'input_placeholder_color',
+            array(
+                'label'  => esc_html__( 'Placeholder Color', 'lastudio-kit' ),
+                'type'   => Controls_Manager::COLOR,
+                'selectors' => array(
+                    '{{WRAPPER}} .lakit-login input.input::-webkit-input-placeholder' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} .lakit-login input.input::-moz-placeholder'          => 'color: {{VALUE}}',
+                    '{{WRAPPER}} .lakit-login input.input::-ms-input-placeholder'     => 'color: {{VALUE}}',
+                ),
+            ),
+            25
+        );
+
+        $this->_add_control(
             'input_color',
             array(
                 'label'  => esc_html__( 'Text Color', 'lastudio-kit' ),

@@ -1175,9 +1175,9 @@ abstract class LaStudioKit_Base extends Widget_Base
                 ],
                 'selectors_dictionary' => [
                     'both' => 'clip-path: inset(-50% -200% -50% -200%)',
-                    'left' => 'clip-path: inset(-50% 0 -50% -200%)',
-                    'right' => 'clip-path: inset(-50% -200% -50% 0)',
-                    'none' => 'clip-path: inset(-50% 0 -50% 0)',
+                    'left' => 'clip-path: inset(-50% calc(-1 * var(--lakit-carousel-item-right-space, 0px)) -50% -200%)',
+                    'right' => 'clip-path: inset(-50% -200% -50% calc(-1 * var(--lakit-carousel-item-left-space, 0px)))',
+                    'none' => 'clip-path: inset(-50% calc(-1 * var(--lakit-carousel-item-right-space, 0px)) -50% calc(-1 * var(--lakit-carousel-item-left-space, 0px)))',
                 ]
 		    )
 	    );
@@ -1711,6 +1711,32 @@ abstract class LaStudioKit_Base extends Widget_Base
                 'show_label' => false,
                 'condition' => $carousel_condition
             )
+        );
+
+        $this->add_responsive_control(
+            'carousel_arrow_display',
+            [
+                'label' => esc_html__( 'Display', 'lastudio-kit' ),
+                'type' => Controls_Manager::CHOOSE,
+                'options' => [
+                    'yes' => [
+                        'title' => esc_html__( 'Yes', 'lastudio-kit' ),
+                        'icon' => 'eicon-check',
+                    ],
+                    'no' => [
+                        'title' => esc_html__( 'No', 'lastudio-kit' ),
+                        'icon' => 'eicon-ban',
+                    ],
+                ],
+                'default' => 'yes',
+                'selectors' => [
+                    '{{WRAPPER}}' => '{{VALUE}}',
+                ],
+                'selectors_dictionary' => [
+                    'yes'       => '--lakit-carousel-arrow-o: 1; --lakit-carousel-arrow-v: inherit; --lakit-carousel-arrow-d: flex',
+                    'no'        => '--lakit-carousel-arrow-o: 0; --lakit-carousel-arrow-v: hidden; --lakit-carousel-arrow-d: none',
+                ]
+            ]
         );
 
         $this->_add_control(

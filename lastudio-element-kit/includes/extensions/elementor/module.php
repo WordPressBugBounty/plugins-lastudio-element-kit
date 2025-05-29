@@ -62,6 +62,8 @@ class Module extends Module_Base {
 
         add_action('lastudiokit/renderIconSVGSprite', [ $this, 'getRenderSVGSprite' ]);
         add_action('wp_footer', [ $this, 'getRenderSVGSprite' ], 9999);
+
+        $this->loadSVGJSON();
     }
 
     public static function is_active(){
@@ -398,41 +400,17 @@ class Module extends Module_Base {
                 'path' => lastudio_kit()->plugin_path('includes/extensions/elementor/assets/fonts/LaStudioIcons-svg.json')
             ]
         ];
-        $cache_key = 'lakit-icons-data';
-        $cache = get_transient($cache_key);
-        if(empty($cache)){
-            $saved_data = [];
-            foreach ($svg as $k => $item){
-                $fileData = \Elementor\Utils::file_get_contents($item['path']);
-                $saved_data[$k] = [
-                    'version' => $item['version'],
-                    'data' => !empty($fileData) ? $fileData : ''
-                ];
-            }
-            set_transient($cache_key, $saved_data, WEEK_IN_SECONDS);
-            $cache = $saved_data;
+
+        $saved_data = [];
+        foreach ($svg as $k => $item){
+            $fileData = \Elementor\Utils::file_get_contents($item['path']);
+            $saved_data[$k] = [
+                'version' => $item['version'],
+                'data' => !empty($fileData) ? $fileData : ''
+            ];
         }
-        else{
-            $updated = false;
-            $newData = [];
-            foreach ($cache as $k => $item){
-                if(isset($svg[$k]) && $item['version'] !== $svg[$k]['version']){
-                    $updated = true;
-                    $fileData = \Elementor\Utils::file_get_contents($svg[$k]['path']);
-                    $item = [
-                        'version' => $svg[$k]['version'],
-                        'data' => !empty($fileData) ? $fileData : ''
-                    ];
-                }
-                $newData[$k] = $item;
-            }
-            if($updated){
-                set_transient($cache_key, $newData, WEEK_IN_SECONDS);
-                $cache = $newData;
-            }
-        }
-        self::$iconResources = $cache;
-        return $cache;
+        self::$iconResources = $saved_data;
+        return self::$iconResources;
     }
 
     public function maybeRenderSVGSpriteIcon( $icon = '', $type = '' ){

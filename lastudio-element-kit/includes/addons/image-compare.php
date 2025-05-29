@@ -574,16 +574,17 @@ class LaStudioKit_Image_Compare extends LaStudioKit_Base {
 
 	public function _get_js_settings(){
 		$starting_point = $this->get_settings_for_display('starting_point');
+
 		return wp_json_encode([
 			'startingPoint' => !empty($starting_point['size']) ? absint($starting_point['size']) : 50,
 			'verticalMode'  => $this->get_settings_for_display('compare_mode') === 'vertical',
 			'hoverStart'    => filter_var( $this->get_settings_for_display('hover_start'), FILTER_VALIDATE_BOOLEAN ),
 			'showLabels'    => filter_var( $this->get_settings_for_display('show_label'), FILTER_VALIDATE_BOOLEAN ),
 			'labelOptions' => [
-				'before' => $this->get_settings_for_display('before_title'),
-				'after' => $this->get_settings_for_display('after_title'),
+				'before'    => esc_attr($this->get_settings_for_display('before_title')),
+				'after'     => esc_attr($this->get_settings_for_display('after_title')),
 			],
-			'controlType' => $this->get_settings_for_display('control_type')
+			'controlType' => esc_attr($this->get_settings_for_display('control_type'))
 		]);
 	}
 

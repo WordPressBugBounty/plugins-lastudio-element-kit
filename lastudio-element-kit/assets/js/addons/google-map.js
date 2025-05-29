@@ -23,43 +23,46 @@
             map = new google.maps.Map($container[0], init);
 
             if (pins) {
-                $.each(pins, function (index, pin) {
+                try{
+                    $.each(pins, function (index, pin) {
 
-                    var marker,
-                        infowindow,
-                        pinData = {
-                            position: pin.position,
-                            map: map
-                        };
+                        var marker,
+                            infowindow,
+                            pinData = {
+                                position: pin.position,
+                                map: map
+                            };
 
-                    if ('' !== pin.image) {
-                        pinData.icon = pin.image;
-                    }
+                        if ('' !== pin.image) {
+                            pinData.icon = pin.image;
+                        }
 
-                    marker = new google.maps.Marker(pinData);
+                        marker = new google.maps.Marker(pinData);
 
-                    if ('' !== pin.desc) {
-                        infowindow = new google.maps.InfoWindow({
-                            content: pin.desc,
-                            disableAutoPan: true
+                        if ('' !== pin.desc) {
+                            infowindow = new google.maps.InfoWindow({
+                                content: pin.desc,
+                                disableAutoPan: true
+                            });
+                        }
+
+                        marker.addListener('click', function () {
+                            infowindow.setOptions({disableAutoPan: false});
+                            infowindow.open(map, marker);
                         });
-                    }
 
-                    marker.addListener('click', function () {
-                        infowindow.setOptions({disableAutoPan: false});
-                        infowindow.open(map, marker);
+                        google.maps.event.addListener(infowindow, 'domready', function () {
+                            var iwOuter = $('.gm-style-iw');
+                            iwOuter.prev().addClass('gm-style-iw-prev').parent().parent().parent().parent().addClass('gm-parent-iw');
+                        });
+
+                        if ('visible' === pin.state && '' !== pin.desc) {
+                            infowindow.open(map, marker);
+                        }
                     });
-
-                    google.maps.event.addListener(infowindow, 'domready', function () {
-                        var iwOuter = $('.gm-style-iw');
-                        iwOuter.prev().addClass('gm-style-iw-prev').parent().parent().parent().parent().addClass('gm-parent-iw');
-                    });
-
-                    if ('visible' === pin.state && '' !== pin.desc) {
-                        infowindow.open(map, marker);
-                    }
-
-                });
+                }catch (err) {
+                    console.log(err)
+                }
             }
 
             map.addListener('tilt_changed', function () {
