@@ -649,7 +649,7 @@ class LaStudioKit_Breadcrumbs extends LaStudioKit_Base {
         $this->_add_responsive_control(
             'breadcrumbs_sep_icon_size',
             array(
-                'label'      => esc_html__( 'Icon Size', 'lastudio-kit' ),
+                'label'      => esc_html__( 'Font Size', 'lastudio-kit' ),
                 'type'       => Controls_Manager::SLIDER,
                 'size_units' => array( 'px', 'em', 'rem' ),
                 'range'      => array(
@@ -659,23 +659,8 @@ class LaStudioKit_Breadcrumbs extends LaStudioKit_Base {
                     ),
                 ),
                 'selectors'  => array(
-                    '{{WRAPPER}} ' . $css_scheme['sep'] => 'font-size: {{SIZE}}{{UNIT}};',
-                ),
-                'condition' => array(
-                    'separator_type' => 'icon',
-                ),
-            ),
-            50
-        );
-
-        $this->_add_group_control(
-            Group_Control_Typography::get_type(),
-            array(
-                'name'      => 'breadcrumbs_sep_typography',
-                'selector'  => '{{WRAPPER}} ' . $css_scheme['sep'],
-                'condition' => array(
-                    'separator_type' => 'custom',
-                ),
+	                '{{WRAPPER}} ' . $css_scheme['sep'] . ' > span' => 'font-size: {{SIZE}}{{UNIT}};',
+                )
             ),
             50
         );
@@ -878,9 +863,12 @@ class LaStudioKit_Breadcrumbs extends LaStudioKit_Base {
 
         $title_format = '<' . $title_tag . ' class="lakit-breadcrumbs__title">%s</' . $title_tag . '>';
 
+		$show_title = filter_var( $settings['show_title'], FILTER_VALIDATE_BOOLEAN );
+	    $custom_title = '';
         $custom_page_title = $this->get_settings_for_display('custom_page_title');
         if(!empty($custom_page_title)){
             $title_format = '<' . $title_tag . ' class="lakit-breadcrumbs__title">'. esc_html($custom_page_title) .'</' . $title_tag . '>';
+			$custom_title = $custom_page_title;
         }
 
         $custom_home_page_enabled = ! empty( $settings['enabled_custom_home_page_label'] ) ? $settings['enabled_custom_home_page_label'] : false;
@@ -892,7 +880,8 @@ class LaStudioKit_Breadcrumbs extends LaStudioKit_Base {
             'page_title_format' => $title_format,
             'separator'         => $this->_get_separator(),
             'show_on_front'     => filter_var( $settings['show_on_front'], FILTER_VALIDATE_BOOLEAN ),
-            'show_title'        => filter_var( $settings['show_title'], FILTER_VALIDATE_BOOLEAN ),
+            'show_title'        => $show_title,
+            'custom_title'      => $custom_title,
             'show_browse'       => filter_var( $settings['show_browse'], FILTER_VALIDATE_BOOLEAN ),
             'path_type'         => $settings['path_type'],
             'action'            => 'lakit_breadcrumbs/render',
@@ -971,7 +960,7 @@ class LaStudioKit_Breadcrumbs extends LaStudioKit_Base {
      *
      * @return boolean
      */
-    public function static_home_page_title_off() {
+    public static function static_home_page_title_off() {
         return false;
     }
 

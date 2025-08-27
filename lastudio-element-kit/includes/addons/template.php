@@ -70,7 +70,9 @@ class LaStudioKit_Template extends LaStudioKit_Base {
 
     $template_id = apply_filters('wpml_object_id', $template_id, 'elementor_library', true);
 
-    if ( ! empty( $template_id ) ) {
+    $is_valid = !empty($template_id) && 'publish' === get_post_status( $template_id );
+
+    if ( $is_valid ) {
         ob_start();
         if(Plugin::instance()->editor->is_edit_mode()){
             $css_file = Post_CSS::create( $template_id );
@@ -86,7 +88,7 @@ class LaStudioKit_Template extends LaStudioKit_Base {
     <div class="lakit-template">
       <?php
 
-      if ( ! empty( $template_id ) ) {
+      if ( $is_valid ) {
         $link = add_query_arg(
           array(
             'elementor' => '',

@@ -3932,4 +3932,44 @@ abstract class LaStudioKit_Base extends Widget_Base
             ],
         ];
     }
+
+	protected function _loop_image_item( $key = '', $format = '%s', $html_return = true ) {
+		$item = $this->_processed_item;
+		$params = [];
+
+		if ( ! array_key_exists( $key, $item ) ) {
+			return false;
+		}
+
+		$image_item = $item[ $key ];
+
+		if ( ! empty( $image_item['id'] ) ) {
+			$image_data = wp_get_attachment_image_src( $image_item['id'], 'full' );
+			if( !empty($image_data) ){
+				$params[] = apply_filters('lastudio_wp_get_attachment_image_url', $image_data[0]);
+				$params[] = $image_data[1];
+				$params[] = $image_data[2];
+				$params[] = trim( strip_tags( get_post_meta( $image_item['id'], '_wp_attachment_image_alt', true ) ) );
+			}
+			else{
+				$params[] = isset($image_item['url']) ? esc_url($image_item['url']) : Utils::get_placeholder_image_src();
+				$params[] = 1200;
+				$params[] = 800;
+				$params[] = '';
+			}
+		}
+		else {
+			$params[] = isset($image_item['url']) ? esc_url($image_item['url']) : Utils::get_placeholder_image_src();
+			$params[] = 1200;
+			$params[] = 800;
+			$params[] = '';
+		}
+
+		if($html_return){
+			return vsprintf( $format, $params );
+		}
+		else{
+			return $params;
+		}
+	}
 }

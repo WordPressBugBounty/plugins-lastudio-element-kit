@@ -310,6 +310,9 @@ class Locations_Manager {
 		return true;
 	}
 
+	public function get_documents_for_location( string $location ) : array {
+		return $this->locations_queue[ $location ] ?? [];
+	}
 	public function did_location( $location ) {
 		return in_array( $location, $this->did_locations, true );
 	}

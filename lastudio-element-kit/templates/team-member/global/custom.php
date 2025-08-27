@@ -127,12 +127,20 @@ if( $enable_carousel ){
                                         if(!empty($member_role) && $show_role){
                                             echo sprintf('<div class="lakit-team-member__position"><span>%s</span></div>', esc_html($member_role));
                                         }
-    
-                                        if($excerpt_length > 0){
-                                            echo sprintf(
-                                                '<p class="lakit-team-member__desc">%1$s</p>',
-                                                wp_trim_words($member_description, $excerpt_length) // phpcs:ignore
-                                            );
+
+                                        if($show_excerpt){
+                                            if($excerpt_length > 0){
+                                                echo sprintf(
+                                                    '<div class="lakit-team-member__desc">%1$s</div>',
+                                                    wp_trim_words($member_description, $excerpt_length) // phpcs:ignore
+                                                );
+                                            }
+                                            else{
+                                                echo sprintf(
+                                                    '<div class="lakit-team-member__desc">%1$s</div>',
+                                                    wp_kses_post(balanceTags($member_description, true))
+                                                );
+                                            }
                                         }
     
                                         if(!in_array($preset, array('type-1', 'type-2', 'type-3')) && $show_social && !empty($social_html)){

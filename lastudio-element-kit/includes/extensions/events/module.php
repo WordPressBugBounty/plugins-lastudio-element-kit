@@ -121,6 +121,7 @@ class Module extends Module_Base {
 				'event_start_date' => array(
 					'type'        => 'text',
 					'input_type'  => 'date',
+					'is_timestamp'=> false,
 					'title'       => esc_html_x( 'Start Date', 'CPT Event Metabox','lastudio-kit' ),
 					'description' => esc_html_x( 'Formatted like "YYYY-MM-DD".','CPT Event Metabox', 'lastudio-kit' ),
 					'placeholder' => 'YYYY-MM-DD'

@@ -1,0 +1,31 @@
+:root, [data-theme=dark], [data-theme=light]{
+  --font-size: 15px;
+}
+.givewp-fields-gateways__gateway label {
+  padding: var(--givewp-spacing-4);
+}
+.givewp-donation-form-design--classic .givewp-layouts-section{
+  padding-inline: clamp(var(--givewp-spacing-6),7vw,var(--givewp-spacing-10))
+}
+.givewp-elements-donationSummary__list {
+  gap: 0;
+}
+button[type=submit]{
+  margin: 0
+}
+.givewp-donation-form{
+  padding: 0;
+}
+.givewp-groups-name {
+  column-gap: 1rem;
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  width: 100%;
+}
+.givewp-donation-form__steps{
+  max-width: 100%;
+}
+.givewp-layouts-receipt{
+  box-shadow: none;
+}

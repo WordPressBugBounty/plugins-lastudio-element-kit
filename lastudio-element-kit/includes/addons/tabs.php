@@ -1854,7 +1854,7 @@ class LaStudioKit_Tabs extends LaStudioKit_Base {
               break;
 
             case 'editor':
-              $content_html = $this->parse_text_editor( $item['item_editor_content'] );
+              $content_html = $this->parse_text_editor( $item['item_editor_content'] ?? '' );
               break;
           }
 

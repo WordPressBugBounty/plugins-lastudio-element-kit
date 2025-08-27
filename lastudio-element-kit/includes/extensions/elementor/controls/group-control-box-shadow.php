@@ -24,10 +24,10 @@ class Group_Control_Box_Shadow extends Group_Control_Base {
         $fields['_boxshadow_c'] = array(
             'label'     => _x( 'Color', 'Box Shadow Control', 'lastudio-kit' ),
             'type'      => Controls_Manager::COLOR,
-            'default'   => 'rgba(0,0,0,0.5)',
+            'default'   => 'rgba(0,0,0,0.15)',
             'title'     => _x( 'Color', 'Box Shadow Control', 'lastudio-kit' ),
             'selectors' => [
-                '{{SELECTOR}}' => 'box-shadow: var(--shadow_horizontal, 0) var(--shadow_vertical, 0) var(--shadow_blur, 0) var(--shadow_spread, 0) {{VALUE}} {{_boxshadow_p.VALUE}};',
+                '{{SELECTOR}}' => 'box-shadow: var(--shadow_horizontal, 0) var(--shadow_vertical, 0) var(--shadow_blur, 10px) var(--shadow_spread, 0) {{VALUE}} {{_boxshadow_p.VALUE}};',
             ],
             'global'    => [],
             'render_type' => 'ui',

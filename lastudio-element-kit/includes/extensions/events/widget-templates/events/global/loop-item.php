@@ -61,6 +61,9 @@ if($show_title == 'yes' || $show_more == 'yes' || $show_meta == 'yes' || $show_e
                         'class' => 'lakit-posts__thumbnail-img wp-post-image la-lazyload-image'
                     ))
                 ?></a>
+                <?php
+                $this->_load_template($this->_get_global_template('loop-date'));
+                ?>
             </div>
         <?php }
 
@@ -70,7 +73,7 @@ if($show_title == 'yes' || $show_more == 'yes' || $show_meta == 'yes' || $show_e
 
             echo '<div class="lakit-posts__inner-content-inner">';
 
-            if( $preset === 'evt-2' ){
+            if( $preset === 'evt-2' || $preset === 'evt-3' ){
                 echo '<div class="lakit-posts__wrap-title">';
             }
 
@@ -110,6 +113,17 @@ if($show_title == 'yes' || $show_more == 'yes' || $show_meta == 'yes' || $show_e
                 $this->_load_template($this->_get_global_template('loop-meta2'));
             }
 
+	        if( $preset === 'evt-3' ){
+		        echo '</div>';
+	        }
+
+	        if ($meta1_pos == 'before_content') {
+		        $this->_load_template($this->_get_global_template('loop-meta1'));
+	        }
+	        if ($meta2_pos == 'before_content') {
+		        $this->_load_template($this->_get_global_template('loop-meta2'));
+	        }
+
             if ($show_excerpt) {
                 $excerpt_length = absint($excerpt_length);
                 if ($excerpt_length > 0) {
@@ -131,7 +145,7 @@ if($show_title == 'yes' || $show_more == 'yes' || $show_meta == 'yes' || $show_e
                 echo '</div>';
             }
 
-            if ($show_more == 'yes' && !in_array($preset, ['evt-1', 'evt-2']) ) {
+            if ($show_more == 'yes' && !in_array($preset, ['evt-1', 'evt-2', 'evt-3']) ) {
                 echo sprintf(
                     '<div class="lakit-posts__more-wrap lakit-btn-more-wrap"><a href="%2$s" class="elementor-button lakit-posts__btn-more lakit-btn-more" title="%3$s" rel="bookmark"><span class="btn__text">%1$s</span>%4$s</a></div>',
                     esc_html($more_text),
@@ -152,7 +166,7 @@ if($show_title == 'yes' || $show_more == 'yes' || $show_meta == 'yes' || $show_e
         echo '</div>';
         echo '</div>';
 
-        if($show_more == 'yes' && in_array($preset, ['evt-1', 'evt-2'])){
+        if($show_more == 'yes' && in_array($preset, ['evt-1', 'evt-2', 'evt-3'])){
             echo sprintf(
                 '<div class="lakit-posts__more-wrap lakit-btn-more-wrap"><a href="%2$s" class="elementor-button lakit-posts__btn-more lakit-btn-more" title="%3$s" rel="bookmark"><span class="btn__text">%1$s</span>%4$s</a></div>',
                 esc_html($more_text),

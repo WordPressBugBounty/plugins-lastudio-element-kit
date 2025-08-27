@@ -377,7 +377,7 @@ class Portfolio extends LaStudioKit_Posts {
 			array(
 				'label'      => esc_html__( 'Width', 'lastudio-kit' ),
 				'type'       => Controls_Manager::SLIDER,
-				'size_units' => ['px', '%'],
+				'size_units' => ['px', '%', 'custom'],
 				'selectors'  => array(
 					'{{WRAPPER}} ' . $css_scheme['inner-content'] => 'width: {{SIZE}}{{UNIT}};',
 				),

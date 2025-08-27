@@ -1,10 +1,3 @@
-// jQuery( window ).on( 'elementor/frontend/init', () => {
-//
-//     window.elementorFrontend.hooks.addAction('frontend/element_ready/lakit-posts.default', function ($scope) {
-//         LogError('aa');
-//     });
-// } );
-
 document.addEventListener('DOMContentLiteSpeedLoaded', function(){
     document.body.classList.remove('site-loading');
     document.body.classList.remove('body-loading');
@@ -18,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
     const mobileMenuNodes = document.querySelectorAll('.lakit-mobile-menu:not([data-mobile-breakpoint="all"])');
     mobileMenuNodes.forEach( menuNode => {
-        let menuBreakpoint = parseInt(menuNode.getAttribute('data-mobile-breakpoint'));
+        let menuBreakpoint = parseInt(menuNode.dataset.mobileBreakpoint);
         if(window.innerWidth <= menuBreakpoint){
             menuNode.classList.add('lakit-active--mbmenu');
         }
@@ -28,17 +21,14 @@ document.addEventListener('DOMContentLoaded', function () {
         return stickySection?.clientHeight || 0;
     }
     const setHeaderHeight = () => {
-        document.documentElement.style.setProperty('--lakit-header-height', getHeaderHeight() + 'px');
-        let footerElement = document.querySelector('.lakit-site-wrapper > .elementor-location-footer') ?? document.querySelector('#site-footer'),
-            pageHeaderElement = document.querySelector('.page-header--default');
-        document.documentElement.style.setProperty('--lakit-footer-height', (footerElement?.clientHeight || 0) + 'px');
-        document.documentElement.style.setProperty('--lakit-pheader-height', (pageHeaderElement?.clientHeight || 0) + 'px');
-        if(document.querySelector('.elementor-location-header .e-con.elementor-sticky')){
-            document.body.classList.add('e-has-header-sticky')
-        }
-        else{
-            document.body.classList.remove('e-has-header-sticky')
-        }
+        const root = document.documentElement;
+        root.style.setProperty('--lakit-header-height', `${getHeaderHeight()}px`);
+        const footer = document.querySelector('.lakit-site-wrapper > .elementor-location-footer') || document.querySelector('#site-footer');
+        const pageHeader = document.querySelector('.page-header--default');
+        root.style.setProperty('--lakit-footer-height', `${footer?.clientHeight || 0}px`);
+        root.style.setProperty('--lakit-pheader-height', `${pageHeader?.clientHeight || 0}px`);
+        const hasSticky = document.querySelector('.elementor-location-header .e-con.elementor-sticky');
+        document.body.classList.toggle('e-has-header-sticky', !!hasSticky);
     }
     setHeaderHeight();
     window.addEventListener('load', setHeaderHeight);
@@ -465,10 +455,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 speed: elementSettings.speed,
                 handleElementorBreakpoints: false,
                 slidesPerGroup: parseInt(elementSettings.slidesToScroll.desktop || 1),
-                loopAdditionalSlides: 4,
-                loopFillGroupWithBlank: true,
-                loopedSlides: 4,
+                loopFillGroupWithBlank: false,
+                loopedSlides: slidesToShow,
+                loopAdditionalSlides: 1,
                 preloadImages: false,
+                threshold: 1,
+                preventClicks: false,
+                preventClicksPropagation: false,
+                slideToClickedSlide: false,
                 grid: {
                     rows: e_dRows,
                     fill: 'row'
@@ -498,7 +492,8 @@ document.addEventListener('DOMContentLoaded', function () {
                         fill: 'row'
                     },
                     direction: elementSettings.directionbkp[breakpointName] || _directionBase,
-                    loop: _bkp_gRows > 1 ? false : elementSettings.infinite
+                    loop: _bkp_gRows > 1 ? false : elementSettings.infinite,
+                    loopFillGroupWithBlank: _bkp_gRows > 1 ? true : false
                 }
                 lastBreakpointSlidesToShowValue = +elementSettings.slidesToShow[breakpointName] || defaultSlidesToShow;
             });
@@ -723,8 +718,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 swiperOptions.slideToClickedSlide = true;
             }
 
-            const Swiper = LaStudioKits.utils.Swiper;
-            // const Swiper = elementorFrontend.utils.swiper;
+
 
             $('.swiper-slide .lakit-has-entrance-animation', $scope).each(function (){
                 const _settings = $(this).data('settings');
@@ -819,8 +813,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
 
-            let _c_timeout;
-
             swiperOptions.on = {
                 ...swiperOptions?.on,
                 beforeInit: ( _swiper ) => {
@@ -862,22 +854,26 @@ document.addEventListener('DOMContentLoaded', function () {
                         return _swiper.visibleSlidesIndexes.includes(_idx)
                     });
                     slideContentAnimation_cb(_deactivateSlides, _activeSlides);
-
                 },
                 slideChange: function (){
                     const _swiper = this;
                     $('[data-carousel-goto="#'+carousel_id+'"]').removeClass('s-active');
                     $('[data-carousel-goto="#'+carousel_id+'"][data-carousel-index="'+_swiper.realIndex+'"]').addClass('s-active');
                 },
-                transitionStart: (_swiper) => {
-                    let _max_w = Math.max(..._swiper.slidesSizesGrid),
-                        _min_w = Math.min(..._swiper.slidesSizesGrid);
-
-                    if(elementSettings?.variableWidth){
-                        clearTimeout(_c_timeout)
-                        _c_timeout = setTimeout(() => {
-                            _swiper.update()
-                        }, _swiper.params.speed * (_min_w / _max_w) + 80 )
+                snapIndexChange: function (_swiper){
+                    if (elementSettings?.variableWidth) {
+                        let _max_w = Math.max(..._swiper.slidesSizesGrid),
+                            _min_w = Math.min(..._swiper.slidesSizesGrid);
+                        let ml = (_max_w - _min_w) + 'px'
+                        if( _swiper.slidesSizesGrid[_swiper.activeIndex] === _max_w ){
+                            ml = 0
+                        }
+                        if(!_swiper.controller.control){
+                            if(_swiper.activeIndex === _swiper.realIndex){
+                                ml = 0
+                            }
+                        }
+                        _swiper.$wrapperEl.css('margin-left', ml)
                     }
                 }
             };
@@ -896,12 +892,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 swiperOptions.loop = false;
                 swiperOptions.noSwipingSelector = '.swiper-slide > .e-con .elementor-element';
             }
-
+            const Swiper = LaStudioKits.utils.Swiper;
             new Swiper($swiperContainer, swiperOptions).then(function (SwiperInstance) {
 
                 LaStudioKits.swiperInstances[carousel_id] = SwiperInstance
 
                 if(elementSettings?.variableWidth || elementSettings?.infiniteEffect){
+                    console.log('here..')
                     SwiperInstance.update()
                 }
 
@@ -915,14 +912,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if(SwiperInstance?.pagination?.bullets?.length < 5){
                     SwiperInstance?.pagination?.$el?.addClass('no-bullets-dynamic');
-                }
-
-                if(elementSettings.autoplay && elementSettings.pauseOnHover && typeof SwiperInstance.autoplay !== "undefined" && typeof SwiperInstance.autoplay.onMouseEnter === "undefined"){
-                    $swiperContainer.on('mouseenter', function (){
-                        SwiperInstance.autoplay.stop();
-                    }).on('mouseleave', function (){
-                        SwiperInstance.autoplay.start();
-                    });
                 }
 
                 if(elementSettings.autoHeight){
@@ -941,9 +930,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         })
                         if(_c?.length > 0 && _c?.length === _ok?.length){
                             _syncItem.synced = true;
-                            let _main_instance = LaStudioKits.swiperInstances[_syncItem.id]
-                            let _synced = _ok?.map( _e => LaStudioKits.swiperInstances[_e] )
-                            _main_instance.controller.control = _synced
+                            LaStudioKits.swiperInstances[_syncItem.id].controller.control = _ok?.map( _e => LaStudioKits.swiperInstances[_e] )
                         }
                     }
                     if(_syncItem?.syncedThumbs !== true && _syncItem?.thumbs !== '' && LaStudioKits.swiperInstances[_syncItem?.thumbs]){
@@ -1627,6 +1614,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 } )
             })
+
+            if( $('.lakit-portfolio-parallax').length > 0 ){
+                const CustomParallax = LaStudioKits.utils.CustomParallax;
+                new CustomParallax(document.querySelectorAll('.lakit-portfolio-parallax .lakit-posts__thumbnail-img'), {
+                    scale: 1.3
+                })
+            }
         },
         isEditMode: function () {
             return Boolean(elementorFrontend.isEditMode());
@@ -2559,6 +2553,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let itemDetected = ['.elementor-widget-icon-list', '.main-color', '.elementor-icon', '.elementor-heading-title', '.elementor-widget-text-editor', '.elementor-widget-divider', '.elementor-icon-list-item', '.elementor-social-icon', '.elementor-button', '.lakit-nav-wrap', '.lakit-nav', '.menu-item-link-depth-0'];
             let _q = [];
             itemDetected.forEach( _item => _q.push('.lakit-nav__sub ' + _item) );
+            itemDetected.forEach( _item => _q.push('.w--hamburger ' + _item) );
             document.querySelectorAll(_q.join()).forEach( _item => _item.classList.add('ignore-docs-style') );
 
             $('.need-check-active.elementor-widget-icon-list .elementor-icon-list-item a[href], .need-check-active .lakit-nav__sub .elementor-icon-list-item a[href]').each( function (){
@@ -2961,6 +2956,26 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     else{
                         resolve(createSwiperInstance(container, config));
+                    }
+                });
+            },
+            CustomParallax: function ( container, config ){
+                function createParallaxInstance(_container, _config){
+                    const LakitSimpleParallax = window.SimpleParallax;
+                    return new LakitSimpleParallax(_container, _config);
+                }
+                return new Promise(resolve => {
+                    if ('undefined' === typeof SimpleParallax) {
+                        if(!LaStudioKits.addedScripts.hasOwnProperty('simpleparallax')){
+                            LaStudioKits.addedAssetsPromises.push(LaStudioKits.loadScriptAsync('simpleparallax', LaStudioKitSettings.resources.simpleparallax, '', true))
+                        }
+                        Promise.all(LaStudioKits.addedAssetsPromises).then(() => {
+                            resolve(createParallaxInstance(container, config));
+                        })
+                        return;
+                    }
+                    else{
+                        resolve(createParallaxInstance(container, config));
                     }
                 });
             }
@@ -4590,6 +4605,22 @@ document.addEventListener('DOMContentLoaded', function () {
 (function ($) {
     "use strict";
 
+    let shouldInjection = false;
+
+    Object.keys(LaStudioKitSettings.delayResources.js).forEach( js_delay_name => {
+        if(!LaStudioKits.addedScripts.hasOwnProperty(js_delay_name)){
+            LaStudioKits.addedAssetsPromises.push(LaStudioKits.loadScriptAsync(js_delay_name, LaStudioKitSettings.delayResources.js[js_delay_name], '', true));
+            shouldInjection = true;
+        }
+    })
+    if(shouldInjection){
+        Promise.all(LaStudioKits.addedAssetsPromises).then( () => {
+            console.log('Delay js loaded.')
+        }, ( reason ) => {
+            LaStudioKits.log('[LA-Studio Kit] Delay JS error', reason)
+        } )
+    }
+
     $(window).on('load', () => {
         setTimeout(()=> {
             $('.accordion-close-all.elementor-widget-accordion .elementor-tab-title.elementor-active').trigger('click');
@@ -4648,6 +4679,37 @@ document.addEventListener('DOMContentLoaded', function () {
             $('.elementor-background-video-hosted', $scope).removeAttr('autoplay');
             return swiperOptions;
         })
+
+        elementorFrontend.hooks.addAction(`frontend/element_ready/heading.default`, function ($scope){
+            if($scope.hasClass('heading--marquee')){
+                const updateHeadingRepeat = () => {
+                    const headingEl = $scope.find('.elementor-heading-title').get(0)
+                    if (!headingEl.dataset.originalText) {
+                        headingEl.dataset.originalText = headingEl.innerText;
+                    }
+                    const originalText = headingEl.dataset.originalText;
+                    const spacedText = originalText + ' ';
+                    const span = document.createElement("span");
+                    span.style.visibility = "hidden";
+                    span.style.whiteSpace = "nowrap";
+                    span.style.position = "absolute";
+                    span.innerText = originalText;
+                    document.body.appendChild(span);
+
+                    const textWidth = span.offsetWidth;
+                    const targetWidth = 3 * window.innerWidth;
+                    if (textWidth < targetWidth) {
+                        const repeatCount = Math.round(targetWidth / textWidth);
+                        headingEl.innerText = spacedText.repeat(repeatCount).trim();
+                    } else {
+                        headingEl.innerText = originalText;
+                    }
+                    document.body.removeChild(span);
+                }
+                updateHeadingRepeat()
+                window.addEventListener('resize', updateHeadingRepeat);
+            }
+        } )
     })
 
     $( document ).on( 'elementor/popup/show', (evt, popup_id) => {
@@ -4699,45 +4761,5 @@ document.addEventListener('DOMContentLoaded', function () {
                     $priceWrapper.html($priceWrapper.data('oldValue'))
                 }
             })
-
-
-        $(document).on('click', '.lakit-posts__btn-donate', function (evt){
-            evt.preventDefault();
-            if( $('html').hasClass('elementor-html') ){
-                return;
-            }
-            const frmID = $(".lakit-give-form-modal[data-id='"+$(this).data('id')+"']").first();
-            $.magnificPopup.open({
-                items: {
-                    type: "inline",
-                    src: frmID
-                },
-                fixedContentPos: true,
-                fixedBgPos: true,
-                closeBtnInside: true,
-                midClick: true,
-                removalDelay: 300,
-                mainClass: "modal-fade-slide",
-                callbacks: {
-                    open: function (){
-                        $('.mfp-content').addClass('lakit-mfp--content');
-                    },
-                    beforeOpen: function(){
-                        const giveEmbed = $('.root-data-givewp-embed', frmID);
-                        if(giveEmbed.length > 0 && $('>iframe', giveEmbed).length === 0){
-                            $('<iframe>', {
-                                src: giveEmbed.data('src'),
-                                id: giveEmbed.data('givewp-embed-id'),
-                                title: 'iframe',
-                                scrolling: 'no'
-                            }).appendTo(giveEmbed);
-                            if( typeof iFrameResize !== "undefined"){
-                                iFrameResize();
-                            }
-                        }
-                    }
-                }
-            })
-        })
     });
 })(jQuery);

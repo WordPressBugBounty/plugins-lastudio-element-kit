@@ -144,7 +144,7 @@ class Module extends \Elementor\Core\Base\Module {
 	}
 
     public function register_enqueue_scripts(){
-        wp_register_script('lastudio-kit-popup', lastudio_kit()->plugin_url('includes/modules/popup/assets/js/popup.min.js'), [], lastudio_kit()->get_version(), true);
+        wp_register_script('lastudio-kit-popup', lastudio_kit()->plugin_url('includes/modules/popup/assets/js/popup.min.js'), ['lastudio-kit-base'], lastudio_kit()->get_version(), true);
         wp_register_style('lastudio-kit-popup', lastudio_kit()->plugin_url('includes/modules/popup/assets/css/popup.min.css'), [], lastudio_kit()->get_version());
     }
 }

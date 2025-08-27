@@ -117,6 +117,10 @@ body {
   --lakit-gcol-bottom-space: 0;
   --lakit-gcol-left-space: 10px
 }
+.elementor-lakit-wooproducts, .lakit-products.lakit-carousel .lakit-products__list_wrapper.swiper-horizontal {
+  --lakit-carousel-item-left-space: var(--lakit-item-padding-left);
+  --lakit-carousel-item-right-space: var(--lakit-item-padding-right)
+}
 @media (min-width: 782px) {
   .admin-bar {
     --lakit-adminbar-height: 32px
@@ -872,7 +876,7 @@ p + .wp-block-columns {
     transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg)
   }
 }
-@keyframes la-rotateplane {
+@keyframes lakit-rotateplane {
   0% {
     transform: perspective(120px) rotateX(0) rotateY(0)
   }
@@ -883,7 +887,7 @@ p + .wp-block-columns {
     transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg)
   }
 }
-@keyframes la-scaleout {
+@keyframes lakit-scaleout {
   0% {
     transform: scale(0)
   }
@@ -892,7 +896,7 @@ p + .wp-block-columns {
     opacity: 0
   }
 }
-@keyframes la-bouncedelay {
+@keyframes lakit-bouncedelay {
   0%, 80%, to {
     transform: scale(0)
   }
@@ -900,12 +904,12 @@ p + .wp-block-columns {
     transform: scale(1)
   }
 }
-@keyframes la-rotate {
+@keyframes lakit-rotate {
   to {
     transform: rotate(360deg)
   }
 }
-@keyframes la-bounce {
+@keyframes lakit-bounce {
   0%, to {
     transform: scale(0)
   }
@@ -913,7 +917,7 @@ p + .wp-block-columns {
     transform: scale(1)
   }
 }
-@keyframes la-cubeGridScaleDelay {
+@keyframes lakit-cubeGridScaleDelay {
   0%, 70%, to {
     transform: scale3d(1, 1, 1)
   }
@@ -1120,7 +1124,7 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
 .elementor-location-header.elementor-edit-mode.elementor-edit-area-active ~ main.site-main {
   min-height: 50vh
 }
-.e-con .elementor-motion-effects-layer, .elementor-editor-active .lakit-site-wrapper > .elementor-location-header:not(.elementor-edit-area-active), .lakit-posts__thumbnail:before, .tooltip[class*=lakit-tooltip-zone], body:not(.elementor-editor-active) .elementor-element.no-click-event {
+.e-con .elementor-motion-effects-layer, .elementor-editor-active .lakit-site-wrapper > .elementor-location-header:not(.elementor-edit-area-active), .lakit-nav__item > .menu-item-link:not(:hover):before, .lakit-posts__thumbnail:before, .tooltip[class*=lakit-tooltip-zone], body:not(.elementor-editor-active) .elementor-element.no-click-event {
   pointer-events: none
 }
 .elementor-editor-active .lakit-site-wrapper > .elementor-location-header:not(.elementor-edit-area-active) .elementor-sticky.elementor-sticky__spacer.lakit--transparency-yes, .lakit-nav__mobile-close-btn, body.body-loading .lakit-nav__sub, body:not(.lakit--js-ready) .lakit-nav__sub {
@@ -1299,14 +1303,13 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
   left: 0;
   top: 100%;
   width: 100%;
-  height: var(--mm-dd-gap, 0);
-  pointer-events: none
+  height: var(--mm-dd-gap, 0)
 }
 .lakit-mobile-menu.lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__sub {
   position: static;
   top: 0;
   left: 0;
-  width: 100% !important;
+  width: calc(100% - var(--lakit-nav-lv2-gap, 0)) !important;
   transform: translateY(0);
   display: none
 }
@@ -1359,10 +1362,10 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
 .lakit-nav.lakit-nav--vertical .menu-item-link.menu-item-link-top {
   justify-content: flex-start
 }
-.lakit-nav.lakit-nav--vertical-sub-left-side .menu-item-link.menu-item-link-sub .lakit-nav-arrow, .lakit-nav.lakit-nav--vertical-sub-left-side .menu-item-link.menu-item-link-top .lakit-nav-arrow {
+.lakit-nav.lakit-nav--vertical-sub-left-side .menu-item-link.menu-item-link-sub .lakit-nav-arrow:before, .lakit-nav.lakit-nav--vertical-sub-left-side .menu-item-link.menu-item-link-top .lakit-nav-arrow:before {
   transform: rotate(90deg)
 }
-.lakit-mobile-menu.lakit-nav-wrap.lakit-active--mbmenu .lakit-nav .menu-item-link.menu-item-link-sub .lakit-nav-arrow, .lakit-mobile-menu.lakit-nav-wrap.lakit-active--mbmenu .lakit-nav .menu-item-link.menu-item-link-top .lakit-nav-arrow, .lakit-nav.lakit-nav--vertical-sub-bottom .menu-item-link.menu-item-link-sub .lakit-nav-arrow, .lakit-nav.lakit-nav--vertical-sub-bottom .menu-item-link.menu-item-link-top .lakit-nav-arrow {
+.lakit-mobile-menu.lakit-nav-wrap.lakit-active--mbmenu .lakit-nav .menu-item-link.menu-item-link-sub .lakit-nav-arrow:before, .lakit-mobile-menu.lakit-nav-wrap.lakit-active--mbmenu .lakit-nav .menu-item-link.menu-item-link-top .lakit-nav-arrow:before, .lakit-nav.lakit-nav--vertical-sub-bottom .menu-item-link.menu-item-link-sub .lakit-nav-arrow:before, .lakit-nav.lakit-nav--vertical-sub-bottom .menu-item-link.menu-item-link-top .lakit-nav-arrow:before {
   transform: rotate(0)
 }
 .lakit-nav.lakit-nav--vertical-sub-left-side .menu-item-link.menu-item-link-sub {
@@ -1634,7 +1637,7 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
   margin-bottom: var(--pf-meta-space, 0);
   flex-flow: row wrap
 }
-.lakit-pf-layout-type-block .lakit-pf-metalist .lakit-pf-meta__item:last-child {
+.elementor-lakit-search .lakit-search__label, .lakit-pf-layout-type-block .lakit-pf-metalist .lakit-pf-meta__item:last-child {
   margin-bottom: 0
 }
 .lakit-pf-metalist .lakit-pf-meta__item .meta--label {
@@ -1660,13 +1663,15 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
 .elementor-button-icon svg, .elementor-icon svg path[fill*="#"], .lakit-btn--icon svg, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget.include-docs-style .elementor-icon svg, svg.e-font-icon-svg, svg.lakit-font-icon-svg, svg[fill=none] g[fill] path:not([fill]) {
   fill: currentColor
 }
-.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget.include-docs-style .elementor-icon{
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget.include-docs-style .elementor-icon {
   border-color: inherit
 }
-.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-icon:not(.ignore-docs-style), .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget-icon-list:not(.ignore-docs-style) .elementor-icon-list-item, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget.include-docs-style .elementor-icon, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .main-color:not(.ignore-docs-style) {
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-element .elementor-icon:not(.ignore-docs-style), .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget-icon-list:not(.ignore-docs-style) .elementor-icon-list-item, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget.include-docs-style .elementor-icon, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .main-color:not(.ignore-docs-style),
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .main-color.lakit-nav__mobile-trigger:not(.ignore-docs-style){
   color: var(--lakit-doc-headerts-link-color, var(--lakit-secondary-color))
 }
-.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-icon:hover:not(.ignore-docs-style), .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget-icon-list:not(.ignore-docs-style) .elementor-icon-list-item:hover, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget.include-docs-style .elementor-icon:hover, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .main-color:not(.ignore-docs-style):hover {
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-element .elementor-icon:hover:not(.ignore-docs-style), .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget-icon-list:not(.ignore-docs-style) .elementor-icon-list-item:hover, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget.include-docs-style .elementor-icon:hover, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .main-color:not(.ignore-docs-style):hover,
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .main-color.lakit-nav__mobile-trigger:not(.ignore-docs-style):hover{
   color: var(--lakit-doc-headerts-link-hover-color, var(--lakit-primary-color))
 }
 .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-heading-title:not(.ignore-docs-style), .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-lakit-search:not(.ignore-docs-style) .lakit-search__form .lakit-search__field, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget-text-editor:not(.ignore-docs-style) {
@@ -1860,12 +1865,10 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
   --lakit-zone-padding: 20px 0
 }
 .elementor-lakit-wooproducts {
-  --lakit-item-padding-top: 0;
+  --lakit-item-padding-top: 0px;
   --lakit-item-padding-right: 10px;
   --lakit-item-padding-bottom: 0px;
-  --lakit-item-padding-left: 0;
-  --lakit-carousel-item-left-space: var(--lakit-item-padding-left);
-  --lakit-carousel-item-right-space: var(--lakit-item-padding-right);
+  --lakit-item-padding-left: 0px;
   max-width: 100%
 }
 .lakit-products.lakit-masonry-wrapper, .lastudio-kit ul.products.ul_products_v2.lakit-products__list:not(.swiper-wrapper) {
@@ -1874,10 +1877,6 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
 }
 .lastudio-kit ul.products.ul_products_v2.lakit-products__list li {
   padding: var(--lakit-item-padding-top) var(--lakit-item-padding-right) var(--lakit-item-padding-bottom) var(--lakit-item-padding-left)
-}
-.lakit-products.lakit-carousel .lakit-products__list_wrapper.swiper-horizontal {
-  --lakit-carousel-item-left-space: var(--lakit-item-padding-left);
-  --lakit-carousel-item-right-space: var(--lakit-item-padding-right)
 }
 .lakit-product.product_item:hover {
   z-index: 3
@@ -2589,7 +2588,8 @@ form.error {
   width: 100%;
   height: 100%;
   overflow: hidden;
-  z-index: 0
+  z-index: 0;
+  border-radius: inherit
 }
 .elementor-motion-effects-layer {
   position: absolute;
@@ -2630,16 +2630,11 @@ form.error {
 .lakit-carousel-dots-equality .lakit-slides-v2 .lakit-carousel__dots .swiper-pagination-bullet-active {
   flex-grow: 1
 }
-.lakit-carousel.e-swiper--variablewidth .swiper-wrapper {
-  transition-timing-function: linear
-}
 .lakit-carousel.e-swiper--variablewidth .swiper-slide {
   flex: 0 0 auto;
   width: var(--lakit-carousel-item-normal-width, 100%);
   max-width: var(--lakit-carousel-item-normal-width, 100%);
   align-self: flex-end;
-  transition-duration: var(--swiperSpeed, 500ms);
-  transition-property: all;
   height: auto
 }
 .elementor-lakit-advanced-carousel .lakit-carousel.e-swiper--variablewidth .swiper-slide {
@@ -2757,8 +2752,8 @@ body .e-con-inner > .elementor-widget-spacer > .elementor-widget-container > .el
   display: none
 }
 .lakit-masonry-wrapper.lakit--m-even .lakit-masonry--con {
-  margin-left: -0.5px !important;
-  margin-right: -0.5px !important;
+  margin-left: -.5px !important;
+  margin-right: -.5px !important
 }
 .lastudio-kit .lakit-product-images ol.flex-control-nav.flex-control-thumbs li[data-type]:after {
   font-family: LaStudioIcons;
@@ -2826,10 +2821,6 @@ body .e-con-inner > .elementor-widget-spacer > .elementor-widget-container > .el
 .marquee-text .elementor-heading-title {
   white-space: nowrap;
   overflow: hidden;
-  animation: 20s linear infinite lakit_marqueetext
-}
-.heading--marquee .elementor-heading-title {
-  white-space: nowrap;
   animation: 20s linear infinite lakit_marqueetext
 }
 @keyframes lakit_marqueetext {
@@ -3351,7 +3342,7 @@ body:not(.e-has-header-sticky) .lakit-ntabs-heading.e--sticky {
 .lakit-ntabs-heading.e-sticky--activated .ntabs-selectbox {
   border-color: transparent !important
 }
-.lakitp-zone .lakit-btn.loading:before {
+.lakit-posts__btn-donate.loading:before, .lakitp-zone .lakit-btn.loading:before {
   content: " ";
   border-radius: 50%;
   display: block;
@@ -3537,10 +3528,6 @@ body:not(.e-has-header-sticky) .lakit-ntabs-heading.e--sticky {
 }
 .lakit-navmb-onlymenu-yes .lakit-mobile-menu.lakit-nav-wrap.lakit-active--mbmenu .lakit-nav {
   display: block
-}
-.lastudio-kit .lakit-carousel .swiper-slide {
-  will-change: transform;
-  transition-property: transform
 }
 @font-face {
   font-family: LaStudioBIcons;
@@ -3759,15 +3746,148 @@ body .elementor-widget-lakit-hotspots.elementor-widget-empty {
   display: flex
 }
 .elementor-widget-spacer > .elementor-spacer > .elementor-spacer-inner {
-  height: var(--spacer-size) !important;
-}
-.elementor-lakit-search .lakit-search__label{
-  margin-bottom: 0
+  height: var(--spacer-size) !important
 }
 .elementor-icon-list-items {
   list-style: none;
-  margin: 0;
+  margin: 0
 }
 .elementor-element.elementor-motion-effects-element {
-  transition: none !important;
+  transition: none !important
+}
+.heading--marquee .elementor-heading-title {
+  white-space: nowrap;
+  animation: 20s linear infinite lakit_marqueetext
+}
+.lakit-portfolio-parallax .lakit-posts__thumbnail-img {
+  transition: transform .4s cubic-bezier(0, 0, 0, 1)
+}
+.lakit-site-wrapper > [class*=give-p2p] {
+  margin: 0 auto;
+  max-width: 100%
+}
+.lakit-posts__btn-donate.loading .btn__text {
+  opacity: 0
+}
+.lakit-posts__meta__item {
+  gap: .2em
+}
+
+.lakit-popup--wrap {
+  display: none;
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 101;
+}
+.lakit-popup--overlay {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 8;
+}
+.lakit-popup--content {
+  position: relative;
+  margin: auto;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  align-items: center;
+  overflow: hidden auto;
+  padding: 30px 10px;
+}
+
+.lakit-popup--iframe {
+  max-width: 100%;
+  width: 770px;
+  margin: auto;
+  position: relative;
+  z-index: 9;
+}
+.lakit-popup--iframe.frame-multi-step {
+  width: 600px;
+}
+.lakit-popup--iframe iframe{
+  width: 100%;
+  height: 100%;
+  border: none;
+  border-radius: 8px;
+}
+
+.lakit-popup--close {
+  position: fixed;
+  top: 15px;
+  right: 15px;
+  font-size: 26px;
+  cursor: pointer;
+  z-index: 10000;
+  width: 1.8em;
+  height: 1.8em;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  background: #0000001a;
+  border-radius: 5px;
+}
+.lakit-no-scroll {
+  overflow: hidden !important;
+}
+.lakit-popup--loading {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.2);
+}
+.lakit-popup--is-ready .lakit-popup--loading {
+  display: none;
+}
+.lakit-popup--is-loading .lakit-popup--iframe {
+  display: none;
+}
+.lakit-popup--is-loading .lakit-popup--overlay {
+  display: none;
+}
+@media(max-width: 900px){
+  .lakit-popup--close {
+    color: #333
+  }
+}
+.lakit-cart__icon.lakit-blocks-icon svg {
+  vertical-align: inherit;
+}
+.wpcf7 .hidden-fields-container{
+  display: none
+}
+.wpcf7 .screen-reader-response {
+  position: absolute;
+  overflow: hidden;
+  clip: rect(1px, 1px, 1px, 1px);
+  clip-path: inset(50%);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+  word-wrap: normal !important;
+}
+.elementor-lakit-button .elementor-button-icon {
+  font-size: var(--icon-size, 1em);
+  margin-top: var(--icon-vgap, 0);
+}
+.elementor-lakit-button .elementor-button-content-wrapper {
+  gap: var(--icon-gap, 0)
 }

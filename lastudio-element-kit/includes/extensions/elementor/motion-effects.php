@@ -160,7 +160,7 @@ class Motion_Effects
 		$elementType = $element->get_type();
 
         if ( $elementType == 'section' || $elementType == 'container' ) {
-            $exclude[] = 'motion_fx_mouse';
+//            $exclude[] = 'motion_fx_mouse';
         }
         elseif ($elementType == 'column') {
             $selector .= ' > .elementor-widget-wrap';

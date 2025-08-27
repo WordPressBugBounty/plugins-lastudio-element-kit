@@ -35,6 +35,23 @@ class LaStudioKit_Button extends LaStudioKit_Base {
         return 'lastudio-kit-icon-button';
     }
 
+    protected function control_link() {
+	    $this->_add_control(
+		    'link',
+		    [
+			    'label' => __( 'Link', 'lastudio-kit' ),
+			    'type' => Controls_Manager::URL,
+			    'dynamic' => [
+				    'active' => true,
+			    ],
+			    'placeholder' => __( 'https://your-link.com', 'lastudio-kit' ),
+			    'default' => [
+				    'url' => '#',
+			    ],
+		    ]
+	    );
+    }
+
     protected function register_controls() {
         $this->_start_controls_section(
             'section_button',
@@ -73,20 +90,7 @@ class LaStudioKit_Button extends LaStudioKit_Base {
             ]
         );
 
-        $this->_add_control(
-            'link',
-            [
-                'label' => __( 'Link', 'lastudio-kit' ),
-                'type' => Controls_Manager::URL,
-                'dynamic' => [
-                    'active' => true,
-                ],
-                'placeholder' => __( 'https://your-link.com', 'lastudio-kit' ),
-                'default' => [
-                    'url' => '#',
-                ],
-            ]
-        );
+        $this->control_link();
 
         $this->_add_responsive_control(
             'align',
@@ -169,7 +173,7 @@ class LaStudioKit_Button extends LaStudioKit_Base {
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => [ 'px', '%', 'em' ],
                 'selectors' => [
-                    '{{WRAPPER}} .elementor-button .elementor-button-icon' => 'font-size: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}}' => '--icon-size: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );
@@ -181,7 +185,7 @@ class LaStudioKit_Button extends LaStudioKit_Base {
                 'type' => Controls_Manager::SLIDER,
                 'size_units' => [ 'px', '%', 'em' ],
                 'selectors' => [
-                    '{{WRAPPER}} .elementor-button .elementor-button-content-wrapper' => 'gap: {{SIZE}}{{UNIT}};'
+                    '{{WRAPPER}}' => '--icon-gap: {{SIZE}}{{UNIT}};'
                 ],
             ]
         );
@@ -198,7 +202,7 @@ class LaStudioKit_Button extends LaStudioKit_Base {
                     ),
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} .elementor-button .elementor-button-icon' => 'transform: translateY({{SIZE}}{{UNIT}});',
+                    '{{WRAPPER}}' => '--icon-vgap: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );
@@ -452,8 +456,6 @@ class LaStudioKit_Button extends LaStudioKit_Base {
     protected function render() {
         $settings = $this->get_settings_for_display();
 
-        $this->add_render_attribute( 'wrapper', 'class', 'elementor-button-wrapper' );
-
         $btn_tag = 'button';
 
         if ( ! empty( $settings['link']['url'] ) ) {
@@ -493,14 +495,14 @@ class LaStudioKit_Button extends LaStudioKit_Base {
         }
 
         ?>
-        <div <?php $this->print_render_attribute_string( 'wrapper' ); ?>>
-            <<?php echo esc_attr($btn_tag); ?> <?php $this->print_render_attribute_string( 'button' ); ?>>
-                <?php $this->render_text(); ?>
-            </<?php echo esc_attr($btn_tag); ?>>
-        </div>
+        <<?php echo esc_attr($btn_tag); ?> <?php $this->print_render_attribute_string( 'button' ); ?>>
+            <?php $this->render_text(); ?>
+        </<?php echo esc_attr($btn_tag); ?>>
         <?php
+        $this->render_extra_content();
     }
 
+    protected function render_extra_content() {}
 
     /**
      * Render button widget output in the editor.
@@ -517,24 +519,23 @@ class LaStudioKit_Button extends LaStudioKit_Base {
         view.addInlineEditingAttributes( 'text', 'none' );
         var iconHTML = elementor.helpers.renderIcon( view, settings.selected_icon, { 'aria-hidden': true }, 'i' , 'object' ),
         migrated = elementor.helpers.isIconMigrated( settings, 'selected_icon' );
-        var elm_Tags = settings.link.url ? 'a' : 'button'
+        var elm_Tags = settings?.link?.url ? 'a' : 'button'
+        var linkUrl = settings?.link?.url ?? '#'
         #>
-        <div class="elementor-button-wrapper">
-            <{{{elm_Tags}}} id="{{ settings.button_css_id }}" class="elementor-button elementor-btn-align-icon-{{ settings.icon_align }} elementor-size-{{ settings.size }} elementor-animation-{{ settings.hover_animation }}" href="{{ settings.link.url }}" role="button">
-				<span class="elementor-button-content-wrapper">
-					<# if ( settings.icon || settings.selected_icon ) { #>
-					<span class="elementor-button-icon">
-						<# if ( ( migrated || ! settings.icon ) && iconHTML.rendered ) { #>
-							{{{ iconHTML.value }}}
-						<# } else { #>
-							<i class="{{ settings.icon }}" aria-hidden="true"></i>
-						<# } #>
-					</span>
-					<# } #>
-					<span {{{ view.getRenderAttributeString( 'text' ) }}}>{{{ settings.text }}}</span>
+        <{{{elm_Tags}}} id="{{ settings.button_css_id }}" class="elementor-button elementor-btn-align-icon-{{ settings.icon_align }} elementor-size-{{ settings.size }} elementor-animation-{{ settings.hover_animation }}" href="{{ linkUrl }}" role="button">
+            <span class="elementor-button-content-wrapper">
+                <# if ( settings.icon || settings.selected_icon ) { #>
+                <span class="elementor-button-icon">
+                    <# if ( ( migrated || ! settings.icon ) && iconHTML.rendered ) { #>
+                        {{{ iconHTML.value }}}
+                    <# } else { #>
+                        <i class="{{ settings.icon }}" aria-hidden="true"></i>
+                    <# } #>
                 </span>
-            </{{{elm_Tags}}}>
-        </div>
+                <# } #>
+                <span {{{ view.getRenderAttributeString( 'text' ) }}}>{{{ settings.text }}}</span>
+            </span>
+        </{{{elm_Tags}}}>
         <?php
     }
 

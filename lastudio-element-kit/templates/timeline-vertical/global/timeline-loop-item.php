@@ -31,12 +31,12 @@ $this->_processed_item_index += 1;
 				<div class="lakit-vtimeline-item__card-content">
 					<?php
 						echo '<div class="lakit-vtimeline-item__meta">';
-						echo $this->_loop_item( array( 'item_meta' ), '<div ' . esc_attr($item_meta_attr) . '>%s</div>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						echo $this->_loop_item( array( 'item_meta' ), '<div ' . $item_meta_attr . '>%s</div>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						echo '</div>';
 						echo '<div class="lakit-vtimeline-item__card-content-inner">';
-                        echo $this->_loop_item( array( 'item_subtitle' ) , '<div ' . esc_attr($item_subtitle_attr) . '>%1s</div>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-						echo $this->_loop_item( array( 'item_title' ) , '<h5 ' . esc_attr($item_title_attr) . '>%1s</h5>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-						echo $this->_loop_item( array( 'item_desc' ), '<div ' . esc_attr($item_desc_attr) . '>%s</div>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                        echo $this->_loop_item( array( 'item_subtitle' ) , '<div ' . $item_subtitle_attr . '>%1s</div>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						echo $this->_loop_item( array( 'item_title' ) , '<div ' . $item_title_attr . '>%1s</div>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						echo $this->_loop_item( array( 'item_desc' ), '<div ' . $item_desc_attr . '>%s</div>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                         echo '</div>';
 					?>
 				</div>
@@ -46,7 +46,7 @@ $this->_processed_item_index += 1;
 	<?php
 		$this->_generate_point_content( $item_settings );
 		echo '<div class="lakit-vtimeline-item__meta">';
-		echo $this->_loop_item( array( 'item_meta' ), '<div ' . esc_attr($item_meta_attr) . '>%s</div>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		echo $this->_loop_item( array( 'item_meta' ), '<div ' . $item_meta_attr . '>%s</div>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		if($image_in_meta){
             $this->_render_image( $item_settings );
         }

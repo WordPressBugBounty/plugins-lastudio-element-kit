@@ -813,7 +813,7 @@ class LaStudioKit_Timeline_Vertical extends LaStudioKit_Base {
             )
         );
 
-        $this->_add_control(
+        $this->_add_responsive_control(
             'image_border_radius',
             array(
                 'label'      => esc_html__( 'Border Radius', 'lastudio-kit' ),
@@ -1818,7 +1818,7 @@ class LaStudioKit_Timeline_Vertical extends LaStudioKit_Base {
 
     public function get_item_inline_editing_attributes( $settings_item_key, $repeater_item_key, $index, $classes ) {
         $item_key = $this->get_repeater_setting_key( $settings_item_key, $repeater_item_key, $index );
-        $this->add_render_attribute( $item_key, [ 'class' => $classes ] );
+        $this->add_render_attribute( $item_key, "class", $classes );
         $this->add_inline_editing_attributes( $item_key, 'basic' );
 
         return $this->get_render_attribute_string( $item_key );

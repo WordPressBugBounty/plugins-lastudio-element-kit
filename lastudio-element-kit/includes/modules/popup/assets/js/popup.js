@@ -83,7 +83,7 @@
 
     elementorFrontend.on('elementor/modules/init:before', () => {
         jQuery.each(extendDefaultHandlers(), (moduleName, ModuleClass) => {
-            LaStudioKits['e_module__' + moduleName] = new ModuleClass();
+            window['lakit_e_module__' + moduleName] = new ModuleClass();
         });
     });
     /***/
@@ -132,7 +132,7 @@
                     if (this.getStorage('disable')) {
                         return;
                     }
-                    if (avoidMultiple && LaStudioKits.e_module__popup.popupPopped && settings.avoid_multiple_popups) {
+                    if (avoidMultiple && window.lakit_e_module__popup.popupPopped && settings.avoid_multiple_popups) {
                         return;
                     }
                 } // A clean copy of the element without previous initializations and events
@@ -161,7 +161,7 @@
                 this.countTimes();
             }
 
-            LaStudioKits.e_module__popup.popupPopped = true;
+            window.lakit_e_module____popup.popupPopped = true;
         }
 
         setEntranceAnimation() {

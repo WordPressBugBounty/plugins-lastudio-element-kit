@@ -40,7 +40,6 @@ class Conditions_Manager {
 	}
 
 	public function on_untrash_post( $post_id ) {
-		/** @var Module $theme_builder_module */
 		$theme_builder_module = Module::instance();
 
 		$document = $theme_builder_module->get_document( $post_id );
@@ -72,8 +71,7 @@ class Conditions_Manager {
 		$instances = $this->get_document_instances( $post_id );
 
 		if ( ! empty( $instances ) ) {
-			// PHPCS - the method get_document_instances is safe.
-			echo implode( '<br />', $instances ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			echo wp_kses_post( implode( '<br />', $instances ) );
 		} else {
 			echo esc_html__( 'None', 'lastudio-kit' );
 		}
@@ -89,8 +87,15 @@ class Conditions_Manager {
 		$ajax_manager->register_ajax_action( 'lakit_theme_builder_conditions_check_conflicts', [ $this, 'ajax_check_conditions_conflicts' ] );
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	public function ajax_check_conditions_conflicts( $request ) {
-		$post_id = intval( isset($request['editor_post_id']) ? $request['editor_post_id'] : 0 );
+
+		$doc_id = isset($request['editor_post_id']) ? wp_kses_post_deep( wp_unslash( $request['editor_post_id'] ) ) : 0;
+
+		$document = self::_unstable_get_document_for_edit( $doc_id );
+
 		$condition = $request['condition'];
 
 		unset( $condition['_id'] );
@@ -101,7 +106,7 @@ class Conditions_Manager {
 			return sprintf(
 				'<a href="%s" target="_blank">%s</a>', $conflict['edit_url'], $conflict['template_title']
 			);
-		}, $this->get_conditions_conflicts( $post_id, $condition ) );
+		}, $this->get_conditions_conflicts( $document->get_main_id(), $condition ) );
 
 		if ( empty( $conflicted ) ) {
 			return '';
@@ -137,11 +142,18 @@ class Conditions_Manager {
 				}
 
 				if ( false !== array_search( $condition, $conditions, true ) ) {
-					$edit_url = $theme_builder_module->get_document( $template_id )->get_edit_url();
+					$template_title = esc_html( get_the_title( $template_id ) );
+					$document = $theme_builder_module->get_document( $template_id );
+
+					if ( ! $document instanceof Theme_Document ) {
+						lastudio_kit()->elementor()->logger->get_logger()->error( "Error fetching document in conditions manager. Template: $template_title" );
+					}
+
+					$edit_url = isset( $document ) ? $document->get_edit_url() : '';
 
 					$conflicted[] = [
 						'template_id' => $template_id,
-						'template_title' => esc_html( get_the_title( $template_id ) ),
+						'template_title' => $template_title,
 						'edit_url' => $edit_url,
 					];
 				}
@@ -152,7 +164,7 @@ class Conditions_Manager {
 	}
 
 	public function get_conditions_conflicts( $post_id, $condition ) {
-		/** @var Module $theme_builder_module */
+
 		$theme_builder_module = Module::instance();
 
 		$document = $theme_builder_module->get_document( $post_id );
@@ -160,15 +172,22 @@ class Conditions_Manager {
 		return $this->get_conditions_conflicts_by_location( $condition, $document->get_location(), $post_id );
 	}
 
+	/**
+	 * @throws \Exception
+	 */
 	public function ajax_save_theme_template_conditions( $request ) {
+		$doc_id = isset($request['editor_post_id']) ? wp_kses_post_deep( wp_unslash( $request['editor_post_id'] ) ) : 0;
 
-		$post_id = $request['editor_post_id'] ?? 0;
-		$conditions = $request['conditions'] ?? [];
+		$document = self::_unstable_get_document_for_edit( $doc_id );
 
-		$is_saved = $this->save_conditions( $post_id, $conditions );
+		if ( ! isset( $request['conditions'] ) ) {
+			$request['conditions'] = [];
+		}
+
+		$is_saved = $this->save_conditions( $document->get_main_id(), $request['conditions'] );
 
 		if ( ! $is_saved ) {
-			throw new \Exception( 'Error while saving conditions.', Exceptions::INTERNAL_SERVER_ERROR ); // phpcs:ignore WordPress.Security.EscapeOutput.ExceptionNotEscaped
+			throw new \Exception( 'Error while saving conditions.', Exceptions::INTERNAL_SERVER_ERROR );
 		}
 	}
 
@@ -209,6 +228,10 @@ class Conditions_Manager {
 	 */
 	public function get_condition( $id ) {
 		return isset( $this->conditions[ $id ] ) ? $this->conditions[ $id ] : false;
+	}
+
+	public function get_conditions() {
+		return $this->conditions;
 	}
 
 	public function get_conditions_config() {
@@ -293,13 +316,12 @@ class Conditions_Manager {
 
 		$document = $theme_builder_module->get_document( $post_id );
 
-        if(empty($document)){
-            return false;
-        }
+		if ( ! $document ) {
+			return false;
+		}
 
 		if ( empty( $conditions_to_save ) ) {
-			// TODO: $document->delete_meta.
-			$is_saved = delete_post_meta( $post_id, '_elementor_conditions' );
+			$is_saved = $document->delete_meta( '_elementor_conditions' );
 		} else {
 			$is_saved = $document->update_meta( '_elementor_conditions', $conditions_to_save );
 		}
@@ -332,7 +354,7 @@ class Conditions_Manager {
 			 *
 			 * @param int $theme_template_id Template ID.
 			 */
-			$theme_template_id = apply_filters( 'elementor/theme/get_location_templates/template_id', $theme_template_id );
+			$theme_template_id = apply_filters( 'elementor/theme/get_location_templates/template_id', $theme_template_id, $location );
 
 			foreach ( $conditions as $condition ) {
 				$parsed_condition = $this->parse_condition( $condition );
@@ -397,17 +419,15 @@ class Conditions_Manager {
 	}
 
 	public function get_theme_templates_ids( $location ) {
-		/** @var Module $theme_builder_module */
 		$theme_builder_module = Module::instance();
 
 		$location_manager = $theme_builder_module->get_locations_manager();
 
 		// In case the user want to preview any page with a theme_template_id,
 		// like http://domain.com/any-post/?preview=1&theme_template_id=6453
-		if ( ! empty( $_GET['theme_template_id'] ) ) {
-			$force_template_id = $_GET['theme_template_id'];
+		$force_template_id = isset($_GET['theme_template_id']) ? wp_kses_post_deep( wp_unslash( $_GET['theme_template_id'] ) ) : null;
+		if ( $force_template_id ) {
 			$document = $theme_builder_module->get_document( $force_template_id );
-
 			// e.g. header / header
 			if ( $document && $location === $document->get_location() ) {
                 if('publish' === $document->get_post()->post_status){
@@ -490,7 +510,6 @@ class Conditions_Manager {
 	}
 
 	protected function parse_condition( $condition ) {
-
 		list ( $type, $name, $sub_name, $sub_id ) = array_pad( explode( '/', $condition ), 4, '' );
 
 		return compact( 'type', 'name', 'sub_name', 'sub_id' );
@@ -521,8 +540,6 @@ class Conditions_Manager {
 			$document = $theme_builder_module->get_document( $theme_template_id );
 			if ( $document ) {
 				$documents[ $theme_template_id ] = $document;
-			} else {
-				$this->purge_post_from_cache( $theme_template_id );
 			}
 
 			if ( empty( $location_settings['multiple'] ) ) {
@@ -543,7 +560,24 @@ class Conditions_Manager {
 		return $this->cache;
 	}
 
+	public function clear_cache() {
+		$this->cache->clear();
+	}
+
 	public function clear_location_cache() {
 		$this->location_cache = [];
+	}
+
+	public static function _unstable_get_document_for_edit( $id ) {
+		$document = lastudio_kit()->elementor()->documents->get( $id );
+
+		if ( ! $document ) {
+			throw new \Exception( 'Not found.' );
+		}
+
+		if ( ! $document->is_editable_by_current_user() ) {
+			throw new \Exception( 'Access denied.' );
+		}
+		return $document;
 	}
 }

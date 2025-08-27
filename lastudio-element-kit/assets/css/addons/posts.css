@@ -42,8 +42,8 @@
 	z-index: 0
 }
 .lakit-posts__inner-box:hover .lakit-posts__thumbnail-img {
-	transform: scale(var(--lakit-post-thumb-scale-hover, 1.05));
-	opacity: var(--lakit-post-thumb-opacity-hover, 1)
+	opacity: var(--lakit-post-thumb-opacity-hover, 1);
+	transform: translate3d(var(--lakit-post-thumb-hover-offset-x, 0), var(--lakit-post-thumb-hover-offset-y, 0), 0) scale(var(--lakit-post-thumb-scale-hover, 1.05)) rotate(var(--lakit-post-thumb-hover-rotate, 0deg))
 }
 .lakit-posts__thumbnail {
 	margin-bottom: 1rem;
@@ -71,8 +71,8 @@
 	object-fit: cover;
 	vertical-align: middle;
 	transition: transform .6s, opacity .6s, visibility .6s;
-	transform: scale(var(--lakit-post-thumb-scale, 1));
-	opacity: var(--lakit-post-thumb-opacity, 1)
+	opacity: var(--lakit-post-thumb-opacity, 1);
+	transform: translate3d(var(--lakit-post-thumb-offset-x, 0), var(--lakit-post-thumb-offset-y, 0), 0) scale(var(--lakit-post-thumb-scale, 1)) rotate(var(--lakit-post-thumb-rotate, 0deg))
 }
 .lakit-posts__inner-content, .lakit-posts__more-wrap {
 	position: relative;
@@ -131,14 +131,15 @@
 }
 .lakit-posts.preset-grid-2 .lakit-posts__thumbnail {
 	margin: 0;
-	width: 100%;
+	width: 100%
 }
 .lakit-posts.preset-grid-2 .lakit-posts__thumbnail + .lakit-posts__inner-content {
 	position: absolute;
 	bottom: 0;
 	width: 100%;
 	left: 50%;
-	transform: translateX(-50%)
+	transform: translateX(-50%);
+	pointer-events: none
 }
 .lakit-posts.preset-grid-2 .lakit-posts__inner-content {
 	margin: 0 auto;
@@ -286,9 +287,22 @@
 .lakit-posts__inner-box:after {
 	background-color: inherit
 }
-.lakit-posts.preset-grid-2 .lakit-posts__thumbnail+.lakit-posts__inner-content {
-	pointer-events: none;
+.lakit-posts.preset-grid-2 .lakit-posts__inner-content-inner {
+	pointer-events: initial
 }
-.lakit-posts.preset-grid-2 .lakit-posts__inner-content-inner{
-	pointer-events: initial;
+.lakit_fdt--type1 div span, .lakit_fdt--type2 div span {
+	font-size: 1em
+}
+.lakit_fdt--type1 div .m-d, .lakit_fdt--type2 div .m-d {
+	font-size: 2.1em;
+	font-weight: 600
+}
+.lakit_fdt--type2 div {
+	flex-direction: row;
+	text-align: inherit;
+	align-items: center;
+	gap: .5em
+}
+.lakit_fdt--type2 div .m-my {
+	width: 2.8em
 }

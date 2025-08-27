@@ -23,7 +23,7 @@
   <div class="cx-vui-panel">
     <?php
     $post_types    = get_post_types( array( 'public' => true ), 'objects' );
-    $deny_list     = array( 'elementor_library', 'lakit-theme-core', 'e-landing-page' );
+    $deny_list     = array( 'elementor_library', 'lakit-theme-core', 'e-landing-page', 'e-floating-buttons' );
     $tax_deny_list = array( 'product_shipping_class' );
 
     if ( is_array( $post_types ) && ! empty( $post_types ) ) {

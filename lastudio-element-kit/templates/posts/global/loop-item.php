@@ -148,8 +148,8 @@ if($should_display_formatcontent && $post_format === 'quote'){
                     '<%1$s class="lakit-posts__title"><a href="%2$s" title="%3$s" rel="bookmark">%4$s</a></%1$s>',
                     esc_attr($title_html_tag),
                     esc_url(get_the_permalink()),
-                    esc_html(get_the_title()),
-                    esc_html($title)
+                    esc_attr(strip_tags(get_the_title())),
+                    esc_html(strip_tags($title))
                 );
             }
 

@@ -257,7 +257,7 @@ class Portfolio_Meta extends LaStudioKit_Base {
 		    array(
 			    'label'       => esc_html__( 'Label width', 'lastudio-kit' ),
 			    'type'        => Controls_Manager::SLIDER,
-                'size_units'  => [ 'px', 'custom' ],
+                'size_units'  => [ 'px', '%', 'custom' ],
 			    'selectors'   => [
 				    '{{WRAPPER}}' => '--pf-label-width: {{SIZE}}{{UNIT}};'
 			    ],

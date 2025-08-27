@@ -90,6 +90,7 @@ if (!class_exists('LaStudio_Kit_Breadcrumbs')) {
                 'show_on_front' => true,
                 'network' => false,
                 'show_title' => true,
+                'custom_title' => '',
                 'show_items' => true,
                 'show_browse' => true,
                 'echo' => true,
@@ -431,6 +432,21 @@ if (!class_exists('LaStudio_Kit_Breadcrumbs')) {
                 }
             }
 
+			$prepare_items = $this->items;
+			if(!empty($this->args['custom_title'])){
+				if ((is_singular() && 1 < get_query_var('page')) || is_paged()) {
+					$last_key = array_key_last($prepare_items);
+					$prepare_items[$last_key] = preg_replace('/(<a[^>]*>)(.*?)(<\/a>)/i', '$1' . esc_html($this->args['custom_title']) . '$3', $prepare_items[$last_key]);
+				}
+				else{
+					array_pop($prepare_items);
+					$this->items = $prepare_items;
+					$this->_add_item('target_format', $this->args['custom_title']);
+					$prepare_items = $this->items;
+				}
+			}
+	        $this->items = $prepare_items;
+
             /* Add paged items if they exist. */
             $this->add_paged_items();
 
@@ -480,9 +496,18 @@ if (!class_exists('LaStudio_Kit_Breadcrumbs')) {
                 $this->items[] = $result;
             }
 
-            if((!is_paged() && 'target_format' === $format) || 'link_format' === $format){
-                $this->page_title = $label;
-            }
+			if(
+				'link_format' === $format
+				|| (
+					'target_format' === $format
+					&& !(
+						get_query_var('page') > 1
+						|| get_query_var('paged') > 1
+					)
+				)
+			){
+				$this->page_title = $label;
+			}
         }
 
         /**
@@ -730,18 +755,13 @@ if (!class_exists('LaStudio_Kit_Breadcrumbs')) {
             /* End with the post title. */
             if ($post_title) {
 
-                if (1 < get_query_var('page')) {
-
+                if (get_query_var('page') > 1 || get_query_var('paged') > 1) {
                     $url = get_permalink($post_id);
-                    $label = $post_title;
-
-                    $this->_add_item('link_format', $label, $url);
-
+                    $this->_add_item('link_format', $post_title, $url);
                 }
-
-                $label = $post_title;
-                $this->_add_item('target_format', $label);
-
+				else{
+					$this->_add_item('target_format', $post_title);
+				}
             }
         }
 

@@ -525,16 +525,6 @@ add_action('elementor/element/image-box/section_style_image/before_section_end',
 });
 add_action('elementor/element/image-box/section_style_content/before_section_end', function ( $element ){
 	$element->add_control(
-		'title_hover_color',
-		[
-			'label' => __( 'Title Hover Color', 'lastudio-kit' ),
-			'type' => \Elementor\Controls_Manager::COLOR,
-			'selectors' => [
-				'{{WRAPPER}} .elementor-image-box-wrapper:hover .elementor-image-box-title' => 'color: {{VALUE}};',
-			]
-		]
-	);
-	$element->add_control(
 		'description_hover_color',
 		[
 			'label' => __( 'Description Hover Color', 'lastudio-kit' ),

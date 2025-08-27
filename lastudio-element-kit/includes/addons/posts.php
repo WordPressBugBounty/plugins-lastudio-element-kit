@@ -472,7 +472,8 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
                     'author'   => esc_html__( 'Author', 'lastudio-kit' ),
                     'date'     => esc_html__( 'Posted Date', 'lastudio-kit' ),
                     'comment'  => esc_html__( 'Comment', 'lastudio-kit' ),
-                    'view'      => esc_html__( 'View', 'lastudio-kit' ),
+                    'view'     => esc_html__( 'View', 'lastudio-kit' ),
+                    'empty'    => esc_html__( 'Empty', 'lastudio-kit' ),
                 ] )
             ]
         );
@@ -1114,6 +1115,15 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
                 ],
             ]
         );
+	    $this->add_group_control(
+		    \LaStudioKitExtensions\Elementor\Controls\Group_Control_Transform::get_type(),
+		    array(
+			    'label'    => esc_html__( 'Transform', 'elementor' ),
+			    'name'     => 'image_transform',
+			    'selector' => '{{WRAPPER}}',
+			    'css_var_prefix'    => '--lakit-post-thumb'
+		    )
+	    );
         $this->add_group_control(
             Group_Control_Css_Filter::get_type(),
             [
@@ -1155,6 +1165,15 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
                 ],
             ]
         );
+	    $this->add_group_control(
+		    \LaStudioKitExtensions\Elementor\Controls\Group_Control_Transform::get_type(),
+		    array(
+			    'label'    => esc_html__( 'Transform', 'elementor' ),
+			    'name'     => 'image_transform_h',
+			    'selector' => '{{WRAPPER}}',
+			    'css_var_prefix'    => '--lakit-post-thumb-hover'
+		    )
+	    );
         $this->add_group_control(
             Group_Control_Css_Filter::get_type(),
             [
@@ -1490,6 +1509,18 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
                 'show_label' => false,
             )
         );
+
+	    $this->_add_responsive_control(
+		    'title_width',
+		    [
+			    'label'     => __( 'Custom Width', 'lastudio-kit' ),
+			    'type'      => Controls_Manager::SLIDER,
+			    'size_units' => [ 'px', '%', 'em', 'custom' ],
+			    'selectors' => [
+				    '{{WRAPPER}} .lakit-posts__title' => 'width: {{SIZE}}{{UNIT}}',
+			    ],
+		    ]
+	    );
 
         $this->_add_control(
             'title_bg',
@@ -2105,6 +2136,18 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
             )
         );
 
+	    $this->_add_responsive_control(
+		    'meta1_width',
+		    [
+			    'label'     => __( 'Custom Width', 'lastudio-kit' ),
+			    'type'      => Controls_Manager::SLIDER,
+			    'size_units' => [ 'px', '%', 'em', 'custom' ],
+			    'selectors' => [
+				    '{{WRAPPER}} .lakit-posts__meta1' => 'width: {{SIZE}}{{UNIT}}',
+			    ],
+		    ]
+	    );
+
         $this->_add_control(
             'meta1_bg',
             array(
@@ -2323,6 +2366,17 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
                 ],
             )
         );
+	    $this->_add_responsive_control(
+		    'meta2_width',
+		    [
+			    'label'     => __( 'Custom Width', 'lastudio-kit' ),
+			    'type'      => Controls_Manager::SLIDER,
+			    'size_units' => [ 'px', '%', 'em', 'custom' ],
+			    'selectors' => [
+				    '{{WRAPPER}} .lakit-posts__meta2' => 'width: {{SIZE}}{{UNIT}}',
+			    ],
+		    ]
+	    );
 
         $this->_add_control(
             'meta2_bg',
@@ -3586,6 +3640,11 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
 
     }
 
+	protected function set_wp_query($query_args = [], $fallback_args = []) {
+		$module_query = Module_Query::get_instance();
+		return $module_query->get_query( $this, 'query', $query_args, $fallback_args );
+	}
+
     protected function render() {
         $this->_context = 'render';
 
@@ -3626,8 +3685,7 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
             $query_args['paged'] = $page;
         }
 
-        $module_query = Module_Query::get_instance();
-        $this->_query = $module_query->get_query( $this, 'query', $query_args, [] );
+        $this->_query = $this->set_wp_query($query_args, [] );
 
         $this->_open_wrap();
         include $this->_get_global_template( 'index' );

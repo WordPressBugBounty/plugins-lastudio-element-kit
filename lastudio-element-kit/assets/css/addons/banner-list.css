@@ -1,6 +1,9 @@
 .enable-c-height-true .lakit-bannerlist__link:hover .lakit-bannerlist__image .lakit-bannerlist__image-instance, .lakit-bannerlist__link:hover .lakit-bannerlist__image {
   padding: var(--lakit-bannerlist-image-hover-padding, var(--lakit-bannerlist-image-padding))
 }
+.enable-c-height-true .lakit-bannerlist__image .lakit-bannerlist__image-instance, .lakit-bannerlist__image {
+  padding: var(--lakit-bannerlist-image-padding)
+}
 .lakit-bannerlist {
   --e_bnl-text-align: center;
   --e_bnl-align: center;
@@ -19,14 +22,12 @@
   margin: 0
 }
 .lastudio-kit .lakit-bannerlist__item {
-  padding: var(--lakit-bannerlist-col-gap, 10px);
-  margin-bottom: var(--lakit-bannerlist-row-gap, 0)
+  padding: var(--lakit-bannerlist-row-gap, var(--lakit-bannerlist-col-gap, 10px)) var(--lakit-bannerlist-col-gap, 10px)
 }
 .lakit-bannerlist__image {
   width: var(--e_bnl-iwidth);
   display: inline-block;
   vertical-align: middle;
-  padding: var(--lakit-bannerlist-image-padding);
   border-radius: var(--lakit-bannerlist-image-radius)
 }
 .lakit-bannerlist__image:before {
@@ -40,13 +41,13 @@
   min-height: 20px;
   transition: transform .5s;
   object-fit: cover;
-  transform: scale(var(--lakit-bannerlist-image-scale, 1))
+  transform: translate3d(var(--lakit-bannerlist-image-offset-x, 0), var(--lakit-bannerlist-image-offset-y, 0), 0) scale(var(--lakit-bannerlist-image-scale, 1)) rotate(var(--lakit-bannerlist-image-rotate, 0deg));
 }
 .lakit-bannerlist__image .lakit-bannerlist__image-instance {
   border-radius: inherit
 }
 .lakit-bannerlist__link:hover .lakit-bannerlist__image-instance {
-  transform: scale(var(--lakit-bannerlist-image-scale-hover, 1.15))
+  transform: translate3d(var(--lakit-bannerlist-image-hover-offset-x, 0), var(--lakit-bannerlist-image-hover-offset-y, 0), 0) scale(var(--lakit-bannerlist-image-scale-hover, 1.15)) rotate(var(--lakit-bannerlist-image-hover-rotate, 0deg))
 }
 .lakit-bannerlist__link:hover .lakit-bannerlist__image {
   border-radius: var(--lakit-bannerlist-image-hover-radius, var(--lakit-bannerlist-image-radius))
@@ -69,9 +70,6 @@
 }
 .enable-c-height-true .lakit-bannerlist__image {
   padding: 0
-}
-.enable-c-height-true .lakit-bannerlist__image .lakit-bannerlist__image-instance {
-  padding: var(--lakit-bannerlist-image-padding)
 }
 .lakit-bannerlist.layout-type-overlay .lakit-bannerlist__content {
   position: absolute;
@@ -118,11 +116,15 @@
 }
 .lakit-bannerlist__desc {
   color: var(--e-desc-color);
-  background-color: var(--e-desc-bgcolor)
+  background-color: var(--e-desc-bgcolor);
+  -webkit-line-clamp: var(--lakit-bannerlist-desc-line, 10);
+  line-clamp: var(--lakit-bannerlist-desc-line, 10)
 }
 .lakit-bannerlist__subdesc {
   color: var(--e-subdesc-color);
-  background-color: var(--e-subdesc-bgcolor)
+  background-color: var(--e-subdesc-bgcolor);
+  -webkit-line-clamp: var(--lakit-bannerlist-subdesc-line, 10);
+  line-clamp: var(--lakit-bannerlist-subdesc-line, 10)
 }
 .lakit-bannerlist__inner:hover .lakit-bannerlist__subtitle {
   color: var(--e-subtitle-hover-color, var(--e-subtitle-color));
@@ -169,4 +171,10 @@
   width: 1em;
   height: auto;
   vertical-align: top
+}
+.lakit-bannerlist__desc, .lakit-bannerlist__subdesc {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-box-orient: vertical
 }

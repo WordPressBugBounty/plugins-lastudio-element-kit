@@ -953,12 +953,12 @@ class LaStudioKit_Icon_Box extends LaStudioKit_Base {
                     ],
                 ],
                 'selectors_dictionary' => [
-	                'left'    => 'text-align:left; margin-right: auto;',
-	                'center' => 'text-align:center; margin-left: auto; margin-right: auto;',
-	                'right' => 'text-align:right; margin-left: auto;',
+	                'left'      => '--lakit-ib-text-align: left;--lakit-ib-mr: auto;--lakit-ib-fjc: flex-start;',
+	                'center'    => '--lakit-ib-text-align: center;--lakit-ib-ml: auto;--lakit-ib-mr: auto;--lakit-ib-fjc: center;',
+	                'right'     => '--lakit-ib-text-align: right;--lakit-ib-ml: auto;--lakit-ib-fjc: flex-end;',
                 ],
                 'selectors' => [
-                    '{{WRAPPER}} ' . $css_scheme['box_body'] => '{{VALUE}}',
+                    '{{WRAPPER}}' => '{{VALUE}}',
                 ],
             ]
         );

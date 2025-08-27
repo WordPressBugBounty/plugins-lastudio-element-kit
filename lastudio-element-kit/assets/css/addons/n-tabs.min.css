@@ -314,3 +314,9 @@
 .etab--overflow > .lakit-ntabs-heading .ntabs--title {
   white-space: pre
 }
+.elementor-editor-active .lakit-ntabs-content-item.e-active > .elementor-element{
+  display: flex !important;
+}
+.elementor-editor-active .lakit-ntabs-content-item:not(.e-active) > .elementor-element {
+  display: none !important;
+}

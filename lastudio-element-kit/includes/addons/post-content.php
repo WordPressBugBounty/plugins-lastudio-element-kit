@@ -135,6 +135,10 @@ class LaStudioKit_Post_Content extends LaStudioKit_Base {
 
         $post = get_post();
 
+        if( !$post instanceof \WP_Post){
+            return;
+        }
+
         if ( post_password_required( $post->ID ) ) {
             // PHPCS - `get_the_password_form`. is safe.
             echo get_the_password_form( $post->ID ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -155,7 +159,8 @@ class LaStudioKit_Post_Content extends LaStudioKit_Base {
 
         if ( lastudio_kit()->elementor()->preview->is_preview_mode( $post->ID ) ) {
             $content = lastudio_kit()->elementor()->preview->builder_wrapper( '' ); // XSS ok
-        } else {
+        }
+		else {
             $document = lastudio_kit()->elementor()->documents->get( $post->ID );
             // On view theme document show it's preview content.
             if ( $document ) {
@@ -186,8 +191,15 @@ class LaStudioKit_Post_Content extends LaStudioKit_Base {
                 setup_postdata( $post );
 
                 /** This filter is documented in wp-includes/post-template.php */
+
+                if( $post->post_type === 'give_forms' ){
+                    $raw_content = get_post_meta( $post->ID, '_lakit_custom_content', true );
+                }
+                else{
+                    $raw_content = get_the_content();
+                }
                 // PHPCS - `get_the_content` is safe.
-                echo apply_filters( 'the_content', get_the_content() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                echo apply_filters( 'the_content', $raw_content ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
                 wp_link_pages( [
                     'before' => '<div class="page-links elementor-page-links"><span class="page-links-title elementor-page-links-title">' . __( 'Pages:', 'lastudio-kit' ) . '</span>',
@@ -206,7 +218,8 @@ class LaStudioKit_Post_Content extends LaStudioKit_Base {
                 lastudio_kit()->elementor()->editor->set_edit_mode( $is_edit_mode );
 
                 return;
-            } else {
+            }
+			else {
                 lastudio_kit()->elementor()->frontend->remove_content_filters();
                 $content = apply_filters( 'the_content', $content );
                 lastudio_kit()->elementor()->frontend->restore_content_filters();

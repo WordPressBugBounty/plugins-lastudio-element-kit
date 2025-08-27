@@ -198,6 +198,17 @@ class GiveFormGrid extends LaStudioKit_Posts{
 		);
 
 		$this->_add_control(
+			'floating_category',
+			[
+				'label'     => esc_html__( 'Show Floating Category', 'lastudio-kit' ),
+				'type'      => Controls_Manager::SWITCHER,
+				'label_on'  => esc_html__( 'Yes', 'lastudio-kit' ),
+				'label_off' => esc_html__( 'No', 'lastudio-kit' ),
+				'default'   => 'no'
+			]
+		);
+
+		$this->_add_control(
 			'show_meta',
 			array(
 				'type'         => 'switcher',
@@ -212,10 +223,29 @@ class GiveFormGrid extends LaStudioKit_Posts{
 		$repeater = new Repeater();
 
 		$repeater->add_control(
+			'item_type',
+			[
+				'label'   => esc_html__( 'Type', 'lastudio-kit' ),
+				'type'    => Controls_Manager::SELECT2,
+				'options' => apply_filters( 'lastudio-kit/' . $this->get_lakit_name() . '/metadata', [
+					'category'      => esc_html__( 'Category', 'lastudio-kit' ),
+					'tag'           => esc_html__( 'Tags', 'lastudio-kit' ),
+					'goal_amount'   => esc_html__( 'Goal Amount', 'lastudio-kit' ),
+					'amount_raised' => esc_html__( 'Amount Raised', 'lastudio-kit' ),
+					'number_donations' => esc_html__( 'Number of Donations', 'lastudio-kit' ),
+					'empty'          => esc_html__( 'Empty', 'lastudio-kit' ),
+				])
+			]
+		);
+
+		$repeater->add_control(
 			'item_label',
 			array(
 				'label' => esc_html__( 'Label', 'lastudio-kit' ),
 				'type'  => Controls_Manager::TEXT,
+				'condition' => [
+					'item_type!' => 'empty'
+				]
 			)
 		);
 		$repeater->add_control(
@@ -226,21 +256,9 @@ class GiveFormGrid extends LaStudioKit_Posts{
 				'fa4compatibility' => 'icon',
 				'skin'             => 'inline',
 				'label_block'      => false,
-			]
-		);
-
-		$repeater->add_control(
-			'item_type',
-			[
-				'label'   => esc_html__( 'Type', 'lastudio-kit' ),
-				'type'    => Controls_Manager::SELECT2,
-				'options' => apply_filters( 'lastudio-kit/' . $this->get_lakit_name() . '/metadata', [
-					'category'      => esc_html__( 'Category', 'lastudio-kit' ),
-                    'tag'           => esc_html__( 'Tags', 'lastudio-kit' ),
-					'goal_amount'   => esc_html__( 'Goal Amount', 'lastudio-kit' ),
-					'amount_raised' => esc_html__( 'Amount Raised', 'lastudio-kit' ),
-					'number_donations' => esc_html__( 'Number of Donations', 'lastudio-kit' )
-				])
+				'condition' => [
+					'item_type!' => 'empty'
+				]
 			]
 		);
 
@@ -463,11 +481,30 @@ class GiveFormGrid extends LaStudioKit_Posts{
                 ],
             )
         );
+		$this->_add_group_control(
+			Group_Control_Background::get_type(),
+			array(
+				'name'     => 'goal_bg',
+				'types'    => [ 'classic', 'gradient' ],
+				'selector' => '{{WRAPPER}} .lakit-goal-progress',
+				'exclude'  => array(
+					'image',
+					'position',
+					'xpos',
+					'ypos',
+					'attachment',
+					'attachment_alert',
+					'repeat',
+					'size',
+					'bg_width'
+				),
+			)
+		);
         $this->_add_group_control(
             Group_Control_Typography::get_type(),
             array(
                 'name'     => 'goal_typography',
-                'selector' => '{{WRAPPER}} .lakit-goal-progress .raised span',
+                'selector' => '{{WRAPPER}} .lakit-goal-progress .raised',
             )
         );
         $this->_add_control(
@@ -686,6 +723,17 @@ class GiveFormGrid extends LaStudioKit_Posts{
                 'size_units' => array( 'px', '%', 'em', 'custom' ),
                 'selectors'  => array(
                     '{{WRAPPER}} .lakit-goal-progress' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ),
+            )
+        );
+		$this->_add_responsive_control(
+            'goal_radius',
+            array(
+                'label'      => esc_html__( 'Border Radius', 'lastudio-kit' ),
+                'type'       => Controls_Manager::DIMENSIONS,
+                'size_units' => array( 'px', '%', 'em', 'custom' ),
+                'selectors'  => array(
+                    '{{WRAPPER}} .lakit-goal-progress' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ),
             )
         );
@@ -942,7 +990,7 @@ class GiveFormGrid extends LaStudioKit_Posts{
 	}
 
 	protected function _register_section_style_floating_category( $css_scheme ){
-
+		parent::_register_section_style_floating_category( $css_scheme );
 	}
 
 	protected function _register_section_style_floating_postformat( $css_scheme ){

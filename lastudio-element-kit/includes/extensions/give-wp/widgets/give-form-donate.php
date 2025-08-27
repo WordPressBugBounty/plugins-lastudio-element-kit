@@ -341,31 +341,53 @@ class GiveFormDonate extends LaStudioKit_Base {
         if(empty($form_id)){
             $form_id = get_the_ID();
         }
+
         if($display_style === 'button'){
             $donate_text = $this->get_settings_for_display('continue_button_title');
-            echo sprintf(
-                '<button type="button" class="elementor-button lakit-posts__btn-donate" data-id="%3$s"><span class="btn__text">%1$s</span>%2$s</button>',
-                esc_html($donate_text),
-                $this->_get_icon('donate_icon', '<span class="lakit-btn-more-icon">%s</span>'), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-                esc_attr($form_id)
-            );
-            echo '<div class="mfp-hide give-donation-grid-item-form lakit-give-form-modal give-modal--slide" data-id="'.esc_attr($form_id).'">';
+	        $isV3 = false;
+
+			if(class_exists('\Give\Helpers\Form\Utils') && \Give\Helpers\Form\Utils::isV3Form($form_id)){
+				$isV3 = true;
+			}
+
+	        echo sprintf(
+		        '<button type="button" class="elementor-button lakit-posts__btn-donate" data-id="%3$s" data-isv3="%4$s"><span class="btn__text">%1$s</span>%2$s</button>',
+		        esc_html($donate_text),
+		        $this->_get_icon('donate_icon', '<span class="lakit-btn-more-icon">%s</span>'), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		        esc_attr($form_id),
+		        $isV3 ? 'true' : ''
+	        );
+
+			if(!$isV3){
+				if(!lastudio_kit()->elementor()->editor->is_edit_mode()) {
+					echo '<div class="mfp-hide give-donation-grid-item-form lakit-give-form-modal give-modal--slide" data-id="' . esc_attr( $form_id ) . '">';
+					echo give_form_shortcode(
+						[
+							'id'            => $form_id,
+							'display_style' => 'onpage',
+							'show_title'    => 'false',
+							'show_goal'     => 'false',
+							'show_content'  => 'none',
+						]
+					);
+					echo '</div>';
+				}
+			}
         }
         else{
-            echo '<div class="lakit-give-form-modal" data-id="'.esc_attr($form_id).'">';
+	        if(!lastudio_kit()->elementor()->editor->is_edit_mode()) {
+		        echo '<div class="lakit-give-form-modal" data-id="' . esc_attr( $form_id ) . '">';
+		        echo give_form_shortcode(
+			        [
+				        'id'            => $form_id,
+				        'display_style' => 'onpage',
+				        'show_title'    => 'false',
+				        'show_goal'     => 'false',
+				        'show_content'  => 'none',
+			        ]
+		        );
+		        echo '</div>';
+	        }
         }
-
-        $shortcode_output = give_form_shortcode(
-            [
-                'id' => $form_id,
-                'display_style' => 'onpage',
-                'show_title' => 'false',
-                'show_goal' => 'false',
-                'show_content' => 'none',
-            ]
-        );
-
-        echo $shortcode_output; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-        echo '</div>';
     }
 }

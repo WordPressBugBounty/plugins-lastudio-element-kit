@@ -1474,54 +1474,17 @@ class LaStudioKit_Images_Layout extends LaStudioKit_Base {
 
         $image_data = $this->_loop_image_item('item_image', '', false);
         $title = $this->_loop_item(['item_title']);
+	    if(empty($title)){
+		    $title = '';
+	    }
         if(!empty($image_data)){
 	        $giflazy = 'data:image/gif;base64,R0lGODlhAQABAIAAAP///wAAACH5BAEAAAAALAAAAAABAAEAAAICRAEAOw==';
 	        $giflazy = $image_data[0];
-            $srcset = sprintf('width="%1$d" height="%2$d" style="--img-height:%3$dpx"', $image_data[1], $image_data[2], $image_data[2]);
-            return sprintf( apply_filters('lastudio-kit/images-layout/image-format', '<img src="%1$s" alt="%5$s" loading="lazy" class="%3$s" %4$s>'), $giflazy, $image_data[0], 'lakit-images-layout__image-instance' , $srcset, esc_attr(wp_strip_all_tags($title)));
+	        $alt = !empty($image_data[3]) ? $image_data[3] : strip_tags($title);
+	        $srcset = sprintf('width="%1$d" height="%2$d" alt="%4$s" style="--img-height:%3$dpx"', $image_data[1], $image_data[2], $image_data[2], esc_attr($alt));
+	        return sprintf( apply_filters('lastudio-kit/images-layout/image-format', '<img src="%1$s" loading="lazy" class="%3$s" %4$s>'), $giflazy, $image_data[0], 'lakit-images-layout__image-instance' , $srcset);
         }
         return '';
-    }
-
-    /**
-     * Get loop image html
-     *
-     */
-    protected function _loop_image_item( $key = '', $format = '%s', $html_return = true ) {
-        $item = $this->_processed_item;
-        $params = [];
-
-        if ( ! array_key_exists( $key, $item ) ) {
-            return false;
-        }
-
-        $image_item = $item[ $key ];
-
-        if ( ! empty( $image_item['id'] ) ) {
-            $image_data = wp_get_attachment_image_src( $image_item['id'], 'full' );
-            if( !empty($image_data) ){
-                $params[] = apply_filters('lastudio_wp_get_attachment_image_url', $image_data[0]);
-                $params[] = $image_data[1];
-                $params[] = $image_data[2];
-            }
-            else{
-                $params[] = isset($image_item['url']) ? esc_url($image_item['url']) : Utils::get_placeholder_image_src();
-                $params[] = 1200;
-                $params[] = 800;
-            }
-        }
-        else {
-            $params[] = isset($image_item['url']) ? esc_url($image_item['url']) : Utils::get_placeholder_image_src();
-            $params[] = 1200;
-            $params[] = 800;
-        }
-
-        if($html_return){
-            return vsprintf( $format, $params );
-        }
-        else{
-            return $params;
-        }
     }
 
     protected function _loop_icon( $format ){

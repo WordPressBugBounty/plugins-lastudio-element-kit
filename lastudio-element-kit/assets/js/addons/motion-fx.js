@@ -806,9 +806,9 @@
                 var _this = _possibleConstructorReturn(this, (_class.__proto__ || Object.getPrototypeOf(_class)).call(this));
 
                 elementorFrontend.hooks.addAction('frontend/element_ready/global', function ($element) {
-                    if( $element.closest('.lakit-carousel').length > 0 ){
-                        return;
-                    }
+                    // if( $element.closest('.lakit-carousel').length > 0 ){
+                    //     return;
+                    // }
                     elementorFrontend.elementsHandler.addHandler(_handler2.default, {$element: $element});
                 });
                 return _this;
@@ -1344,6 +1344,9 @@
 
                     var $addBackgroundLayerTo = settings.addBackgroundLayerTo ? this.$element.find(settings.addBackgroundLayerTo) : this.$element;
 
+                    if($addBackgroundLayerTo.find('>.' + settings.classes.container).length){
+                        $addBackgroundLayerTo.find('>.' + settings.classes.container).remove()
+                    }
                     $addBackgroundLayerTo.prepend(this.elements.$motionFXContainer);
                 }
             }, {

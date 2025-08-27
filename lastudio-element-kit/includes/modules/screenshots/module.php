@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Module extends Module_Base {
-	const SCREENSHOT_PROXY_NONCE_ACTION = 'screenshot_proxy';
+	const SCREENSHOT_PROXY_NONCE_ACTION = 'screenshot-proxy';
 
 	/**
 	 * Module name.

@@ -86,7 +86,7 @@ $item_link_url = get_the_permalink();
                 <?php if(filter_var($floating_category, FILTER_VALIDATE_BOOLEAN)): ?>
                 <div class="lakit-posts__floating_category">
                     <div class="lakit-posts__floating_category-inner"><?php
-                        echo get_the_category_list(' '); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                        echo get_the_term_list( get_the_ID(), 'la_portfolio_category', '', ' ', '' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                     ?></div>
                 </div>
                 <?php endif; ?>

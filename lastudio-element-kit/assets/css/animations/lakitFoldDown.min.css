@@ -1,0 +1,1 @@
+.lakitFoldDown{perspective:400px}.lakitFoldDown>*{animation-name:lakitFoldDown;transform-origin:50% 0;animation-duration:.6s}@keyframes lakitFoldDown{0%{opacity:0;transform:translate3d(0,20px,-20px) rotateX(-50deg)}100%{opacity:1;transform:translate3d(0,0,0)}}

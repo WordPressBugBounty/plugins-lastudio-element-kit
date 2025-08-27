@@ -73,7 +73,7 @@
 .lakit-vtimeline--align-left .lakit-vtimeline-item > .lakit-vtimeline-item__meta {
 	display: none
 }
-@media (min-width: 1025px) {
+@media (min-width: 860px) {
 	.lakit-vtimeline--align-center .lakit-vtimeline-item:nth-child(2n) {
 		flex-direction: row-reverse
 	}
@@ -83,8 +83,6 @@
 	.lakit-vtimeline--align-center .lakit-vtimeline-item:nth-child(2n) .lakit-vtimeline-item__card-arrow {
 		left: 0;
 		margin-left: -10px;
-		border-top-width: 0 !important;
-		border-right-width: 0 !important
 	}
 	.lakit-vtimeline--align-center .lakit-vtimeline-item:nth-child(odd) .lakit-vtimeline-item__meta {
 		text-align: left
@@ -92,8 +90,6 @@
 	.lakit-vtimeline--align-center .lakit-vtimeline-item:nth-child(odd) .lakit-vtimeline-item__card-arrow {
 		right: 0;
 		margin-right: -10px;
-		border-left-width: 0 !important;
-		border-bottom-width: 0 !important
 	}
 	.lakit-vtimeline--align-center .lakit-vtimeline-item__meta {
 		flex-grow: 1;
@@ -123,7 +119,7 @@
 		display: none;
 	}
 }
-@media (max-width: 1024px) {
+@media (max-width: 859px) {
 	.lakit-vtimeline--align-center .lakit-vtimeline-item__point {
 		flex-grow: 0;
 		order: 0;

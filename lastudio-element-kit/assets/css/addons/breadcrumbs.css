@@ -87,6 +87,12 @@
 body.home .elementor-widget-lakit-breadcrumbs:not(.lakit-breadcrumbs-on-front-yes):not(.elementor-element-edit-mode) {
 	display: none
 }
-.lakit-breadcrumbs__item:last-child{
-	display: inline
+.lakit-breadcrumbs__item-sep svg {
+	vertical-align: top;
 }
+.lakit-breadcrumbs__item-sep > span{
+	vertical-align: middle;
+}
+/*.lakit-breadcrumbs__item:last-child{*/
+/*	display: inline*/
+/*}*/

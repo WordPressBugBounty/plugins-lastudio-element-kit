@@ -332,7 +332,7 @@ if ( ! class_exists( 'LaStudio_Kit_Helper' ) ) {
 
 			$deprecated = apply_filters(
 				'lastudio-kit/post-types-list/deprecated',
-				array( 'attachment', 'elementor_library' )
+				array( 'attachment', 'elementor_library', 'e-floating-buttons' )
 			);
 
 			$result = array();
@@ -1080,6 +1080,9 @@ if ( ! class_exists( 'LaStudio_Kit_Helper' ) ) {
 		}
 
 		public static function transfer_text( $content, $autop = false ){
+			if(empty($content)){
+				return '';
+			}
 			if ( $autop ) {
 				$content = preg_replace( '/<\/?p\>/', "\n", $content );
 				$content = preg_replace( '/<p[^>]*><\\/p[^>]*>/', "", $content );

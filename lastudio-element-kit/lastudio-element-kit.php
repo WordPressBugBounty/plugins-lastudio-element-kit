@@ -1,23 +1,26 @@
 <?php
 /**
  * Plugin Name:       LA-Studio Element Kit for Elementor
+ * Plugin URI:        https://la-studioweb.com/lastudio-element-kit/
  * Description:       Additional widgets for Elementor page builder. It has 60 highly customizable widgets
- * Version:           1.5.3
+ * Version:           1.5.5
+ * Requires at least: 5.2
+ * Requires PHP:      7.2
  * Author:            LA-Studio
- * Author URI:        https://la-studioweb.com/
+ * Author URI:        https://1.envato.market/POnObq
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       lastudio-kit
  * Domain Path:       /languages
  *
- * Elementor tested up to: 3.28.x
- * Elementor Pro tested up to: 3.28.x
- * WooCommerce tested up to: 9.8.2
+ * Elementor tested up to: 3.31.x
+ * Elementor Pro tested up to: 3.31.x
+ * WooCommerce tested up to: 10.0.x
  *
  * @package lastudio-kit
  * @author  LA-Studio
  * @license GPL-2.0+
- * @copyright  2024, LA-Studio
+ * @copyright  2025, LA-Studio
  */
 
 // If this file is called directly, abort.
@@ -59,7 +62,7 @@ if(!class_exists('LaStudio_Kit')){
          *
          * @var string
          */
-        private $version = '1.5.3';
+        private $version = '1.5.5';
 
         /**
          * Framework component

@@ -296,14 +296,14 @@ class LaStudioKit_Post_Terms extends LaStudioKit_Base {
     }
 
     protected function render() {
-        global $post;
+
         $settings = $this->get_settings();
 
         $taxonomy = $settings['taxonomy'];
         if ( empty( $taxonomy ) )
             return;
 
-        $term_list = get_the_terms( $post->ID, $taxonomy );
+        $term_list = get_the_terms( get_the_ID(), $taxonomy );
         if ( empty( $term_list ) || is_wp_error( $term_list ) )
             return;
 

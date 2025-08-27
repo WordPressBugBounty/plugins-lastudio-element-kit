@@ -83,8 +83,18 @@ $title = $this->_loop_item( ['title'] );
 if(!empty($title)){
     $__content_html .= sprintf('<%3$s class="lakit-bannerlist__title" data-title="%2$s">%1$s</%3$s>', $title, esc_attr(wp_strip_all_tags($title)), $title_tag);
 }
-$__content_html .= $this->_loop_item( array( 'description' ), '<div class="lakit-bannerlist__desc">%1$s</div>' );
-$__content_html .= $this->_loop_item( array( 'subdescription' ), '<div class="lakit-bannerlist__subdesc">%1$s</div>' );
+
+$_bn_desc = $this->_loop_item( array( 'description' ) );
+$_bn_desc = $this->parse_text_editor( $_bn_desc ?? '' );
+if(!empty($_bn_desc)){
+	$__content_html .= '<div class="lakit-bannerlist__desc">'.$_bn_desc.'</div>';
+}
+
+$_bn_subdesc = $this->_loop_item( array( 'subdescription' ) );
+$_bn_subdesc = $this->parse_text_editor( $_bn_subdesc ?? '' );
+if(!empty($_bn_subdesc)) {
+	$__content_html .= '<div class="lakit-bannerlist__subdesc">' . $_bn_subdesc . '</div>';
+}
 
 $button_html = '';
 if(!empty($_processed_item['button_text']) || !empty($btn_icon)){

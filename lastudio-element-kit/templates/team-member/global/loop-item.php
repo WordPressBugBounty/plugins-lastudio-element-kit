@@ -44,7 +44,7 @@ $post_link = get_the_permalink();
                 <?php
                 if($excerpt_length > 0){
                     echo sprintf(
-                        '<p class="lastudio-team-member__desc">%1$s</p>',
+                        '<div class="lastudio-team-member__desc">%1$s</div>',
                         esc_html(lastudio_kit_helper()->get_excerpt($excerpt_length))
                     );
                 }

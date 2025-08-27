@@ -17,7 +17,7 @@ if (filter_var($show_metadata, FILTER_VALIDATE_BOOLEAN) && !empty($metadata)) {
     foreach ($metadata as $meta) {
         $item_type = isset($meta['item_type']) ? $meta['item_type'] : '';
         $meta_icon = $this->_get_icon_setting($meta['item_icon'], '<span class="meta--icon">%s</span>', '', false);
-        $meta_label = !empty($meta['item_label']) ? sprintf('<span class="meta--label">%s</span>', $meta['item_label']) : '';
+        $meta_label = !empty($meta['item_label']) ? sprintf('<span class="meta--label">%s</span>', esc_html($meta['item_label'])) : '';
         $meta_value = '';
         $item_type_class = '';
 
@@ -58,6 +58,10 @@ if (filter_var($show_metadata, FILTER_VALIDATE_BOOLEAN) && !empty($metadata)) {
         if (!empty($meta_value)) {
             $output .= sprintf('<div class="lakit-posts__meta__item lakit-posts__meta__item--%4$s %5$s">%1$s%2$s%3$s</div>', $meta_icon, $meta_label, $meta_value, $item_type, $item_type_class);
         }
+
+	    if($item_type === 'empty'){
+		    $output .= '<span class="lakit-posts__meta__item lakit-posts__meta__item--empty"></span>';
+	    }
 
     }
 

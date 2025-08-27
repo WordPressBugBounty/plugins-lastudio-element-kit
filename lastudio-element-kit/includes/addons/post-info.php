@@ -366,7 +366,9 @@ class LaStudioKit_Post_Info extends LaStudioKit_Base {
 		    $meta_label = !empty($meta['item_label']) ? sprintf('<span class="meta--label">%s</span>', $meta['item_label']) : '';
 		    $meta_value = '';
 		    $item_type_class = '';
-
+            if( $item_type === 'category' && !taxonomy_exists($post_taxonomy)){
+                continue;
+            }
 		    switch ($item_type) {
 			    case 'category':
                     $meta_value = get_the_term_list(get_the_ID(), $post_taxonomy, '', '<span class="cspr">, </span>');

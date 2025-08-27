@@ -154,7 +154,7 @@ class GiveFormGoal extends LaStudioKit_Base {
             Group_Control_Typography::get_type(),
             array(
                 'name'     => 'goal_typography',
-                'selector' => '{{WRAPPER}} .lakit-goal-progress .raised span',
+                'selector' => '{{WRAPPER}} .lakit-goal-progress .raised',
             )
         );
         $this->_add_control(

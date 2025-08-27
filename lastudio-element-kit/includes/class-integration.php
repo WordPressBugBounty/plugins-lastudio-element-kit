@@ -486,6 +486,14 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 
             $template_cache = filter_var(lastudio_kit_settings()->get_option('template-cache', false), FILTER_VALIDATE_BOOLEAN);
 
+			$delayResources = [
+				'js' => [],
+				'css' => [],
+			];
+			if(class_exists( 'Give', false )){
+				$delayResources['js']['lakit-givewp'] = lastudio_kit()->plugin_url('assets/js/delay/givewp.min.js');
+			}
+
             $LaStudioKitSettings = [
 	            'templateApiUrl' => $rest_api_url . 'lastudio-kit-api/v1/elementor-template',
 	            'widgetApiUrl'   => $rest_api_url . 'lastudio-kit-api/v1/elementor-widget',
@@ -515,8 +523,11 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 	                'popupcss'          => lastudio_kit()->plugin_url('includes/modules/popup/assets/css/popup.min.css'),
                     'odometerjs'        => lastudio_kit()->plugin_url('assets/js/lib/odometer.min.js'),
                     'swiperjs'          => lastudio_kit()->plugin_url('assets/js/lib/swiper.min.js'),
+                    'simpleparallax'    => lastudio_kit()->plugin_url('assets/js/lib/simple-parallax.min.js'),
                 ],
+	            'delayResources'        => $delayResources,
 	            'recaptchav3'       => $this->is_active_recaptchav3() ? $this->get_recaptchav3_site_key() : '',
+	            'giveRouter'        => esc_url(add_query_arg(['givewp-route'=>'donation-form-view', 'form-id' => 'lakit_rp_lakit'], home_url('/'))),
             ];
 
             wp_localize_script('lastudio-kit-base', 'LaStudioKitSettings', $LaStudioKitSettings );
@@ -993,6 +1004,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
                 'lakitRevealLeft' => 'Reveal from left',
                 'lakitRevealRight' => 'Reveal from right',
                 'lakitRevealCenter' => 'Reveal from center',
+                'lakitFoldDown' => 'Fold Down',
             ];
             $animations['LaStudio Kit'] = $new_animation;
 		    return $animations;
@@ -1591,70 +1603,19 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
         }
 
         public function e_shapes( $additional_shapes ){
-            $additional_shapes['lakit-shape-01'] = [
-                'title' => esc_html_x( 'LaKit Shape 01', 'Shapes', 'lastudio-kit' ),
-                'has_negative' => true,
-                'has_flip' => true,
-                'url'   => lastudio_kit()->plugin_url('assets/shapes/custom-01.svg'),
-                'path'   => lastudio_kit()->plugin_path('assets/shapes/custom-01.svg'),
-            ];
-            $additional_shapes['lakit-shape-02'] = [
-                'title' => esc_html_x( 'LaKit Shape 02', 'Shapes', 'lastudio-kit' ),
-                'has_negative' => true,
-                'has_flip' => true,
-                'url'   => lastudio_kit()->plugin_url('assets/shapes/custom-02.svg'),
-                'path'   => lastudio_kit()->plugin_path('assets/shapes/custom-02.svg'),
-            ];
-            $additional_shapes['lakit-shape-03'] = [
-                'title' => esc_html_x( 'LaKit Shape 03', 'Shapes', 'lastudio-kit' ),
-                'has_negative' => true,
-                'has_flip' => true,
-                'url'   => lastudio_kit()->plugin_url('assets/shapes/custom-03.svg'),
-                'path'   => lastudio_kit()->plugin_path('assets/shapes/custom-03.svg'),
-            ];
-            $additional_shapes['lakit-shape-04'] = [
-                'title' => esc_html_x( 'LaKit Shape 04', 'Shapes', 'lastudio-kit' ),
-                'has_negative' => true,
-                'has_flip' => true,
-                'url'   => lastudio_kit()->plugin_url('assets/shapes/custom-04.svg'),
-                'path'   => lastudio_kit()->plugin_path('assets/shapes/custom-04.svg'),
-            ];
-			$additional_shapes['lakit-shape-05'] = [
-                'title' => esc_html_x( 'LaKit Shape 05', 'Shapes', 'lastudio-kit' ),
-                'has_negative' => true,
-                'has_flip' => true,
-                'url'   => lastudio_kit()->plugin_url('assets/shapes/custom-05.svg'),
-                'path'   => lastudio_kit()->plugin_path('assets/shapes/custom-05.svg'),
-            ];
-            $additional_shapes['lakit-shape-06'] = [
-                'title' => esc_html_x( 'LaKit Shape 06', 'Shapes', 'lastudio-kit' ),
-                'has_negative' => true,
-                'has_flip' => true,
-                'url'   => lastudio_kit()->plugin_url('assets/shapes/custom-06.svg'),
-                'path'   => lastudio_kit()->plugin_path('assets/shapes/custom-06.svg'),
-            ];
-            $additional_shapes['lakit-shape-07'] = [
-                'title' => esc_html_x( 'LaKit Shape 07', 'Shapes', 'lastudio-kit' ),
-                'has_negative' => true,
-                'has_flip' => true,
-                'url'   => lastudio_kit()->plugin_url('assets/shapes/custom-07.svg'),
-                'path'   => lastudio_kit()->plugin_path('assets/shapes/custom-07.svg'),
-            ];
-            $additional_shapes['lakit-shape-08'] = [
-                'title' => esc_html_x( 'LaKit Shape 08', 'Shapes', 'lastudio-kit' ),
-                'has_negative' => true,
-                'has_flip' => true,
-                'url'   => lastudio_kit()->plugin_url('assets/shapes/custom-08.svg'),
-                'path'   => lastudio_kit()->plugin_path('assets/shapes/custom-08.svg'),
-            ];
-            $additional_shapes['lakit-shape-09'] = [
-                'title' => esc_html_x( 'LaKit Shape 09', 'Shapes', 'lastudio-kit' ),
-                'has_negative' => true,
-                'has_flip' => true,
-                'url'   => lastudio_kit()->plugin_url('assets/shapes/custom-09.svg'),
-                'path'   => lastudio_kit()->plugin_path('assets/shapes/custom-09.svg'),
-            ];
-            return $additional_shapes;
+	        $lakit_shapes = [];
+	        $title =  esc_html_x( 'LA-Kit Shape', 'Shapes', 'lastudio-kit' );
+			for ($i = 1; $i <= 19; $i++){
+				$k = $i < 10 ? '0' . $i : $i;
+				$lakit_shapes['lakit-shape-' . $k] = [
+					'title' => $title . ' ' . $k,
+					'has_negative' => true,
+					'has_flip' => true,
+					'url'   => lastudio_kit()->plugin_url('assets/shapes/custom-'.$k.'.svg'),
+					'path'   => lastudio_kit()->plugin_path('assets/shapes/custom-'.$k.'.svg'),
+				];
+			}
+            return array_merge( $additional_shapes, $lakit_shapes );
         }
 
         public function enqueue_frontend_scripts(){
@@ -1679,6 +1640,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
                 'lakitRevealLeft' => 'Reveal from left',
                 'lakitRevealRight' => 'Reveal from right',
                 'lakitRevealCenter' => 'Reveal from center',
+                'lakitFoldDown' => 'Fold Down',
             ];
 
             $styles = [];

@@ -139,10 +139,11 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
 
 		$html = '';
 		$image_data = $this->_loop_image_item('item_image', '', false);
+		$bn_title = $this->_loop_item( ['title'] );
 		if(!empty($image_data[0])){
 			$giflazy = $image_data[0];
-			$srcset = sprintf('width="%1$d" height="%2$d" style="--img-height:%3$dpx"', $image_data[1], $image_data[2], $image_data[2]);
-			$_img_html = sprintf( apply_filters('lastudio-kit/banner-list/image-format', '<img src="%1$s" alt="" loading="lazy" class="%3$s" %4$s>'), $giflazy, $image_data[0], 'lakit-bannerlist__image-instance' , $srcset);
+			$srcset = sprintf('width="%1$d" height="%2$d" alt="%4$s" style="--img-height:%3$dpx"', $image_data[1], $image_data[2], $image_data[2], esc_attr(!empty($image_data[3]) ? $image_data[3] : $bn_title));
+			$_img_html = sprintf( apply_filters('lastudio-kit/banner-list/image-format', '<img src="%1$s" loading="lazy" class="%3$s" %4$s>'), $giflazy, $image_data[0], 'lakit-bannerlist__image-instance' , $srcset);
 			$html = sprintf($format, $_img_html);
 		}
         if($echo){
@@ -155,10 +156,15 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
 
     public function get_loop_image_item() {
         $image_data = $this->_loop_image_item('item_image', '', false);
+	    $bn_title = $this->_loop_item( ['title'] );
+		if(empty($bn_title)){
+			$bn_title = '';
+		}
         if(!empty($image_data[0])){
 	        $giflazy = $image_data[0];
-            $srcset = sprintf('width="%1$d" height="%2$d" style="--img-height:%3$dpx"', $image_data[1], $image_data[2], $image_data[2]);
-            return sprintf( apply_filters('lastudio-kit/banner-list/image-format', '<img src="%1$s" alt="" loading="lazy" class="%3$s" %4$s>'), $giflazy, $image_data[0], 'lakit-bannerlist__image-instance' , $srcset);
+			$alt = !empty($image_data[3]) ? $image_data[3] : strip_tags($bn_title);
+            $srcset = sprintf('width="%1$d" height="%2$d" alt="%4$s" style="--img-height:%3$dpx"', $image_data[1], $image_data[2], $image_data[2], esc_attr($alt));
+            return sprintf( apply_filters('lastudio-kit/banner-list/image-format', '<img src="%1$s" loading="lazy" class="%3$s" %4$s>'), $giflazy, $image_data[0], 'lakit-bannerlist__image-instance' , $srcset);
         }
         return '';
     }
@@ -166,47 +172,6 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
     protected function get_loop_icon( $format = '%s' ){
         $item = $this->_processed_item;
         return $this->_get_icon_setting( $item['item_icon'], $format );
-    }
-
-    /**
-     * Get loop image html
-     *
-     */
-    protected function _loop_image_item( $key = '', $format = '%s', $html_return = true ) {
-        $item = $this->_processed_item;
-        $params = [];
-
-        if ( ! array_key_exists( $key, $item ) ) {
-            return false;
-        }
-
-        $image_item = $item[ $key ];
-
-        if ( ! empty( $image_item['id'] ) ) {
-            $image_data = wp_get_attachment_image_src( $image_item['id'], 'full' );
-            if( !empty($image_data) ){
-                $params[] = apply_filters('lastudio_wp_get_attachment_image_url', $image_data[0]);
-                $params[] = $image_data[1];
-                $params[] = $image_data[2];
-            }
-            else{
-                $params[] = isset($image_item['url']) ? esc_url($image_item['url']) : Utils::get_placeholder_image_src();
-                $params[] = 1200;
-                $params[] = 800;
-            }
-        }
-        else {
-            $params[] = isset($image_item['url']) ? esc_url($image_item['url']) : Utils::get_placeholder_image_src();
-            $params[] = 1200;
-            $params[] = 800;
-        }
-
-        if($html_return){
-            return vsprintf( $format, $params );
-        }
-        else{
-            return $params;
-        }
     }
 
     protected function render() {
@@ -386,7 +351,7 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
             'description',
             [
                 'label' => __( 'Description', 'lastudio-kit' ),
-                'type' => Controls_Manager::TEXTAREA,
+                'type' => Controls_Manager::WYSIWYG,
                 'label_block' => true,
             ]
         );
@@ -962,6 +927,10 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
                 'label'      => esc_html__( 'Inactive Item', 'lastudio-kit' ),
                 'tab'        => Controls_Manager::TAB_STYLE,
                 'show_label' => false,
+                'condition' => [
+	                'enable_masonry!' => 'yes',
+	                'enable_carousel' => 'yes',
+                ]
             )
         );
         $this->_add_responsive_control(
@@ -1132,6 +1101,16 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
             ]
         );
 
+	    $this->add_group_control(
+		    \LaStudioKitExtensions\Elementor\Controls\Group_Control_Transform::get_type(),
+		    array(
+			    'label'    => esc_html__( 'Transform', 'elementor' ),
+			    'name'     => 'image_transform',
+			    'selector' => '{{WRAPPER}}',
+			    'css_var_prefix'    => '--lakit-bannerlist-image'
+		    )
+	    );
+
         $this->add_group_control(
             Group_Control_Css_Filter::get_type(),
             [
@@ -1229,6 +1208,16 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
             ]
         );
 
+	    $this->add_group_control(
+		    \LaStudioKitExtensions\Elementor\Controls\Group_Control_Transform::get_type(),
+		    array(
+			    'label'    => esc_html__( 'Transform', 'elementor' ),
+			    'name'     => 'image_transform_hover',
+			    'selector' => '{{WRAPPER}}',
+			    'css_var_prefix'    => '--lakit-bannerlist-image-hover'
+		    )
+	    );
+
         $this->add_group_control(
             Group_Control_Css_Filter::get_type(),
             [
@@ -1283,6 +1272,219 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
         $this->end_controls_tab();
 
         $this->end_controls_tabs();
+
+	    $this->add_control(
+		    'bn_img_mask_switch',
+		    [
+			    'label' => esc_html__( 'Mask', 'lastudio-kit' ),
+			    'type' => Controls_Manager::SWITCHER,
+			    'label_on' => esc_html__( 'On', 'lastudio-kit' ),
+			    'label_off' => esc_html__( 'Off', 'lastudio-kit' ),
+			    'default' => '',
+		    ]
+	    );
+
+		$mask_selector = '{{WRAPPER}} .lakit-bannerlist__image';
+
+	    $this->add_control(
+		    'bn_img_mask_image',
+		    [
+			    'label' => esc_html__( 'Image', 'lastudio-kit' ),
+			    'type' => Controls_Manager::MEDIA,
+			    'media_types' => [ 'image' ],
+			    'should_include_svg_inline_option' => true,
+			    'library_type' => 'image/svg+xml',
+			    'dynamic' => [
+				    'active' => true,
+			    ],
+			    'selectors'  => array(
+				    $mask_selector => '-webkit-mask-image: url( {{URL}} );'
+			    ),
+			    'condition' => [
+				    'bn_img_mask_switch!' => '',
+			    ],
+		    ]
+	    );
+	    $this->add_responsive_control(
+		    'bn_img_mask_size',
+		    [
+			    'label' => esc_html__( 'Size', 'elementor' ),
+			    'type' => Controls_Manager::SELECT,
+			    'options' => [
+				    'contain' => esc_html__( 'Fit', 'elementor' ),
+				    'cover' => esc_html__( 'Fill', 'elementor' ),
+				    'custom' => esc_html__( 'Custom', 'elementor' ),
+			    ],
+			    'default' => 'contain',
+			    'selectors' => [
+				    $mask_selector => '-webkit-mask-size: {{VALUE}};'
+			    ],
+			    'condition' => [
+				    'bn_img_mask_switch!' => '',
+			    ],
+		    ]
+	    );
+
+	    $this->add_responsive_control(
+		    'bn_img_mask_size_scale',
+		    [
+			    'label' => esc_html__( 'Scale', 'elementor' ),
+			    'type' => Controls_Manager::SLIDER,
+			    'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
+			    'range' => [
+				    'px' => [
+					    'min' => 0,
+					    'max' => 500,
+				    ],
+				    'em' => [
+					    'min' => 0,
+					    'max' => 100,
+				    ],
+				    '%' => [
+					    'min' => 0,
+					    'max' => 200,
+				    ],
+			    ],
+			    'default' => [
+				    'unit' => '%',
+				    'size' => 100,
+			    ],
+			    'selectors' => [
+				    $mask_selector => '-webkit-mask-size: {{SIZE}}{{UNIT}};'
+			    ],
+			    'condition' => [
+				    'bn_img_mask_switch!' => '',
+				    'bn_img_mask_size' => 'custom',
+			    ],
+		    ]
+	    );
+
+	    $this->add_responsive_control(
+		    'bn_img_mask_pos',
+		    [
+			    'label' => esc_html__( 'Position', 'elementor' ),
+			    'type' => Controls_Manager::SELECT,
+			    'options' => [
+				    'center center' => esc_html__( 'Center Center', 'elementor' ),
+				    'center left' => esc_html__( 'Center Left', 'elementor' ),
+				    'center right' => esc_html__( 'Center Right', 'elementor' ),
+				    'top center' => esc_html__( 'Top Center', 'elementor' ),
+				    'top left' => esc_html__( 'Top Left', 'elementor' ),
+				    'top right' => esc_html__( 'Top Right', 'elementor' ),
+				    'bottom center' => esc_html__( 'Bottom Center', 'elementor' ),
+				    'bottom left' => esc_html__( 'Bottom Left', 'elementor' ),
+				    'bottom right' => esc_html__( 'Bottom Right', 'elementor' ),
+				    'custom' => esc_html__( 'Custom', 'elementor' ),
+			    ],
+			    'default' => 'center center',
+			    'selectors' => [
+				    $mask_selector => '-webkit-mask-position: {{VALUE}};'
+			    ],
+			    'condition' => [
+				    'bn_img_mask_switch!' => '',
+			    ],
+		    ]
+	    );
+
+	    $this->add_responsive_control(
+		    'bn_img_mask_pos_x',
+		    [
+			    'label' => esc_html__( 'X Position', 'elementor' ),
+			    'type' => Controls_Manager::SLIDER,
+			    'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
+			    'range' => [
+				    'px' => [
+					    'min' => -500,
+					    'max' => 500,
+				    ],
+				    'em' => [
+					    'min' => -100,
+					    'max' => 100,
+				    ],
+				    '%' => [
+					    'min' => -100,
+					    'max' => 100,
+				    ],
+				    'vw' => [
+					    'min' => -100,
+					    'max' => 100,
+				    ],
+			    ],
+			    'default' => [
+				    'unit' => '%',
+				    'size' => 0,
+			    ],
+			    'selectors' => [
+				    $mask_selector => '-webkit-mask-position-x: {{SIZE}}{{UNIT}};'
+			    ],
+			    'condition' => [
+				    'bn_img_mask_switch!' => '',
+				    'bn_img_mask_pos' => 'custom',
+			    ],
+		    ]
+	    );
+
+	    $this->add_responsive_control(
+		    'bn_img_mask_pos_y',
+		    [
+			    'label' => esc_html__( 'Y Position', 'elementor' ),
+			    'type' => Controls_Manager::SLIDER,
+			    'size_units' => [ 'px', '%', 'em', 'rem', 'vw', 'custom' ],
+			    'range' => [
+				    'px' => [
+					    'min' => -500,
+					    'max' => 500,
+				    ],
+				    'em' => [
+					    'min' => -100,
+					    'max' => 100,
+				    ],
+				    '%' => [
+					    'min' => -100,
+					    'max' => 100,
+				    ],
+				    'vw' => [
+					    'min' => -100,
+					    'max' => 100,
+				    ],
+			    ],
+			    'default' => [
+				    'unit' => '%',
+				    'size' => 0,
+			    ],
+			    'selectors' => [
+				    $mask_selector => '-webkit-mask-position-y: {{SIZE}}{{UNIT}};'
+			    ],
+			    'condition' => [
+				    'bn_img_mask_switch!' => '',
+				    'bn_img_mask_pos' => 'custom',
+			    ],
+		    ]
+	    );
+
+	    $this->add_responsive_control(
+		    'bn_img_mask_repeat',
+		    [
+			    'label' => esc_html__( 'Repeat', 'elementor' ),
+			    'type' => Controls_Manager::SELECT,
+			    'options' => [
+				    'no-repeat' => esc_html__( 'No-repeat', 'elementor' ),
+				    'repeat' => esc_html__( 'Repeat', 'elementor' ),
+				    'repeat-x' => esc_html__( 'Repeat-x', 'elementor' ),
+				    'repeat-Y' => esc_html__( 'Repeat-y', 'elementor' ),
+				    'round' => esc_html__( 'Round', 'elementor' ),
+				    'space' => esc_html__( 'Space', 'elementor' ),
+			    ],
+			    'default' => 'no-repeat',
+			    'selectors' => [
+				    $mask_selector => '-webkit-mask-repeat: {{VALUE}};'
+			    ],
+			    'condition' => [
+				    'bn_img_mask_switch!' => '',
+				    'bn_img_mask_size!' => 'cover',
+			    ],
+		    ]
+	    );
 
         $this->end_controls_section();
 
@@ -2025,6 +2227,23 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
                 )
             );
 
+			$this->add_responsive_control(
+				$section_key . '_order',
+				[
+					'label'   => esc_html__( 'CSS Order', 'lastudio-kit' ),
+					'type'    => Controls_Manager::NUMBER,
+					'min'     => -5,
+					'max'     => 10,
+					'step'    => 1,
+					'selectors' => [
+						'{{WRAPPER}} .lakit-bannerlist__' . $section_key => '-webkit-order: {{VALUE}};order: {{VALUE}};',
+					],
+					'condition' => [
+						'content_l_direction!' => ''
+					]
+				]
+			);
+
 	        $this->add_responsive_control(
 		        $section_key .'_width',
 		        [
@@ -2036,6 +2255,19 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
 			        ]
 		        ]
 	        );
+
+			if(in_array($section_key, ['desc','subdesc'])){
+				$this->add_responsive_control(
+					$section_key .'_maxline',
+					[
+						'label' => esc_html__( 'Max Line', 'lastudio-kit' ),
+						'type' => Controls_Manager::SLIDER,
+						'selectors' => [
+							'{{WRAPPER}}' => '--lakit-bannerlist-'.$section_key.'-line: {{SIZE}};'
+						]
+					]
+				);
+			}
 
             $this->add_group_control(
                 Group_Control_Typography::get_type(),
@@ -2066,16 +2298,6 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
                     ],
                 ]
             );
-//			$this->add_control(
-//                $section_key .'_bgcolor',
-//                array(
-//                    'label' => esc_html__( 'Background Color', 'lastudio-kit' ),
-//                    'type' => Controls_Manager::COLOR,
-//                    'selectors' => array(
-//						'{{WRAPPER}} '   => sprintf('--e-%1$s-bgcolor: {{VALUE}}', $section_key),
-//                    ),
-//                )
-//            );
 
 			$this->add_control(
                 $section_key .'_hover_color',
@@ -2087,17 +2309,6 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
                     ),
                 )
             );
-
-//			$this->add_control(
-//                $section_key .'_hover_bgcolor',
-//                array(
-//                    'label' => esc_html__( 'Hover Background Color', 'lastudio-kit' ),
-//                    'type' => Controls_Manager::COLOR,
-//                    'selectors' => array(
-//	                    '{{WRAPPER}}'   => sprintf('--e-%1$s-hover-bgcolor: {{VALUE}}', $section_key),
-//                    ),
-//                )
-//            );
 
             $this->add_group_control(
                 Group_Control_Background::get_type(),

@@ -3,6 +3,10 @@
  * Posts loop start template
  */
 
+if (!defined('ABSPATH')) {
+	exit;
+}
+
 $preset = $this->get_settings_for_display('preset');
 
 $show_image     = $this->get_settings_for_display('show_image');
@@ -12,7 +16,7 @@ $show_excerpt   = $this->get_settings_for_display('show_excerpt');
 $excerpt_length   = $this->get_settings_for_display('excerpt_length');
 $title_html_tag = $this->get_settings_for_display('title_html_tag');
 $more_text = $this->get_settings_for_display( 'more_text' );
-
+$floating_category = $this->get_settings_for_display('floating_category');
 
 $meta1_pos = $this->get_settings_for_display('meta_position1');
 $meta2_pos = $this->get_settings_for_display('meta_position2');
@@ -51,6 +55,10 @@ $show_content = false;
 if($show_title == 'yes' || $show_more == 'yes' || $show_meta == 'yes' || $show_excerpt || $show_goal == 'yes' || $show_donate_btn == 'yes' ){
     $show_content = true;
 }
+$isV3 = false;
+if(class_exists('\Give\Helpers\Form\Utils') && \Give\Helpers\Form\Utils::isV3Form(get_the_ID())){
+    $isV3 = true;
+}
 
 ?>
 <div class="<?php echo esc_attr(join(' ', $post_classes)) ?>">
@@ -64,6 +72,13 @@ if($show_title == 'yes' || $show_more == 'yes' || $show_meta == 'yes' || $show_e
                         'class' => 'lakit-posts__thumbnail-img wp-post-image la-lazyload-image'
                     ))
                 ?></a>
+	            <?php if(lastudio_kit_helper()::string_to_bool($floating_category) && taxonomy_exists('give_forms_category')): ?>
+                    <div class="lakit-posts__floating_category">
+                        <div class="lakit-posts__floating_category-inner"><?php
+				            echo get_the_term_list( get_the_ID(), 'give_forms_category', '', ' ', '' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                        ?></div>
+                    </div>
+	            <?php endif; ?>
             </div>
         <?php }
 
@@ -160,12 +175,13 @@ if($show_title == 'yes' || $show_more == 'yes' || $show_meta == 'yes' || $show_e
                 echo '<div class="lakit-posts__more-wrap">';
                 if($show_donate_btn == 'yes'){
                     echo sprintf(
-                        '<a href="%2$s" class="elementor-button lakit-posts__btn-donate" title="%3$s" data-effect="mfp-zoom-out" data-id="%5$s" rel="bookmark"><span class="btn__text">%1$s</span>%4$s</a>',
+                        '<a href="%2$s" class="elementor-button lakit-posts__btn-donate" data-isv3="%6$s" title="%3$s" data-effect="mfp-zoom-out" data-id="%5$s" rel="bookmark"><span class="btn__text">%1$s</span>%4$s</a>',
                         esc_html($donate_text),
                         esc_url($post_link),
                         esc_html(get_the_title()),
                         $this->_get_icon('donate_icon', '<span class="lakit-btn-more-icon">%s</span>'), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-                        esc_attr(get_the_ID())
+                        esc_attr(get_the_ID()),
+                        $isV3 ? 'true' : 'false'
                     );
                 }
                 if( $show_more == 'yes' ){
@@ -177,17 +193,18 @@ if($show_title == 'yes' || $show_more == 'yes' || $show_meta == 'yes' || $show_e
                         $this->_get_icon('more_icon', '<span class="lakit-btn-more-icon">%s</span>') // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                     );
                 }
-                if($show_donate_btn == 'yes'){
-                    echo '<div class="mfp-hide give-donation-grid-item-form lakit-give-form-modal give-modal--slide" data-id="'.esc_attr(get_the_ID()).'">';
-                    $shortcode_content = give_form_shortcode([
-                        'id' => get_the_ID(),
-                        'display_style' => 'onpage',
-                        'show_title' => 'false',
-                        'show_goal' => 'false',
-                        'show_content' => 'none',
-                    ]);
-                    echo $shortcode_content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-                    echo '</div>';
+                if($show_donate_btn == 'yes' && !lastudio_kit()->elementor()->editor->is_edit_mode()){
+                    if(!$isV3){
+	                    echo '<div class="mfp-hide give-donation-grid-item-form lakit-give-form-modal give-modal--slide" data-id="'.esc_attr(get_the_ID()).'">';
+	                    echo give_form_shortcode([
+		                    'id' => get_the_ID(),
+		                    'display_style' => 'modal',
+		                    'show_title' => 'false',
+		                    'show_goal' => 'false',
+		                    'show_content' => 'none',
+	                    ]);
+	                    echo '</div>';
+                    }
                 }
                 echo '</div>';
             }

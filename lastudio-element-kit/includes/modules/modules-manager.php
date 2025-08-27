@@ -22,6 +22,7 @@ final class Modules_Manager {
             'woofilters',
             'nested-elements',
 			'edynamic-tags',
+//			'givewp'
 		];
 
 		$forceActivateModules = [

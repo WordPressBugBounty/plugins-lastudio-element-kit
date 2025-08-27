@@ -219,7 +219,7 @@ if ( ! class_exists( 'LaStudio_Kit_Settings' ) ) {
 
             $tax_deny_list = array( 'product_shipping_class' );
 
-            $perpage_deny_post_types = array( 'post', 'page', 'attachment', 'e-landing-page', 'elementor_library' );
+            $perpage_deny_post_types = array( 'post', 'page', 'attachment', 'e-landing-page', 'elementor_library', 'e-floating-buttons' );
 
             if ( is_array( $post_types ) && ! empty( $post_types ) ) {
 

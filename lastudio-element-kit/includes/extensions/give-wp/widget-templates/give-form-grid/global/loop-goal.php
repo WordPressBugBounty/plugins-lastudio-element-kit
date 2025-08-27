@@ -45,56 +45,29 @@ if($show_goal === 'yes'){
         <div class="raised">
                 <?php
                 if ('amount' === $goal_format) :
-
-                    /**
-                     * Filter the give currency.
-                     *
-                     * @since 1.8.17
-                     */
                     $form_currency = apply_filters(
                         'give_goal_form_currency',
                         give_get_currency($form_id),
                         $form_id
                     );
-
-                    /**
-                     * Filter the income formatting arguments.
-                     *
-                     * @since 1.8.17
-                     */
                     $income_format_args = apply_filters(
                         'give_goal_income_format_args',
                         [
-                            'sanitize' => false,
+                            'sanitize' => true,
                             'currency' => $form_currency,
                             'decimal' => false,
                         ],
                         $form_id
                     );
-
-                    /**
-                     * Filter the goal formatting arguments.
-                     *
-                     * @since 1.8.17
-                     */
                     $goal_format_args = apply_filters(
                         'give_goal_amount_format_args',
                         [
-                            'sanitize' => false,
+                            'sanitize' => true,
                             'currency' => $form_currency,
                             'decimal' => false,
                         ],
                         $form_id
                     );
-
-                    /**
-                     * This filter will be used to convert the goal amounts to different currencies.
-                     *
-                     * @since 2.5.4
-                     *
-                     * @param array $amounts List of goal amounts.
-                     * @param int $form_id Donation Form ID.
-                     */
                     $goal_amounts = apply_filters(
                         'give_goal_amounts',
                         [
@@ -102,15 +75,6 @@ if($show_goal === 'yes'){
                         ],
                         $form_id
                     );
-
-                    /**
-                     * This filter will be used to convert the income amounts to different currencies.
-                     *
-                     * @since 2.5.4
-                     *
-                     * @param array $amounts List of goal amounts.
-                     * @param int $form_id Donation Form ID.
-                     */
                     $income_amounts = apply_filters(
                         'give_goal_raised_amounts',
                         [
@@ -118,7 +82,6 @@ if($show_goal === 'yes'){
                         ],
                         $form_id
                     );
-
                     // Get human readable donation amount.
                     $income = give_human_format_large_amount(
                         give_format_amount($income, $income_format_args), ['currency' => $form_currency]
@@ -143,24 +106,23 @@ if($show_goal === 'yes'){
                         ]
                     );
                     echo sprintf(
-                    /* translators: 1: amount of income raised 2: goal target amount. */
-                        __('<span class="amount" data-amounts="%1$s">%2$s</span> of <span class="goal" data-amounts="%3$s">%4$s</span>','lastudio-kit'), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-                        esc_attr(wp_json_encode($income_amounts, JSON_PRETTY_PRINT)),
+                        '<span class="amount">%1$s</span><span class="t-of">%3$s</span><span class="goal">%2$s</span>',
                         esc_attr($formatted_income),
-                        esc_attr(wp_json_encode($goal_amounts, JSON_PRETTY_PRINT)),
-                        esc_attr($formatted_goal)
+                        esc_attr($formatted_goal),
+                        esc_html__('of', 'lastudio-kit')
                     );
 
                 elseif ('percentage' === $goal_format) :
-                    echo sprintf( /* translators: %s: percentage of the amount raised compared to the goal target */
-                        __('<span class="amount">%s%%</span> of <span class="goal">100&#37;</span>','lastudio-kit'), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-                        esc_html(round($progress))
+                    echo sprintf(
+	                    '<span class="amount">%1$s&#37;</span><span class="t-of">%2$s</span><span class="goal">100&#37;</span>',
+                        esc_html(round($progress)),
+	                    esc_html__('of', 'lastudio-kit')
                     );
                 elseif ('donation' === $goal_format) :?>
                     <span class="amount"><?php echo esc_html(give_format_amount($form->get_sales(), ['decimal' => false])) ?></span>
                     <span class="goal"><?php echo sprintf(
                         /* translators: %s is replaced with "string" */
-                            _n('of %s donation', 'of %s donations', esc_html($goal), 'give'), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                            _n('of %s donation', 'of %s donations', esc_html($goal), 'lastudio-kit'), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                             esc_html(give_format_amount($goal, ['decimal' => false]))
                         ); ?></span>
                 <?php
@@ -169,7 +131,7 @@ if($show_goal === 'yes'){
                     <span class="goal"><?php
                         echo sprintf(
                         /* translators: %s is replaced with "string" */
-                            _n('of %s donor', 'of %s donors', esc_html($goal), 'give'), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                            _n('of %s donor', 'of %s donors', esc_html($goal), 'lastudio-kit'), // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                             esc_html(give_format_amount($goal, ['decimal' => false]))
                         ); ?></span>
                 <?php

@@ -22,7 +22,6 @@
 .lakit--portfolio-btn-right-yes .lakit-posts__btn-more{
 	position: absolute;
 	right: 0;
-	top: 0;
 	bottom: 0;
 }
 .rtl .lakit--portfolio-btn-right-yes .lakit-posts__btn-more{
@@ -31,4 +30,8 @@
 }
 .elementor-lakit-portfolio .lakit-posts.preset-grid-2 .lakit-posts__inner-box{
 	background-color: transparent;
+}
+.lakit--portfolio-btn-right-yes .lakit-posts__more-wrap{position:static}
+.elementor-lakit-portfolio .lakit-posts.preset-grid-2 .lakit-posts__inner-content-inner{
+	overflow: inherit;
 }

@@ -858,6 +858,115 @@ class LaStudioKit_Team_Member extends LaStudioKit_Base {
             ]
         );
 
+	    $this->start_controls_tabs( 'tabs_image_style' );
+	    $this->start_controls_tab(
+		    'tabs_image_normal',
+		    array(
+			    'label' => esc_html__( 'Normal', 'lastudio-kit'),
+		    )
+	    );
+	    $this->add_control(
+		    'image_opacity',
+		    [
+			    'label' => esc_html__( 'Opacity', 'lastudio-kit' ),
+			    'type' => Controls_Manager::SLIDER,
+			    'range' => [
+				    'px' => [
+					    'max' => 1,
+					    'min' => 0.10,
+					    'step' => 0.01,
+				    ],
+			    ],
+			    'selectors' => [
+				    '{{WRAPPER}} .lakit-team-member__image img' => 'opacity: {{SIZE}};',
+			    ],
+		    ]
+	    );
+
+	    $this->add_responsive_control(
+		    'image_scale',
+		    [
+			    'label' => __( 'Image Scale', 'lastudio-kit' ),
+			    'type' => Controls_Manager::SLIDER,
+			    'selectors' => [
+				    '{{WRAPPER}}' => '--lakit-team-img-scale: {{SIZE}};',
+			    ],
+		    ]
+	    );
+
+	    $this->add_group_control(
+		    \LaStudioKitExtensions\Elementor\Controls\Group_Control_Transform::get_type(),
+		    array(
+			    'label'    => esc_html__( 'Transform', 'elementor' ),
+			    'name'     => 'image_transform',
+			    'selector' => '{{WRAPPER}}',
+			    'css_var_prefix'    => '--lakit-team-img'
+		    )
+	    );
+
+	    $this->add_group_control(
+		    Group_Control_Css_Filter::get_type(),
+		    [
+			    'name' => 'image_css_filter',
+			    'selector' => '{{WRAPPER}} .lakit-team-member__image img',
+		    ]
+	    );
+		$this->end_controls_tab();
+	    $this->start_controls_tab(
+		    'tabs_image_hover',
+		    array(
+			    'label' => esc_html__( 'Hover', 'lastudio-kit'),
+		    )
+	    );
+	    $this->add_control(
+		    'image_opacity_hover',
+		    [
+			    'label' => esc_html__( 'Opacity', 'lastudio-kit' ),
+			    'type' => Controls_Manager::SLIDER,
+			    'range' => [
+				    'px' => [
+					    'max' => 1,
+					    'min' => 0.10,
+					    'step' => 0.01,
+				    ],
+			    ],
+			    'selectors' => [
+				    '{{WRAPPER}} .lakit-team-member__inner:hover .lakit-team-member__image img' => 'opacity: {{SIZE}};',
+			    ],
+		    ]
+	    );
+	    $this->add_responsive_control(
+		    'image_scale_hover',
+		    [
+			    'label' => __( 'Image Scale', 'lastudio-kit' ),
+			    'type' => Controls_Manager::SLIDER,
+			    'selectors' => [
+				    '{{WRAPPER}}' => '--lakit-team-img-scale-hover: {{SIZE}};',
+			    ],
+		    ]
+	    );
+
+	    $this->add_group_control(
+		    \LaStudioKitExtensions\Elementor\Controls\Group_Control_Transform::get_type(),
+		    array(
+			    'label'    => esc_html__( 'Transform', 'elementor' ),
+			    'name'     => 'image_transform_hover',
+			    'selector' => '{{WRAPPER}}',
+			    'css_var_prefix'    => '--lakit-team-img-hover'
+		    )
+	    );
+
+	    $this->add_group_control(
+		    Group_Control_Css_Filter::get_type(),
+		    [
+			    'name' => 'image_css_filter_hover',
+			    'selector' => '{{WRAPPER}} .lakit-team-member__inner:hover .lakit-team-member__image img',
+		    ]
+	    );
+
+	    $this->end_controls_tab();
+		$this->end_controls_tabs();
+
         $this->add_responsive_control(
             'image_padding',
             [
@@ -1319,7 +1428,7 @@ class LaStudioKit_Team_Member extends LaStudioKit_Base {
         $this->add_responsive_control(
             'social_padding',
             array(
-                'label'      => __( 'Margin', 'lastudio-kit' ),
+                'label'      => __( 'Padding', 'lastudio-kit' ),
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => array( 'px', '%', 'custom' ),
                 'selectors'  => array(
@@ -1772,8 +1881,6 @@ class LaStudioKit_Team_Member extends LaStudioKit_Base {
     }
 
     public function _get_member_image( $image_item ) {
-
-
 
         $image_size = $this->get_settings_for_display('thumb_size');
 

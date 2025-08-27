@@ -85,6 +85,7 @@ class Events extends LaStudioKit_Posts{
 				'list-2' => esc_html__( 'List 2', 'lastudio-kit' ),
 				'evt-1'  => esc_html__( 'List 3', 'lastudio-kit' ),
 				'evt-2'  => esc_html__( 'List 4', 'lastudio-kit' ),
+				'evt-3'  => esc_html__( 'List 5', 'lastudio-kit' ),
 			)
 		);
 
@@ -100,13 +101,50 @@ class Events extends LaStudioKit_Posts{
 			]
 		);
 
-//		$this->add_control(
-//			'text_buy',
-//			array(
-//				'label' => esc_html__( 'Buy Ticket Text', 'lastudio-kit' ),
-//				'type'  => Controls_Manager::TEXT,
-//			)
-//		);
+		$this->_add_control(
+			'floating_date',
+			[
+				'label'     => esc_html__( 'Show Floating Date', 'lastudio-kit' ),
+				'type'      => Controls_Manager::SWITCHER,
+				'label_on'  => esc_html__( 'Yes', 'lastudio-kit' ),
+				'label_off' => esc_html__( 'No', 'lastudio-kit' ),
+				'default'   => 'no'
+			]
+		);
+
+		$this->_add_control(
+			'floating_date_style',
+			[
+				'label'     => esc_html__( 'Date Format', 'lastudio-kit' ),
+				'type'      => Controls_Manager::SELECT,
+				'options'   => [
+					'' => esc_html__( 'Default', 'lastudio-kit' ),
+					'type1' => esc_html__( 'Type 1', 'lastudio-kit' ),
+					'type2' => esc_html__( 'Type 2', 'lastudio-kit' ),
+					'type3' => esc_html__( 'Type 3', 'lastudio-kit' ),
+				],
+				'default'   => '',
+				'condition' => [
+					'floating_date' => 'yes',
+				]
+			]
+		);
+		$this->_add_control(
+			'floating_date_field',
+			[
+				'label'     => esc_html__( 'Date Field', 'lastudio-kit' ),
+				'type'      => Controls_Manager::SELECT,
+				'options'   => [
+					'' => esc_html__( 'Default', 'lastudio-kit' ),
+					'start' => esc_html__( 'Start Date', 'lastudio-kit' ),
+					'end' => esc_html__( 'End Date', 'lastudio-kit' ),
+				],
+				'default'   => '',
+				'condition' => [
+					'floating_date' => 'yes',
+				]
+			]
+		);
 
 		$this->_add_control(
 			'show_meta',
@@ -123,24 +161,6 @@ class Events extends LaStudioKit_Posts{
 		$repeater = new Repeater();
 
 		$repeater->add_control(
-			'item_label',
-			array(
-				'label' => esc_html__( 'Label', 'lastudio-kit' ),
-				'type'  => Controls_Manager::TEXT,
-			)
-		);
-		$repeater->add_control(
-			'item_icon',
-			[
-				'label'            => __( 'Icon', 'lastudio-kit' ),
-				'type'             => Controls_Manager::ICONS,
-				'fa4compatibility' => 'icon',
-				'skin'             => 'inline',
-				'label_block'      => false,
-			]
-		);
-
-		$repeater->add_control(
 			'item_type',
 			[
 				'label'   => esc_html__( 'Type', 'lastudio-kit' ),
@@ -154,7 +174,32 @@ class Events extends LaStudioKit_Posts{
 					'location'      => esc_html__( 'Location', 'lastudio-kit' ),
 					'stage'         => esc_html__( 'Stage', 'lastudio-kit' ),
 					'organized_by'  => esc_html__( 'Organized By', 'lastudio-kit' ),
+					'empty'  => esc_html__( 'Empty', 'lastudio-kit' ),
 				] )
+			]
+		);
+
+		$repeater->add_control(
+			'item_label',
+			array(
+				'label' => esc_html__( 'Label', 'lastudio-kit' ),
+				'type'  => Controls_Manager::TEXT,
+				'condition' => [
+					'item_type!' => 'empty',
+				]
+			)
+		);
+		$repeater->add_control(
+			'item_icon',
+			[
+				'label'            => __( 'Icon', 'lastudio-kit' ),
+				'type'             => Controls_Manager::ICONS,
+				'fa4compatibility' => 'icon',
+				'skin'             => 'inline',
+				'label_block'      => false,
+				'condition' => [
+					'item_type!' => 'empty',
+				]
 			]
 		);
 
@@ -180,6 +225,7 @@ class Events extends LaStudioKit_Posts{
 				'options'   => [
 					'before_title'  => esc_html__( 'Before Title', 'lastudio-kit' ),
 					'after_title'   => esc_html__( 'After Title', 'lastudio-kit' ),
+					'before_content' => esc_html__( 'Before Content', 'lastudio-kit' ),
 					'after_content' => esc_html__( 'After Content', 'lastudio-kit' ),
 					'after_button'  => esc_html__( 'After Button', 'lastudio-kit' ),
 				],
@@ -211,6 +257,7 @@ class Events extends LaStudioKit_Posts{
 				'options'   => [
 					'before_title'  => esc_html__( 'Before Title', 'lastudio-kit' ),
 					'after_title'   => esc_html__( 'After Title', 'lastudio-kit' ),
+					'before_content' => esc_html__( 'Before Content', 'lastudio-kit' ),
 					'after_content' => esc_html__( 'After Content', 'lastudio-kit' ),
 					'after_button'  => esc_html__( 'After Button', 'lastudio-kit' ),
 				],
@@ -220,7 +267,6 @@ class Events extends LaStudioKit_Posts{
 				]
 			]
 		);
-
 
 		$this->_end_controls_section();
 	}
@@ -255,11 +301,13 @@ class Events extends LaStudioKit_Posts{
 					'orderby' => [
 						'default' => 'date',
 						'options' => [
-							'date'          => __( 'Date', 'lastudio-kit' ),
-							'title'         => __( 'Title', 'lastudio-kit' ),
-							'rand'          => __( 'Random', 'lastudio-kit' ),
-							'menu_order'    => __( 'Menu Order', 'lastudio-kit' ),
-							'post__in'      => __( 'Manual Selection', 'lastudio-kit' ),
+							'date'              => __( 'Date', 'lastudio-kit' ),
+							'title'             => __( 'Title', 'lastudio-kit' ),
+							'rand'              => __( 'Random', 'lastudio-kit' ),
+							'menu_order'        => __( 'Menu Order', 'lastudio-kit' ),
+							'post__in'          => __( 'Manual Selection', 'lastudio-kit' ),
+							'event_start_date'  => __( 'Event Start Date', 'lastudio-kit' ),
+							'event_end_date'    => __( 'Event End Date', 'lastudio-kit' ),
 						],
 					],
 					'exclude' => [
@@ -282,6 +330,22 @@ class Events extends LaStudioKit_Posts{
 					'offset',
 					'ignore_sticky_posts',
 				],
+			]
+		);
+
+		$this->_add_control(
+			'exclude_event_status',
+			[
+				'label'     => esc_html__( 'Exclude Event Status', 'lastudio-kit' ),
+				'type'      => Controls_Manager::SELECT2,
+				'multiple'  => true,
+				'options'   => [
+					'upcoming'  => esc_html__( 'Up Coming', 'lastudio-kit' ),
+					'past'      => esc_html__( 'Past', 'lastudio-kit' ),
+					'cancelled' => esc_html__( 'Cancelled', 'lastudio-kit' ),
+					'sold_out'  => esc_html__( 'Sold Out', 'lastudio-kit' ),
+				],
+				'default'   => '',
 			]
 		);
 
@@ -357,7 +421,7 @@ class Events extends LaStudioKit_Posts{
 	}
 
 	protected function _register_section_style_floating_date( $css_scheme ){
-
+		parent::_register_section_style_floating_date( $css_scheme );
 	}
 
 	protected function _register_section_style_floating_counter( $css_scheme ){
@@ -374,5 +438,38 @@ class Events extends LaStudioKit_Posts{
 
 	protected function register_controls() {
 		parent::register_controls();
+	}
+
+	protected function set_wp_query( $query_args = [], $fallback_args = [] ) {
+		add_filter('elementor/query/query_args', [ $this, 'override_wp_query_args' ], 20, 2);
+		return parent::set_wp_query( $query_args, $fallback_args );
+	}
+
+	/**
+	 * @param array $query_args
+	 * @param Events $widget
+	 *
+	 * @return array
+	 */
+	public function override_wp_query_args( $query_args, $widget ) {
+		if($widget->get_name() === 'lakit-events'){
+			$exclude_event_status = $widget->get_settings_for_display('exclude_event_status');
+			if(!empty($query_args['orderby']) && in_array($query_args['orderby'], [ 'event_start_date', 'event_end_date' ], true)){
+				$orderby_key = $query_args['orderby'];
+				$query_args['orderby'] = 'meta_value';
+				$query_args['meta_type'] = 'DATE';
+				$query_args['meta_key'] = $orderby_key;
+			}
+			if(!empty($exclude_event_status)){
+				$query_args['meta_query'] = [
+					[
+						'key' => 'event_status',
+						'value' => $exclude_event_status,
+						'compare' => 'NOT IN',
+					]
+				];
+			}
+		}
+		return $query_args;
 	}
 }

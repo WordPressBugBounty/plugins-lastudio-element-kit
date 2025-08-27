@@ -1,6 +1,21 @@
-.lakit-team-member__image, .lakit-team-member__inner {
+.preset-type-4.lakit-team-member .lakit-team-member__link:after, .preset-type-5.lakit-team-member .lakit-team-member__link:after {
+	left: 20px;
+	right: 20px;
+	bottom: 20px;
+	top: 20px;
+	height: auto;
+	width: auto
+}
+.lakit-team-member__image, .lakit-team-member__image_wrap, .lakit-team-member__inner {
 	position: relative;
 	width: 100%
+}
+.lakit-team-member__image img {
+	transition: opacity .35s, transform .45s, filter .35s;
+	transform: translate3d(var(--lakit-team-img-offset-x, 0), var(--lakit-team-img-offset-y, 0), 0) scale(var(--lakit-team-img-scale, 1)) rotate((var(--lakit-team-img-rotate, 0deg)))
+}
+.lakit-team-member__inner:hover .lakit-team-member__image img {
+	transform: translate3d(var(--lakit-team-img-hover-offset-x, 0), var(--lakit-team-img-hover-offset-y, 0), 0) scale(var(--lakit-team-img-scale-hover, 1)) rotate((var(--lakit-team-img-hover-rotate, 0deg)))
 }
 .preset-type-3.lakit-team-member .lakit-team-member__inner, .preset-type-4.lakit-team-member .lakit-team-member__inner, .preset-type-5.lakit-team-member .lakit-team-member__inner {
 	overflow: hidden
@@ -23,7 +38,7 @@
 	padding-top: 20px;
 	padding-bottom: 20px;
 	display: flex;
-	flex-flow: column wrap;
+	flex-flow: column wrap
 }
 .lakit-team-member__content:empty {
 	display: none
@@ -34,14 +49,10 @@
 .lakit-team-member .lakit-team-member__cover {
 	text-align: center;
 	z-index: 2;
-	bottom: 30px;
+	bottom: 0;
 	opacity: 0;
 	transition: .4s .1s;
 	transform: translateY(20px)
-}
-.lakit-team-member__image_wrap {
-	position: relative;
-	width: 100%
 }
 .lakit-team-member__item .lakit-team-member__link:after {
 	content: "";
@@ -120,7 +131,7 @@
 	background-color: #fff;
 	color: #181818
 }
-.preset-type-3.lakit-team-member .lakit-team-member__image, .preset-type-4.lakit-team-member .lakit-team-member__image {
+.preset-type-3.lakit-team-member .lakit-team-member__image img, .preset-type-4.lakit-team-member .lakit-team-member__image img {
 	filter: grayscale(100)
 }
 .preset-type-3.lakit-team-member .lakit-team-member__content {
@@ -147,14 +158,6 @@
 	visibility: visible;
 	left: 0
 }
-.preset-type-4.lakit-team-member .lakit-team-member__link:after {
-	left: 20px;
-	right: 20px;
-	bottom: 20px;
-	top: 20px;
-	width: auto;
-	height: auto
-}
 .preset-type-4.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__link:after, .preset-type-5.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__link:after {
 	left: 0;
 	top: 0;
@@ -166,17 +169,17 @@
 	visibility: visible;
 	transform: translateY(0)
 }
-.preset-type-4.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__name {
-	transition-delay: 0.2s
+.preset-type-4.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__name, .preset-type-5.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__name {
+	transition-delay: .2s
 }
-.preset-type-4.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__position {
-	transition-delay: 0.4s
+.preset-type-4.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__position, .preset-type-5.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__position {
+	transition-delay: .4s
 }
-.preset-type-4.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__desc {
-	transition-delay: 0.5s
+.preset-type-4.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__desc, .preset-type-5.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__desc {
+	transition-delay: .5s
 }
-.preset-type-4.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__socials {
-	transition-delay: 0.6s
+.preset-type-4.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__socials, .preset-type-5.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__socials {
+	transition-delay: .6s
 }
 .preset-type-4.lakit-team-member .lakit-team-member__desc, .preset-type-4.lakit-team-member .lakit-team-member__name, .preset-type-4.lakit-team-member .lakit-team-member__position, .preset-type-4.lakit-team-member .lakit-team-member__socials, .preset-type-5.lakit-team-member .lakit-team-member__desc, .preset-type-5.lakit-team-member .lakit-team-member__name, .preset-type-5.lakit-team-member .lakit-team-member__position, .preset-type-5.lakit-team-member .lakit-team-member__socials {
 	transform: translateY(20px);
@@ -201,29 +204,11 @@
 	opacity: 0;
 	transition: .5s
 }
-.preset-type-4.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__content {
+.preset-type-4.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__content, .preset-type-5.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__content {
 	opacity: 1
 }
 .preset-type-5.lakit-team-member .lakit-team-member__link:after {
-	left: 20px;
-	right: 20px;
-	bottom: 20px;
-	top: 20px;
-	width: auto;
-	height: auto;
 	background-color: rgba(33, 33, 33, .3)
-}
-.preset-type-5.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__name {
-	transition-delay: 0.2s
-}
-.preset-type-5.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__position {
-	transition-delay: 0.4s
-}
-.preset-type-5.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__desc {
-	transition-delay: 0.5s
-}
-.preset-type-5.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__socials {
-	transition-delay: 0.6s
 }
 .preset-type-5.lakit-team-member .lakit-team-member__content {
 	position: absolute;
@@ -238,9 +223,6 @@
 	width: auto;
 	opacity: 0;
 	transition: .5s
-}
-.preset-type-5.lakit-team-member .lakit-team-member__inner:hover .lakit-team-member__content {
-	opacity: 1
 }
 .preset-type-6.lakit-team-member .lakit-team-member__name {
 	display: inline-block;

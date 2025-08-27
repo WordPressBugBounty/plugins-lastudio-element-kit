@@ -156,10 +156,10 @@ class Group_Control_Motion_Fx extends Group_Control_Base {
                         'name' => 'motion_fx_scrolling',
                         'value' => 'yes',
                     ],
-//                    [
-//                        'name' => 'mouseTrack_effect',
-//                        'value' => 'yes',
-//                    ]
+                    [
+                        'name' => 'motion_fx_mouse',
+                        'value' => 'yes',
+                    ]
                 ],
             ],
             'render_type' => 'none',

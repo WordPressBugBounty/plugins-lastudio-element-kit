@@ -9,11 +9,8 @@
   background-color: var(--theme-primary-color,#fd6363);
 }
 .lakit-goal-progress .raised {
-  font-size: 0;
   display: flex;
   gap: 10px;
-}
-.lakit-goal-progress .raised span {
   font-size: 16px;
 }
 .lakit-goal-progress .raised span:before {
@@ -24,4 +21,27 @@
 }
 .elementor-lakit-give-form-grid .lakit-posts.preset-list-1 .lakit-posts__inner-box {
   flex-flow: row-reverse wrap;
+}
+.lakit-goal-progress .t-of{
+  display: none;
+}
+.lakit-goal-progress .t-of:before {
+  display: none !important
+}
+.lakit-carousel-equalheight.elementor-lakit-give-form-grid .lakit-posts__item{
+  height: auto;
+}
+.lakit-carousel-equalheight.elementor-lakit-give-form-grid .lakit-posts__inner-box{
+  flex-direction: column;
+}
+.lakit-carousel-equalheight.elementor-lakit-give-form-grid .lakit-posts__inner-content{
+  flex-grow: 1;
+}
+.lakit-carousel-equalheight.elementor-lakit-give-form-grid .lakit-posts__inner-content-inner {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+.lakit-carousel-equalheight.elementor-lakit-give-form-grid .lakit-posts__more-wrap {
+  margin-top: auto;
 }
