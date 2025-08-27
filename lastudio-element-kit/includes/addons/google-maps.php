@@ -18,24 +18,33 @@ class LaStudioKit_Google_Maps extends LaStudioKit_Base {
 
     public $geo_api_url = 'https://maps.googleapis.com/maps/api/geocode/json';
 
-    protected function enqueue_addon_resources(){
+    protected function enqueue_addon_resources()
+    {
 
-	    $disable_gmap_api_js = lastudio_kit_settings()->get_option( 'disable_gmap_api_js' );
-	    if ( ! filter_var( $disable_gmap_api_js, FILTER_VALIDATE_BOOLEAN ) ) {
-	      $google_api_key = lastudio_kit_settings()->get_option( 'gmap_api_key', lastudio_kit_settings()->get_option( 'gmap_backend_api_key' ) );
+        $disable_gmap_api_js = lastudio_kit_settings()->get_option('disable_gmap_api_js');
+        if (!filter_var($disable_gmap_api_js, FILTER_VALIDATE_BOOLEAN)) {
+            $google_api_key = lastudio_kit_settings()->get_option('gmap_api_key', lastudio_kit_settings()->get_option('gmap_backend_api_key'));
 
-	      $api = add_query_arg( array( 'key' => $google_api_key ), 'https://maps.googleapis.com/maps/api/js' );
-	      wp_register_script( 'lastudio-kit-google-maps-api', $api, false, lastudio_kit()->get_version(), true );
-		    $this->add_script_depends( 'lastudio-kit-google-maps-api' );
-	    }
+            $api = add_query_arg(
+                array(
+                    'key' => $google_api_key,
+                    'libraries' => 'marker'
+                ),
+                'https://maps.googleapis.com/maps/api/js'
+            );
+            wp_register_script('lastudio-kit-google-maps-api', $api, false, lastudio_kit()->get_version(), [
+                'in_footer' => true
+            ]);
+            $this->add_script_depends('lastudio-kit-google-maps-api');
+        }
 
-	    if(!lastudio_kit_settings()->is_combine_js_css()) {
-		    $this->add_script_depends( 'lastudio-kit-w__gmap' );
-		    if(!lastudio_kit()->is_optimized_css_mode()) {
-			    wp_register_style( $this->get_name(), lastudio_kit()->plugin_url( 'assets/css/addons/google-map.min.css' ), null, lastudio_kit()->get_version() );
-			    $this->add_style_depends( $this->get_name() );
-		    }
-	    }
+        if (!lastudio_kit_settings()->is_combine_js_css()) {
+            $this->add_script_depends('lastudio-kit-w__gmap');
+            if (!lastudio_kit()->is_optimized_css_mode()) {
+                wp_register_style($this->get_name(), lastudio_kit()->plugin_url('assets/css/addons/google-map.min.css'), null, lastudio_kit()->get_version());
+                $this->add_style_depends($this->get_name());
+            }
+        }
     }
 
 	public function get_widget_css_config($widget_name){
@@ -553,8 +562,8 @@ class LaStudioKit_Google_Maps extends LaStudioKit_Base {
 
                 $current = array(
                     'position' => $this->get_location_coord( $pin['pin_address'] ),
-                    'desc'     => esc_attr($pin['pin_desc']),
-                    'state'    => esc_attr($pin['pin_state']),
+                    'desc'     => wp_kses($pin['pin_desc'], \LaStudio_Kit_Helper::kses_allowed_tags()),
+                    'state'    => $pin['pin_state'],
                 );
 
                 if ( ! empty( $pin['pin_image']['url'] ) ) {

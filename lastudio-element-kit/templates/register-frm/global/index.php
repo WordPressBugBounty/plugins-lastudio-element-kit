@@ -32,7 +32,7 @@ $email    = ! empty( $_POST['email'] ) ? esc_attr( wp_unslash( $_POST['email'] )
     <?php
     if( 'yes' === $this->get_settings_for_display('show_extra_html') ){
         $extra_html_a = $this->get_settings_for_display('extra_html_a');
-        echo sprintf('<div class="lakit-register__extra lakit-register__extra_a">%1$s</div>', wp_kses_post($extra_html_a));
+        echo sprintf('<div class="lakit-register__extra lakit-register__extra_a">%1$s</div>', wp_kses($extra_html_a, \LaStudio_Kit_Helper::kses_allowed_tags()));
     }
     ?>
 

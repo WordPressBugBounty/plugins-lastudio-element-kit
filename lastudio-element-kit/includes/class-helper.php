@@ -1091,6 +1091,135 @@ if ( ! class_exists( 'LaStudio_Kit_Helper' ) ) {
 			return do_shortcode( shortcode_unautop( $content ) );
 		}
 
+        public static function kses_allowed_tags()
+        {
+            return [
+                'div' => [
+                    'style'    => true,
+                    'class'  => true,
+                ],
+                'p' => [
+                    'style'    => true,
+                    'class'  => true,
+                ],
+                'a' => [
+                    'style'    => true,
+                    'class'  => true,
+                    'href'  => true,
+                    'target'  => true,
+                ],
+                'img' => [
+                    'style'    => true,
+                    'class'  => true,
+                    'src'  => true,
+                    'alt'  => true,
+                    'width' => true,
+                    'height' => true,
+                    'srcset' => true,
+                    'sizes' => true,
+                    'loading' => true,
+                    'fetchpriority' => true,
+                    'decoding' => true,
+                ],
+                'strong' => [
+                    'style'    => true,
+                    'class'  => true,
+                ],
+                'span' => [
+                    'style'    => true,
+                    'class'  => true,
+                ],
+                'em' => [
+                    'style'    => true,
+                    'class'  => true,
+                ],
+                'br' => [
+                    'style'    => true,
+                    'class'  => true,
+                ],
+                'i' => [
+                    'style'    => true,
+                    'class'  => true,
+                ],
+                'svg' => [
+                    'style'    => true,
+                    'class'  => true,
+                    'xmlns'  => true,
+                    'width'  => true,
+                    'height'  => true,
+                    'viewbox'  => true,
+                    'fill'  => true,
+                    'id' => true,
+                ],
+                'g' => [
+                    'style'    => true,
+                    'class'  => true,
+                    'id' => true,
+                    'fill'    => true,
+                    'stroke' => true,
+                    'stroke-width' => true,
+                    'stroke-linecap' => true,
+                    'stroke-linejoin' => true,
+                ],
+                'path' => [
+                    'id' => true,
+                    'class'  => true,
+                    'style'    => true,
+                    'fill'    => true,
+                    'stroke' => true,
+                    'stroke-width' => true,
+                    'stroke-linecap' => true,
+                    'stroke-linejoin' => true,
+                    'd'  => true,
+                    'fill-rule'  => true,
+                    'transform'  => true,
+                ],
+                'use' => [
+                    'href' => true,
+                ],
+                'polygon' => [
+                    'id' => true,
+                    'class'  => true,
+                    'style'    => true,
+                    'points'    => true,
+                ],
+                'rect' => [
+                    'id' => true,
+                    'class'  => true,
+                    'style'    => true,
+                    'x'         => true,
+                    'y'         => true,
+                    'width'     => true,
+                    'height'    => true,
+                    'transform' => true,
+                ],
+                'h1' => [
+                    'style'    => true,
+                    'class'  => true,
+                ],
+                'h2' => [
+                    'style'    => true,
+                    'class'  => true,
+                ],
+                'h3' => [
+                    'style'    => true,
+                    'class'  => true,
+                ],
+                'h4' => [
+                    'style'    => true,
+                    'class'  => true,
+                ],
+                'h5' => [
+                    'style'    => true,
+                    'class'  => true,
+                ],
+                'h6' => [
+                    'style'    => true,
+                    'class'  => true,
+                ],
+            ];
+        }
+
 		public function print_elementor_template( $template_id ){
 
 		}

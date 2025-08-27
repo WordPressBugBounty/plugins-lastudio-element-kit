@@ -1518,30 +1518,7 @@ class LaStudioKit_Slides extends LaStudioKit_Base {
         $slide_count = 0;
 
         $btn_icon =  $this->_get_icon_setting( $this->get_settings_for_display('selected_btn_icon'), '<span class="elementor-button-icon">%s</span>' );
-        $kses_allows = [
-            'div' => [
-                'style'    => true,
-                'class'  => true,
-            ],
-            'a' => [
-                'style'    => true,
-                'class'  => true,
-                'href'  => true,
-                'target'  => true,
-            ],
-            'strong' => [
-                'style'    => true,
-                'class'  => true,
-            ],
-            'span' => [
-                'style'    => true,
-                'class'  => true,
-            ],
-            'br' => [
-                'style'    => true,
-                'class'  => true,
-            ],
-        ];
+        $kses_allows = \LaStudio_Kit_Helper::kses_allowed_tags();
 
         foreach ( $settings['slides'] as $slide ) {
             $slide_html = '';

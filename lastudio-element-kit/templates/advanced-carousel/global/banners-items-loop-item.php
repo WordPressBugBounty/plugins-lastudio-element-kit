@@ -21,7 +21,7 @@
             }
         }
         else{
-            $a_link_attribute = sprintf('href="%1$s" data-elementor-open-lightbox="yes" data-elementor-lightbox-slideshow="%2$s"', $item_settings['item_image']['url'], esc_attr($this->get_id()));
+            $a_link_attribute = sprintf('href="%1$s" data-elementor-open-lightbox="yes" data-elementor-lightbox-slideshow="%2$s"', esc_url($item_settings['item_image']['url']), esc_attr($this->get_id()));
         }
     }
 

@@ -636,7 +636,7 @@ class LaStudioKit_Banner extends LaStudioKit_Base {
 		$format = apply_filters( 'lastudio-kit/banner/image-format', '<img src="%1$s" alt="%2$s" class="lakit-banner__img">' );
 
 		if ( empty( $image['id'] ) ) {
-			return sprintf( $format, $image['url'], '' );
+			return sprintf( $format, esc_url($image['url']), '' );
 		}
 
 		$size = $this->get_settings_for_display( 'banner_image_size' );
@@ -648,7 +648,7 @@ class LaStudioKit_Banner extends LaStudioKit_Base {
 		$image_url = wp_get_attachment_image_url( $image['id'], $size );
 		$alt       = esc_attr( Control_Media::get_image_alt( $image ) );
 
-		return sprintf( $format, $image_url, $alt );
+		return sprintf( $format, esc_url($image_url), esc_attr($alt) );
 	}
 
 }

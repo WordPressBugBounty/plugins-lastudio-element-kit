@@ -514,7 +514,8 @@ abstract class LaStudioKit_Base extends Widget_Base
 
         if (is_array($val)) {
             printf($format, $val[$key]); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-        } else {
+        }
+        else {
             printf($format, $val); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         }
 
@@ -3156,10 +3157,14 @@ abstract class LaStudioKit_Base extends Widget_Base
     }
 
     public function render_variable($var){
-        echo $var; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        if(!empty($var)){
+            echo wp_kses($var, \LaStudio_Kit_Helper::kses_allowed_tags()); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        }
     }
     public function print_var($var){
-        echo $var; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        if(!empty($var)){
+            echo wp_kses($var, \LaStudio_Kit_Helper::kses_allowed_tags()); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        }
     }
 
     public function render_masonry_filters($container = 'parent', $echo = true)

@@ -531,7 +531,7 @@ class LaStudioKit_Image_Compare extends LaStudioKit_Base {
 		$format = apply_filters( 'lastudio-kit/image-compare/image-format', '<img src="%1$s" alt="%2$s" class="lakit-icv__img">' );
 
 		if ( empty( $image['id'] ) ) {
-			return sprintf( $format, $image['url'], '' );
+			return sprintf( $format, esc_url($image['url']), '' );
 		}
 
 		$size = $this->get_settings_for_display( 'image_size' );
@@ -543,7 +543,7 @@ class LaStudioKit_Image_Compare extends LaStudioKit_Base {
 		$image_url = wp_get_attachment_image_url( $image['id'], $size );
 		$alt       = esc_attr( Control_Media::get_image_alt( $image ) );
 
-		return sprintf( $format, $image_url, $alt );
+		return sprintf( $format, esc_url($image_url), $alt );
 	}
 
 	public function _get_image_after() {
@@ -557,7 +557,7 @@ class LaStudioKit_Image_Compare extends LaStudioKit_Base {
 		$format = apply_filters( 'lastudio-kit/image-compare/image-format', '<img src="%1$s" alt="%2$s" class="lakit-icv__img">' );
 
 		if ( empty( $image['id'] ) ) {
-			return sprintf( $format, $image['url'], '' );
+			return sprintf( $format, esc_url($image['url']), '' );
 		}
 
 		$size = $this->get_settings_for_display( 'image_size' );
@@ -569,7 +569,7 @@ class LaStudioKit_Image_Compare extends LaStudioKit_Base {
 		$image_url = wp_get_attachment_image_url( $image['id'], $size );
 		$alt       = esc_attr( Control_Media::get_image_alt( $image ) );
 
-		return sprintf( $format, $image_url, $alt );
+		return sprintf( $format, esc_url($image_url), $alt );
 	}
 
 	public function _get_js_settings(){
@@ -581,8 +581,8 @@ class LaStudioKit_Image_Compare extends LaStudioKit_Base {
 			'hoverStart'    => filter_var( $this->get_settings_for_display('hover_start'), FILTER_VALIDATE_BOOLEAN ),
 			'showLabels'    => filter_var( $this->get_settings_for_display('show_label'), FILTER_VALIDATE_BOOLEAN ),
 			'labelOptions' => [
-				'before'    => esc_attr($this->get_settings_for_display('before_title')),
-				'after'     => esc_attr($this->get_settings_for_display('after_title')),
+				'before'    => esc_attr(wp_kses($this->get_settings_for_display('before_title'), \LaStudio_Kit_Helper::kses_allowed_tags())),
+				'after'     => esc_attr(wp_kses($this->get_settings_for_display('after_title'), \LaStudio_Kit_Helper::kses_allowed_tags())),
 			],
 			'controlType' => esc_attr($this->get_settings_for_display('control_type'))
 		]);

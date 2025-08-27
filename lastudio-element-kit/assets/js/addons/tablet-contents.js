@@ -51,7 +51,10 @@
 
                 // If there is a custom container defined by the user, use it as the headings-scan container
                 if (elementSettings.container) {
-                    return jQuery(elementSettings.container);
+                    const _containerSelector = this.sanitizeContainer(elementSettings.container)
+                    if(_containerSelector){
+                        return jQuery(_containerSelector)
+                    }
                 }
 
                 // Get the document wrapper element in which the TOC is located
@@ -409,6 +412,11 @@
             },
             sanitizeAttributeValue: function ( value ){
                 return value.replace(/[^\w\s-:]/gi, '');
+            },
+            sanitizeContainer: function (value){
+                const t = document.createElement('template');
+                t.innerHTML = value;
+                return t.content.textContent || "";
             }
         })
 

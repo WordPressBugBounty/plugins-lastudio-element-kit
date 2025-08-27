@@ -2251,9 +2251,9 @@ class Nested_Tabs extends Widget_Nested_Base {
 			$tab_count = $index + 1;
 			$tab_title_setting_key = $this->get_repeater_setting_key( 'tab_title', 'tabs', $index );
             $tab_title_mobile_setting_key = $this->get_repeater_setting_key( 'tab_title_mobile', 'tabs', $tab_count );
-			$tab_title = sprintf('<div class="ntabs--title">%1$s</div>', $item['tab_title']);
+			$tab_title = sprintf('<div class="ntabs--title">%1$s</div>', wp_kses($item['tab_title'], \LaStudio_Kit_Helper::kses_allowed_tags()));
             if(!empty($item['tab_subtitle'])){
-                $tab_title = $tab_title . sprintf('<div class="ntabs--subtitle">%1$s</div>', $item['tab_subtitle']);
+                $tab_title = $tab_title . sprintf('<div class="ntabs--subtitle">%1$s</div>', wp_kses($item['tab_subtitle'], \LaStudio_Kit_Helper::kses_allowed_tags()));
             }
 
 			$tab_id = empty( $item['element_id'] ) ? 'lakit-ntabs-title-' . $id_int . $tab_count : $item['element_id'];
@@ -2288,7 +2288,7 @@ class Nested_Tabs extends Widget_Nested_Base {
             }
 
             if ( $item['use_image'] === 'yes' &&  ! empty( $item['tab_image']['url'] ) ) {
-                $icon_html = sprintf( '<img src="%1$s" alt="" width="16" height="16"/>', apply_filters( 'lastudio_wp_get_attachment_image_url', $item['tab_image']['url'] ) );
+                $icon_html = sprintf( '<img src="%1$s" alt="" width="16" height="16"/>', apply_filters( 'lastudio_wp_get_attachment_image_url', esc_url($item['tab_image']['url']) ) );
                 $icon_active_html = '';
             }
 
@@ -2345,7 +2345,7 @@ class Nested_Tabs extends Widget_Nested_Base {
 				<?php
                 if( $settings['tab_as_selectbox'] === 'yes' ) {
                     $first_item .= $dd_icon;
-                    $intro_text = !empty( $settings['tab_text_intro'] ) ? sprintf('<div class="ntabs-selectbox--intro">%1$s</div>', $settings['tab_text_intro']) : '';
+                    $intro_text = !empty( $settings['tab_text_intro'] ) ? sprintf('<div class="ntabs-selectbox--intro">%1$s</div>', wp_kses($settings['tab_text_intro'], \LaStudio_Kit_Helper::kses_allowed_tags())) : '';
                     echo sprintf( '<div class="ntabs-selectbox">%1$s<div class="ntabs-selectbox--wrap"><div class="ntabs-selectbox--label">%2$s</div><div class="ntabs-selectbox--select">%3$s</div></div></div>', $intro_text, $first_item, $tabs_title_html ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                 }
                 else{

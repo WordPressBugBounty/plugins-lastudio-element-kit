@@ -1113,7 +1113,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 			     filter_var( $request['use_target_list_id'], FILTER_VALIDATE_BOOLEAN ) &&
 			     ! empty( $request['target_list_id'] )
 			) {
-				$list_id = $request['target_list_id'];
+				$list_id = esc_attr($request['target_list_id']);
 			}
 
 			if ( ! $list_id ) {

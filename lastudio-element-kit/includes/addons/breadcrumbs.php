@@ -949,7 +949,7 @@ class LaStudioKit_Breadcrumbs extends LaStudioKit_Base {
             $separator = $this->_get_icon( 'icon_separator', '<span class="lakit-blocks-icon">%s</span>' );
         }
 		else {
-            $separator = sprintf( '<span>%s</span>', wp_kses($settings['custom_separator'], [ 'i' => ['class' => true]]) );
+            $separator = sprintf( '<span>%s</span>', wp_kses($settings['custom_separator'], \LaStudio_Kit_Helper::kses_allowed_tags()) );
         }
 
         return $separator;

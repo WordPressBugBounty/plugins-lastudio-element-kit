@@ -1106,13 +1106,22 @@ class LaStudioKit_Price_List extends LaStudioKit_Base {
             return;
         }
 
-        printf( $this->_open_price_item_link_format(), $item[ $url_key ]['url'], ( ! empty( $item[ $url_key ]['is_external'] ) ? ' target="_blank"' : '' ), ( ! empty( $item[ $url_key ]['nofollow'] ) ? ' rel="nofollow"' : '' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        printf(
+            $this->_open_price_item_link_format(),
+            esc_url($item[ $url_key ]['url']),
+            ( ! empty( $item[ $url_key ]['is_external'] ) ? ' target="_blank"' : '' ),
+            ( ! empty( $item[ $url_key ]['nofollow'] ) ? ' rel="nofollow"' : '' )
+        ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 
     }
 
     public function _open_price_item_link_edit( $url_key ) {
         echo '<# if ( item.' . esc_html($url_key) . '.url ) { #>';
-        printf( $this->_open_price_item_link_format(), '{{{ item.' . $url_key . '.url }}}', '<# if ( item.' . $url_key . '.is_external ) { #> target="_blank"<# } #>', '<# if ( item.' . $url_key . '.nofollow ) { #> rel="nofollow"<# } #>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        printf(
+            $this->_open_price_item_link_format(),
+            '{{{ item.' . $url_key . '.url }}}',
+            '<# if ( item.' . $url_key . '.is_external ) { #> target="_blank"<# } #>',
+            '<# if ( item.' . $url_key . '.nofollow ) { #> rel="nofollow"<# } #>' ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         echo '<# } #>';
     }
 

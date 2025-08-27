@@ -1628,15 +1628,15 @@ class LaStudioKit_Tabs extends LaStudioKit_Base {
 
     $tab_as_dropdown = filter_var( $this->get_settings_for_display( 'tab_as_dropdown' ), FILTER_VALIDATE_BOOLEAN );
 
-    $tabs_position                = $this->get_settings( 'tabs_position' );
-    $tabs_position_laptop         = $this->get_settings( 'tabs_position_laptop' );
-    $tabs_position_tablet         = $this->get_settings( 'tabs_position_tablet' );
-    $tabs_position_tabletportrait = $this->get_settings( 'tabs_position_tabletportrait' );
-    if ( empty( $this->get_settings( 'tabs_position_tabletportrait' ) ) ) {
-      $tabs_position_tabletportrait = $this->get_settings( 'tabs_position_mobile_extra' );
+    $tabs_position                = $this->get_settings_for_display( 'tabs_position' );
+    $tabs_position_laptop         = $this->get_settings_for_display( 'tabs_position_laptop' );
+    $tabs_position_tablet         = $this->get_settings_for_display( 'tabs_position_tablet' );
+    $tabs_position_tabletportrait = $this->get_settings_for_display( 'tabs_position_tabletportrait' );
+    if ( empty( $this->get_settings_for_display( 'tabs_position_tabletportrait' ) ) ) {
+      $tabs_position_tabletportrait = $this->get_settings_for_display( 'tabs_position_mobile_extra' );
     }
-    $tabs_position_mobile = $this->get_settings( 'tabs_position_mobile' );
-    $show_effect          = $this->get_settings( 'show_effect' );
+    $tabs_position_mobile = $this->get_settings_for_display( 'tabs_position_mobile' );
+    $show_effect          = $this->get_settings_for_display( 'show_effect' );
 
     $active_index = 0;
 
@@ -1648,9 +1648,9 @@ class LaStudioKit_Tabs extends LaStudioKit_Base {
 
     $settings = array(
       'activeIndex'     => $active_index,
-      'event'           => $this->get_settings( 'tabs_event' ),
-      'autoSwitch'      => filter_var( $this->get_settings( 'auto_switch' ), FILTER_VALIDATE_BOOLEAN ),
-      'autoSwitchDelay' => $this->get_settings( 'auto_switch_delay' ),
+      'event'           => $this->get_settings_for_display( 'tabs_event' ),
+      'autoSwitch'      => filter_var( $this->get_settings_for_display( 'auto_switch' ), FILTER_VALIDATE_BOOLEAN ),
+      'autoSwitchDelay' => $this->get_settings_for_display( 'auto_switch_delay' ),
     );
 
     $this->add_render_attribute( 'instance', array(
@@ -1713,7 +1713,7 @@ class LaStudioKit_Tabs extends LaStudioKit_Base {
             'id'       => 'lakit-tabs-control-' . $id_int . $tab_count,
             'class'    => array(
               'lakit-tabs__control',
-              'lakit-tabs__control-icon-' . $this->get_settings( 'tabs_control_icon_position' ),
+              'lakit-tabs__control-icon-' . $this->get_settings_for_display( 'tabs_control_icon_position' ),
               $index === $active_index ? 'active-tab' : '',
             ),
             'data-tab' => $tab_count,
@@ -1734,7 +1734,7 @@ class LaStudioKit_Tabs extends LaStudioKit_Base {
           $title_image_html = '';
 
           if ( ! empty( $item['item_image']['url'] ) ) {
-            $title_image_html = sprintf( '<img class="lakit-tabs__label-image" src="%1$s" alt="">', apply_filters( 'lastudio_wp_get_attachment_image_url', $item['item_image']['url'] ) );
+            $title_image_html = sprintf( '<img class="lakit-tabs__label-image" src="%1$s" alt="">', apply_filters( 'lastudio_wp_get_attachment_image_url', esc_url($item['item_image']['url']) ) );
           }
 
           $title_label_html = '';
@@ -1746,16 +1746,16 @@ class LaStudioKit_Tabs extends LaStudioKit_Base {
             $title_label_html .= sprintf( '<div class="lakit-tabs__label-text">%1$s</div>', $item['item_label'] );
           }
           if ( ! empty( $title_label_html ) ) {
-            $title_label_html = sprintf( '<div class="lakit-tabs__label">%1$s</div>', $title_label_html );
+            $title_label_html = sprintf( '<div class="lakit-tabs__label">%1$s</div>', wp_kses($title_label_html, \LaStudio_Kit_Helper::kses_allowed_tags()) );
           }
 
-          if ( in_array( $this->get_settings( 'tabs_control_icon_position' ), [ 'right', 'bottom' ] ) ) {
+          if ( in_array( $this->get_settings_for_display( 'tabs_control_icon_position' ), [ 'right', 'bottom' ] ) ) {
               ?>
               <div <?php $this->print_render_attribute_string( $tab_title_setting_key ) ?>>
                   <div class="lakit-tabs__control-inner">
                       <?php
                       echo $title_label_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-                      echo filter_var( $item['item_use_image'], FILTER_VALIDATE_BOOLEAN ) ? $title_image_html : $title_icon_html;  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                      echo filter_var( $item['item_use_image'], FILTER_VALIDATE_BOOLEAN ) ? wp_kses($title_image_html, \LaStudio_Kit_Helper::kses_allowed_tags()) : $title_icon_html;  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                       ?>
                   </div>
               </div>
@@ -1765,7 +1765,7 @@ class LaStudioKit_Tabs extends LaStudioKit_Base {
               <div <?php $this->print_render_attribute_string( $tab_title_setting_key ) ?>>
                   <div class="lakit-tabs__control-inner">
                       <?php
-                      echo filter_var( $item['item_use_image'], FILTER_VALIDATE_BOOLEAN ) ? $title_image_html : $title_icon_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                      echo filter_var( $item['item_use_image'], FILTER_VALIDATE_BOOLEAN ) ? wp_kses($title_image_html, \LaStudio_Kit_Helper::kses_allowed_tags()) : $title_icon_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                       echo $title_label_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                       ?>
                   </div>

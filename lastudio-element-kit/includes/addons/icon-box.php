@@ -2225,12 +2225,12 @@ class LaStudioKit_Icon_Box extends LaStudioKit_Base {
 
         if ( empty( $image['id'] ) ) {
 	        $format = apply_filters( 'lastudio-kit/iconbox/main-image-format', '<img src="%1$s" alt="%2$s" class="lakit-iconbox__main_icon lakit-iconbox__main_img" loading="lazy">' );
-            $main_image = sprintf( $format, $image['url'], '' );
-            return sprintf( $main_format, $main_image );
+            $main_image = sprintf( $format, esc_url($image['url']), '' );
+            return sprintf( $main_format, wp_kses($main_image, \LaStudio_Kit_Helper::kses_allowed_tags()) );
         }
         else{
 	        $main_image = wp_get_attachment_image( $image['id'], 'full', false, [ 'class' => 'lakit-iconbox__main_icon lakit-iconbox__main_img' ] );
-	        return sprintf( $main_format, $main_image );
+            return sprintf( $main_format, wp_kses($main_image, \LaStudio_Kit_Helper::kses_allowed_tags()) );
         }
     }
 
@@ -2267,17 +2267,14 @@ class LaStudioKit_Icon_Box extends LaStudioKit_Base {
         $format = apply_filters( 'lastudio-kit/iconbox/overlay-image-format', '<img src="%1$s" alt="%2$s" class="lakit-iconbox__overlay_img" loading="lazy">' );
 
         if ( empty( $image['id'] ) ) {
-            $main_image = sprintf( $format, $image['url'], '' );
-            return sprintf( $main_format, $main_image );
+            $main_image = sprintf( $format, esc_url($image['url']), '' );
+            return sprintf( $main_format, wp_kses($main_image, \LaStudio_Kit_Helper::kses_allowed_tags()) );
         }
 
         $size = 'full';
 
-        $image_url = wp_get_attachment_image_url( $image['id'], $size );
-        $alt       = esc_attr( Control_Media::get_image_alt( $image ) );
-
-        $main_image = sprintf( $format, $image_url, $alt );
-        return sprintf( $main_format, $main_image );
+        $main_image = sprintf( $format, esc_url(wp_get_attachment_image_url( $image['id'], $size )), esc_attr( Control_Media::get_image_alt( $image ) ) );
+        return sprintf( $main_format, wp_kses($main_image, \LaStudio_Kit_Helper::kses_allowed_tags()) );
     }
 
     public function get_badge(){

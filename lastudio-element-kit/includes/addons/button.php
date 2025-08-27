@@ -583,7 +583,7 @@ class LaStudioKit_Button extends LaStudioKit_Base {
                 <?php endif; ?>
 			</span>
             <?php endif; ?>
-			<span <?php $this->print_render_attribute_string( 'text' ); ?>><?php echo wp_kses_post($settings['text']); ?></span>
+			<span <?php $this->print_render_attribute_string( 'text' ); ?>><?php echo wp_kses($settings['text'], \LaStudio_Kit_Helper::kses_allowed_tags()); ?></span>
 		</span>
         <?php
     }

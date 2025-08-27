@@ -138,7 +138,7 @@ if( $enable_carousel ){
                                             else{
                                                 echo sprintf(
                                                     '<div class="lakit-team-member__desc">%1$s</div>',
-                                                    wp_kses_post(balanceTags($member_description, true))
+                                                    wp_kses(balanceTags($member_description, true), \LaStudio_Kit_Helper::kses_allowed_tags())
                                                 );
                                             }
                                         }

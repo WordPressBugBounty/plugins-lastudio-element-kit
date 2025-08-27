@@ -421,10 +421,9 @@ class LaStudioKit_Logo extends LaStudioKit_Base {
      */
     public function _get_logo_text() {
 
-        $settings    = $this->get_settings();
-        $type        = isset( $settings['logo_type'] ) ? esc_attr( $settings['logo_type'] ) : 'text';
-        $text_from   = isset( $settings['logo_text_from'] ) ? esc_attr( $settings['logo_text_from'] ) : 'site_name';
-        $custom_text = isset( $settings['logo_text'] ) ? wp_kses_post( $settings['logo_text'] ) : '';
+        $type        = $this->get_settings_for_display('logo_type');
+        $text_from   = $this->get_settings_for_display('logo_text_from');
+        $custom_text = $this->get_settings_for_display('logo_text');
 
         if ( 'image' === $type ) {
             return;
@@ -441,7 +440,7 @@ class LaStudioKit_Logo extends LaStudioKit_Base {
             '<div class="lakit-logo__text">%s</div>'
         );
 
-        return sprintf( $format, $text );
+        return sprintf( $format, wp_kses($text, \LaStudio_Kit_Helper::kses_allowed_tags()) );
     }
 
     /**
@@ -451,12 +450,10 @@ class LaStudioKit_Logo extends LaStudioKit_Base {
      */
     public function _get_logo_classes() {
 
-        $settings = $this->get_settings();
-
         $classes = array(
             'lakit-logo',
-            'lakit-logo-type-' . $settings['logo_type'],
-            'lakit-logo-display-' . $settings['logo_display'],
+            'lakit-logo-type-' . $this->get_settings_for_display('logo_type'),
+            'lakit-logo-display-' . $this->get_settings_for_display('logo_display'),
         );
 
         return implode( ' ', $classes );
@@ -469,10 +466,9 @@ class LaStudioKit_Logo extends LaStudioKit_Base {
      */
     public function _get_logo_image() {
 
-        $settings = $this->get_settings();
-        $type     = isset( $settings['logo_type'] ) ? esc_attr( $settings['logo_type'] ) : 'text';
-        $image    = isset( $settings['logo_image'] ) ? $settings['logo_image'] : false;
-        $image_2x = isset( $settings['logo_image_2x'] ) ? $settings['logo_image_2x'] : false;
+        $type     = $this->get_settings_for_display('logo_type');
+        $image    = $this->get_settings_for_display('logo_image');
+        $image_2x = $this->get_settings_for_display('logo_image_2x');
 
         if ( 'text' === $type || ! $image ) {
             return;
@@ -531,21 +527,21 @@ class LaStudioKit_Logo extends LaStudioKit_Base {
         );
 
         $image_data = ! empty( $image['id'] ) ? wp_get_attachment_image_src( $image['id'], 'full' ) : array();
-        $width      = isset( $image_data[1] ) ? $image_data[1] : false;
-        $height     = isset( $image_data[2] ) ? $image_data[2] : false;
+        $width      = $image_data[1] ?? false;
+        $height     = $image_data[2] ?? false;
 
         $width      = apply_filters('lastudio-kit/logo/attr/width', $width);
         $height      = apply_filters('lastudio-kit/logo/attr/height', $height);
 
         $attrs = sprintf(
             '%1$s%2$s%3$s',
-            $width ? ' width="' . $width . '"' : '',
-            $height ? ' height="' . $height . '"' : '',
+            $width ? ' width="' . esc_attr($width) . '"' : '',
+            $height ? ' height="' . esc_attr($height) . '"' : '',
             ' data-no-lazy="true" fetchpriority="high"'
         );
 
-        $logo1 = sprintf( $format, esc_url( $image_src ), get_bloginfo( 'name' ), $attrs );
-        $logo2 = sprintf( $format2, esc_url( $image_2x_src ), get_bloginfo( 'name' ), $attrs );
+        $logo1 = sprintf( $format, esc_url( $image_src ), esc_attr(get_bloginfo( 'name' )), $attrs );
+        $logo2 = sprintf( $format2, esc_url( $image_2x_src ), esc_attr(get_bloginfo( 'name' )), $attrs );
 
         return $logo1 . $logo2;
     }
@@ -559,7 +555,7 @@ class LaStudioKit_Logo extends LaStudioKit_Base {
         }
 
         if ( ! empty( $args['url'] ) ) {
-            return $args['url'];
+            return esc_url( $args['url'] );
         }
 
         return false;

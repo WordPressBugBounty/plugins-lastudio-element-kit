@@ -28,7 +28,7 @@ $this->add_render_attribute( $link_instance, 'class', array(
 $link_tag = 'a';
 
 if ( 'lightbox' === $link_type ) {
-	$this->add_render_attribute( $link_instance, 'href', $this->_loop_item( array( 'item_image', 'url' ), '%s' ) );
+	$this->add_render_attribute( $link_instance, 'href', esc_url($this->_loop_item( array( 'item_image', 'url' ), '%s' )) );
 	$this->add_render_attribute( $link_instance, 'data-elementor-open-lightbox', 'yes' );
 	$this->add_render_attribute( $link_instance, 'data-elementor-lightbox-slideshow', esc_attr($this->get_id())  );
     $this->add_render_attribute( $link_instance, 'data-elementor-lightbox-title', wp_strip_all_tags($this->_loop_item( array( 'item_title' ), '%s' )) );
@@ -37,7 +37,7 @@ else if ('external' === $link_type){
     $target = $this->_loop_item( array( 'item_target' ), '%s' );
     $target = ! empty( $target ) ? $target : '_self';
 
-    $this->add_render_attribute( $link_instance, 'href', $this->_loop_item( array( 'item_url' ), '%s' ) );
+    $this->add_render_attribute( $link_instance, 'href', esc_url($this->_loop_item( array( 'item_url' ), '%s' )) );
     $this->add_render_attribute( $link_instance, 'target', $target );
 }
 else {

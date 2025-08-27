@@ -786,10 +786,10 @@ class LaStudioKit_Author_Box extends LaStudioKit_Base {
 			}
 
 			if ( ! empty( $link_url ) ) {
-				$this->add_render_attribute( 'author_link', 'href', $link_url );
+				$this->add_render_attribute( 'author_link', 'href', esc_url($link_url) );
 
 				if ( ! empty( $link_target ) ) {
-					$this->add_render_attribute( 'author_link', 'target', $link_target );
+					$this->add_render_attribute( 'author_link', 'target', esc_attr($link_target) );
 				}
 			}
 		}
@@ -804,22 +804,22 @@ class LaStudioKit_Author_Box extends LaStudioKit_Base {
 		);
 
 		if ( $print_link ) {
-			$this->add_render_attribute( 'button', 'href', $author['posts_url'] );
+			$this->add_render_attribute( 'button', 'href', esc_url($author['posts_url']) );
 		}
 
 		if ( $print_link && ! empty( $settings['button_hover_animation'] ) ) {
 			$this->add_render_attribute(
 				'button',
 				'class',
-				'elementor-animation-' . $settings['button_hover_animation']
+				'elementor-animation-' . esc_attr($settings['button_hover_animation'])
 			);
 		}
 
 		if ( $print_avatar ) {
-			$this->add_render_attribute( 'avatar', 'src', $author['avatar'] );
+			$this->add_render_attribute( 'avatar', 'src', esc_url($author['avatar']) );
 
 			if ( ! empty( $author['display_name'] ) ) {
-				$this->add_render_attribute( 'avatar', 'alt', $author['display_name'] );
+				$this->add_render_attribute( 'avatar', 'alt', esc_attr($author['display_name']) );
 			}
 		}
 
@@ -834,13 +834,13 @@ class LaStudioKit_Author_Box extends LaStudioKit_Base {
 			<div class="elementor-author-box__text">
 				<?php if ( $print_name ) : ?>
 					<<?php echo esc_attr($link_tag); ?> <?php $this->print_render_attribute_string( 'author_link' ); ?>>
-						<?php echo '<' . $author_name_tag . ' class="elementor-author-box__name">' . wp_kses_post($author['display_name']) . '</' . $author_name_tag . '>'; ?>
+						<?php echo '<' . $author_name_tag . ' class="elementor-author-box__name">' . wp_kses($author['display_name'], \LaStudio_Kit_Helper::kses_allowed_tags()) . '</' . $author_name_tag . '>'; ?>
 					</<?php echo esc_attr($link_tag); ?>>
 				<?php endif; ?>
 
 				<?php if ( $print_bio ) : ?>
 					<div class="elementor-author-box__bio">
-						<?php echo wp_kses_post($author['bio']); ?>
+						<?php echo wp_kses($author['bio'], \LaStudio_Kit_Helper::kses_allowed_tags()); ?>
 					</div>
 				<?php endif; ?>
 

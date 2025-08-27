@@ -1506,11 +1506,14 @@ class LaStudioKit_Subscribe_Form extends LaStudioKit_Base {
     public function generate_setting_json() {
         $module_settings = $this->get_settings();
 
+        $redirect_url = esc_url($module_settings['redirect_url']);
+        $target_list_id = esc_attr($module_settings['target_list_id']);
+
         $settings = array(
-            'redirect'           => filter_var( $module_settings['use_redirect_url'], FILTER_VALIDATE_BOOLEAN ),
-            'redirect_url'       => $module_settings['redirect_url'],
-            'use_target_list_id' => filter_var( $module_settings['use_target_list_id'], FILTER_VALIDATE_BOOLEAN ),
-            'target_list_id'     => $module_settings['target_list_id'],
+            'redirect'           => filter_var( $module_settings['use_redirect_url'], FILTER_VALIDATE_BOOLEAN ) && !empty( $redirect_url ),
+            'redirect_url'       => $redirect_url,
+            'use_target_list_id' => filter_var( $module_settings['use_target_list_id'], FILTER_VALIDATE_BOOLEAN ) && !empty( $target_list_id ),
+            'target_list_id'     => $target_list_id,
         );
 
         $settings = wp_json_encode( $settings );

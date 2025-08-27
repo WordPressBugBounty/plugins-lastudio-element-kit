@@ -2,21 +2,39 @@
 /**
  * Loop item template
  */
-?>
-<figure class="lakit-banner lakit-ef-<?php $this->_html( 'animation_effect', '%s' ); ?>"><?php
-	$target = $this->_get_html( 'banner_link_target', ' target="%s"' );
-	$rel = $this->_get_html( 'banner_link_rel', ' rel="%s"' );
 
-	$this->_html( 'banner_link', '<a href="%s" class="lakit-banner__link"' . $target . $rel . '>' );
+
+$target     = $this->get_settings_for_display('banner_link_target');
+$rel        = $this->get_settings_for_display('banner_link_rel');
+$banner_link = $this->get_settings_for_display('banner_link');
+$banner_title = $this->get_settings_for_display('banner_title');
+$banner_text = $this->get_settings_for_display('banner_text');
+$css_classes = [
+    'lakit-banner',
+    'lakit-ef-' . esc_attr( $this->get_settings_for_display('animation_effect') ),
+];
+
+$kses_allows = \LaStudio_Kit_Helper::kses_allowed_tags();
+
+?>
+<figure class="<?php echo join(' ', $css_classes); ?>"><?php
+    if(!empty($banner_link)){
+        echo sprintf( '<a href="%1$s" class="lakit-banner__link" target="%2$s" rel="%3$s">', esc_url($banner_link), esc_attr($target), esc_attr($rel) );
+    }
 		echo '<div class="lakit-banner__overlay"></div>';
 		$this->print_var($this->_get_banner_image());
 		echo '<div class="lakit-banner__content">';
 			echo '<div class="lakit-banner__content-wrap">';
 				$title_tag = lastudio_kit_helper()->validate_html_tag( $this->_get_html( 'banner_title_html_tag', '%s' ) );
-
-				$this->_html( 'banner_title', '<' . $title_tag  . ' class="lakit-banner__title">%s</' . $title_tag  . '>' );
-				$this->_html( 'banner_text', '<div class="lakit-banner__text">%s</div>' );
+                if(!empty($banner_title)){
+                    echo sprintf('<%1$s class="lakit-banner__title">%2$s</%1$s>', $title_tag, wp_kses($banner_title, $kses_allows));
+                }
+                if(!empty($banner_text)){
+                    echo sprintf('<div class="lakit-banner__text">%1$s</div>', wp_kses($banner_text, $kses_allows));
+                }
 			echo '</div>';
 		echo '</div>';
-	$this->_html( 'banner_link', '</a>' );
+    if(!empty($banner_link)){
+        echo '</a>';
+    }
 ?></figure>
