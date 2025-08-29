@@ -1217,6 +1217,10 @@ if ( ! class_exists( 'LaStudio_Kit_Helper' ) ) {
                     'style'    => true,
                     'class'  => true,
                 ],
+                'style' => [
+                    'class'  => true,
+                    'id' => true
+                ],
             ];
         }
 

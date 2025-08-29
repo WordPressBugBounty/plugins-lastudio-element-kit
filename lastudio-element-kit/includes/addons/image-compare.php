@@ -575,16 +575,31 @@ class LaStudioKit_Image_Compare extends LaStudioKit_Base {
 	public function _get_js_settings(){
 		$starting_point = $this->get_settings_for_display('starting_point');
 
+        $before_title = $this->get_settings_for_display('before_title');
+        $after_title = $this->get_settings_for_display('after_title');
+        if(!empty($before_title)){
+            $before_title = wp_specialchars_decode($before_title);
+        }
+        if(!empty($after_title)){
+            $after_title = wp_specialchars_decode($after_title);
+        }
+        if(!empty($before_title)){
+            $before_title = wp_kses($before_title, \LaStudio_Kit_Helper::kses_allowed_tags());
+        }
+        if(!empty($after_title)){
+            $after_title = wp_kses($after_title, \LaStudio_Kit_Helper::kses_allowed_tags());
+        }
+
 		return wp_json_encode([
 			'startingPoint' => !empty($starting_point['size']) ? absint($starting_point['size']) : 50,
 			'verticalMode'  => $this->get_settings_for_display('compare_mode') === 'vertical',
 			'hoverStart'    => filter_var( $this->get_settings_for_display('hover_start'), FILTER_VALIDATE_BOOLEAN ),
 			'showLabels'    => filter_var( $this->get_settings_for_display('show_label'), FILTER_VALIDATE_BOOLEAN ),
 			'labelOptions' => [
-				'before'    => esc_attr(wp_kses($this->get_settings_for_display('before_title'), \LaStudio_Kit_Helper::kses_allowed_tags())),
-				'after'     => esc_attr(wp_kses($this->get_settings_for_display('after_title'), \LaStudio_Kit_Helper::kses_allowed_tags())),
+				'before'    => $before_title,
+				'after'     => $after_title,
 			],
-			'controlType' => esc_attr($this->get_settings_for_display('control_type'))
+			'controlType' => $this->get_settings_for_display('control_type')
 		]);
 	}
 

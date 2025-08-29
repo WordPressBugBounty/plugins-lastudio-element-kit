@@ -560,9 +560,12 @@ class LaStudioKit_Google_Maps extends LaStudioKit_Base {
                     continue;
                 }
 
+                $desc = $pin['pin_desc'] ?: '';
+                $desc = wp_specialchars_decode($desc);
+
                 $current = array(
                     'position' => $this->get_location_coord( $pin['pin_address'] ),
-                    'desc'     => wp_kses($pin['pin_desc'], \LaStudio_Kit_Helper::kses_allowed_tags()),
+                    'desc'     => wp_kses($desc, \LaStudio_Kit_Helper::kses_allowed_tags()),
                     'state'    => $pin['pin_state'],
                 );
 
@@ -574,6 +577,7 @@ class LaStudioKit_Google_Maps extends LaStudioKit_Base {
             }
 
         }
+
         $this->add_render_attribute( 'map-data', 'data-pins', wp_json_encode( $pins ) );
         $this->add_render_attribute( 'map-data', 'class', 'lakit-gmap' );
 
