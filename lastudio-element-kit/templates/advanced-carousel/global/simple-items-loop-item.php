@@ -5,7 +5,7 @@
 
 	$img = $this->get_advanced_carousel_img( 'lakit-carousel__item-img' );
 
-    $title  = $this->_loop_item( array( 'item_title' ) );
+    $title  = wp_kses($this->_loop_item( array( 'item_title' ) ), \LaStudio_Kit_Helper::kses_allowed_tags());
 
 	$item_settings = $this->_processed_item;
 

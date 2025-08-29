@@ -4,7 +4,7 @@ Tags: elementor addons, elementor extensions, header footer builder, widgets for
 Donate Link: https://paypal.me/dpv0990
 Requires at least: 6.0
 Tested up to: 6.8.0
-Stable tag: 1.5.5.2
+Stable tag: 1.5.5.4
 Requires PHP: 7.0
 WC tested up to: 10.1.1
 Elementor tested up to: 3.31.3
@@ -48,8 +48,10 @@ LA-Studio Kit is an ultimate All in one addons for Elementor Page Builder, it wi
 
 == Changelog ==
 
+= 1.5.5.3 =
+* Fix Advanced carousel displaying issue
+
 = 1.5.5.2 =
-* Fix Advanced carousel issue
 * Fixed security issue
 
 = 1.5.5.1 =

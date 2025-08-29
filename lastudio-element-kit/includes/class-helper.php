@@ -1176,6 +1176,7 @@ if ( ! class_exists( 'LaStudio_Kit_Helper' ) ) {
                 ],
                 'use' => [
                     'href' => true,
+                    'xlink:href' => true,
                 ],
                 'polygon' => [
                     'id' => true,

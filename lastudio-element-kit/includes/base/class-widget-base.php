@@ -3158,10 +3158,16 @@ abstract class LaStudioKit_Base extends Widget_Base
 
     public function render_variable($var){
         if(!empty($var)){
-            echo wp_kses($var, \LaStudio_Kit_Helper::kses_allowed_tags()); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            echo $var; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         }
     }
     public function print_var($var){
+        if(!empty($var)){
+            echo $var; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        }
+    }
+
+    public function print_var_kses($var){
         if(!empty($var)){
             echo wp_kses($var, \LaStudio_Kit_Helper::kses_allowed_tags()); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
         }
