@@ -54,7 +54,13 @@ class Get_Menu_Items extends Base {
 
 		$sub_item_id = ! empty( $args['sub_item_id'] ) ? 'item-' . $args['sub_item_id'] : false;
 
-		$dev = filter_var( $args['dev'], FILTER_VALIDATE_BOOLEAN ) ? true : false;
+		$dev = (bool)filter_var($args['dev'], FILTER_VALIDATE_BOOLEAN);
+
+        if(empty($menu_id)){
+            return rest_ensure_response( [
+                'data' => null,
+            ]);
+        }
 
 		$transient_key = md5( sprintf( 'lastudio_kit_menu_remote_items_data_%s_sub_%s', $menu_id, $sub_item_id ) );
 

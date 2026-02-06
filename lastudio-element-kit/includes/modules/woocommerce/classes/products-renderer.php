@@ -11,6 +11,8 @@ class Products_Renderer extends Base_Products_Renderer {
 
     public static $displayed_ids = [];
 
+    protected $settings = [];
+
 	public function __construct( $settings = [], $type = 'products' ) {
 
         $this->settings = $settings;
@@ -41,17 +43,16 @@ class Products_Renderer extends Base_Products_Renderer {
             $is_filtered = wc_string_to_bool( $this->settings['is_filter_container'] ) === true;
         }
 
-        if( !empty($this->settings['query_post_type']) && in_array( $this->settings['query_post_type'], ['related', 'upsells'] )){
+        if( !empty($this->settings['query_post_type']) && in_array( $this->settings['query_post_type'], ['related', 'upsells', 'crosssells'] )){
             $is_filtered = false;
         }
 
+        $transient_name    = $this->get_transient_name();
+        $transient_version = \WC_Cache_Helper::get_transient_version( 'product_query' );
+        $cache             = wc_string_to_bool( $this->attributes['cache'] ) === true;
+
         if($is_filtered){
             $cache = false;
-        }
-        else{
-            $transient_name    = $this->get_transient_name();
-            $transient_version = \WC_Cache_Helper::get_transient_version( 'product_query' );
-            $cache             = wc_string_to_bool( $this->attributes['cache'] ) === true;
         }
 
         $transient_value   = $cache ? get_transient( $transient_name ) : false;
@@ -111,7 +112,8 @@ class Products_Renderer extends Base_Products_Renderer {
 
         $prefix = self::QUERY_CONTROL_NAME . '_';
 
-        if ( 'upsells' === $this->settings[ $prefix . 'post_type' ] || 'related' === $this->settings[ $prefix . 'post_type' ] ) {
+        $query_type = $this->settings[ $prefix . 'post_type' ] ?: '';
+        if( in_array( $query_type, ['related', 'upsells', 'crosssells'] ) ){
             $query_args = $this->get_query_args();
             if(empty($query_args['post__in'])){
                 return false;
@@ -190,8 +192,11 @@ class Products_Renderer extends Base_Products_Renderer {
         // Set Related Query;
         $this->set_related_query_args( $query_args );
 
-        // Set UpSell Query;
+        // Set Up-Sells Query;
         $this->set_upsells_query_args( $query_args );
+
+        // Set Cross-sells Query;
+        $this->set_crosssells_query_args( $query_args );
 
 		if ( wc_string_to_bool($settings['paginate']) ) {
 
@@ -393,6 +398,14 @@ class Products_Renderer extends Base_Products_Renderer {
             $upsell_ids = $product->get_upsell_ids();
 
             $query_args['post__in'] = $upsell_ids;
+        }
+    }
+
+    protected function set_crosssells_query_args( &$query_args ){
+        $prefix = self::QUERY_CONTROL_NAME . '_';
+        if ( 'crosssells' === $this->settings[ $prefix . 'post_type' ] ) {
+            $cross_sells_ids = WC()->cart->get_cross_sells();
+            $query_args['post__in'] = $cross_sells_ids;
         }
     }
 

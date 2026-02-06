@@ -1312,6 +1312,20 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
         $this->_end_controls_tabs();
 
         $this->_add_responsive_control(
+            'lv0_gap',
+            array(
+                'label'      => esc_html__( 'Items Spacing', 'lastudio-kit' ),
+                'type'       => Controls_Manager::SLIDER,
+                'size_units' => array( 'px', 'em' ),
+                'selectors' => array(
+                    '{{WRAPPER}} .lakit-nav-{{ID}}' => 'gap: {{SIZE}}{{UNIT}};',
+                ),
+                'separator' => 'before',
+            ),
+            50
+        );
+
+        $this->_add_responsive_control(
             'nav_items_padding',
             array(
                 'label'      => esc_html__( 'Padding', 'lastudio-kit' ),
@@ -1320,7 +1334,6 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
                 'selectors'  => array(
                     '{{WRAPPER}} .lakit-nav-id-{{ID}} > .menu-item-link-top' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ),
-                'separator' => 'before',
             ),
             25
         );
@@ -2634,6 +2647,44 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
                 ),
                 'selectors' => array(
                     '{{WRAPPER}} .lakit-nav-{{ID}} > .lakit-nav__mobile-close-btn' => 'font-size: {{SIZE}}{{UNIT}};',
+                ),
+                'condition' => array(
+                    'mobile_menu_layout' => array(
+                        'left-side',
+                        'right-side',
+                    ),
+                ),
+            ),
+            50
+        );
+
+        $this->_add_control(
+            'mobile_close_icon_offset_x',
+            array(
+                'label' => esc_html__( 'Offset X', 'lastudio-kit' ),
+                'type'  => Controls_Manager::SLIDER,
+                'size_units' => array( 'px', 'em', '%' ),
+                'selectors' => array(
+                    '{{WRAPPER}} .lakit-nav-{{ID}}' => '--mm-close-icon-offset-x: {{SIZE}}{{UNIT}};',
+                ),
+                'condition' => array(
+                    'mobile_menu_layout' => array(
+                        'left-side',
+                        'right-side',
+                    ),
+                ),
+            ),
+            50
+        );
+
+        $this->_add_control(
+            'mobile_close_icon_offset_y',
+            array(
+                'label' => esc_html__( 'Offset Y', 'lastudio-kit' ),
+                'type'  => Controls_Manager::SLIDER,
+                'size_units' => array( 'px', 'em', '%' ),
+                'selectors' => array(
+                    '{{WRAPPER}} .lakit-nav-{{ID}}' => '--mm-close-icon-offset-y: {{SIZE}}{{UNIT}};',
                 ),
                 'condition' => array(
                     'mobile_menu_layout' => array(

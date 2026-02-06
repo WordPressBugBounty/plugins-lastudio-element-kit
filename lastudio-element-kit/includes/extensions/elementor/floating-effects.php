@@ -15,7 +15,7 @@ class Floating_Effects {
     }
 
     public function register_enqueue_scripts(){
-        if(lastudio_kit()->elementor()->experiments->is_feature_active('e_element_cache')){
+        if(\LaStudio_Kit_Helper::is_active_elementor_cache()){
             wp_enqueue_script('lastudio-kit-floating-effects');
         }
     }

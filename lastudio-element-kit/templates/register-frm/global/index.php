@@ -54,7 +54,7 @@ $email    = ! empty( $_POST['email'] ) ? esc_attr( wp_unslash( $_POST['email'] )
 		<?php
 			wp_nonce_field( 'lakit-register', 'lakit-register-nonce' );
 			printf( '<input type="hidden" name="lakit_redirect" value="%s">', esc_url($redirect_url) );
-      printf('<input type="hidden" name="lakit_field_log" value="%s">', esc_url($this->get_settings_for_display('show_username')));
+      printf('<input type="hidden" name="lakit_field_log" value="%s">', esc_attr($this->get_settings_for_display('show_username')));
       printf('<input type="hidden" name="lakit_field_pwd" value="%s">', esc_attr($this->get_settings_for_display('show_password')));
       printf('<input type="hidden" name="lakit_field_cpwd" value="%s">', esc_attr($this->get_settings_for_display('confirm_password')));
       if( lastudio_kit_integration()->is_active_recaptchav3() ){

@@ -248,7 +248,7 @@ class Module extends Module_Base {
     }
 
     /**
-     * Serch page
+     * Search page
      *
      * @return [type] [description]
      */
@@ -267,7 +267,7 @@ class Module extends Module_Base {
     }
 
     /**
-     * Serch post
+     * Search post
      *
      * @return [type] [description]
      */
@@ -289,7 +289,7 @@ class Module extends Module_Base {
     }
 
     /**
-     * Serch category
+     * Search category
      *
      * @return [type] [description]
      */
@@ -309,7 +309,7 @@ class Module extends Module_Base {
     }
 
     /**
-     * Serch tag
+     * Search tag
      *
      * @return [type] [description]
      */
@@ -325,7 +325,7 @@ class Module extends Module_Base {
     }
 
     /**
-     * Serach terms from passed taxonomies
+     * Search terms from passed taxonomies
      * @return [type] [description]
      */
     public function search_terms() {
@@ -415,7 +415,7 @@ class Module extends Module_Base {
     }
 
     public function maybeRenderSVGSpriteIcon( $icon = '', $type = '' ){
-        if(empty($type) || empty($type)){
+        if(empty($icon) || empty($type)){
             return '';
         }
         $tmp = explode(' ', $icon);
@@ -439,10 +439,10 @@ class Module extends Module_Base {
             $_d = $svgData[$type][$icon][4];
 
             $show_source = false;
-            if( wp_doing_ajax() || lastudio_kit()->elementor()->editor->is_edit_mode() || lastudio_kit()->elementor()->experiments->is_feature_active( 'e_element_cache' ) ){
+            $is_shortcode = apply_filters( 'elementor/element/should_render_shortcode', false );
+            if( $is_shortcode || wp_doing_ajax() || lastudio_kit()->elementor()->editor->is_edit_mode() || \LaStudio_Kit_Helper::is_active_elementor_cache() ){
                 $show_source = true;
             }
-
             if( $show_source ) {
                 $output = sprintf('<svg xmlns="http://www.w3.org/2000/svg" width="%1$s" height="%2$s" viewBox="0 0 %1$s %2$s" class="lakit-font-icon-svg" data-icon-name="%5$s" data-icon-type="%4$s"><path d="%3$s" fill="currentColor"/></svg>', $_w, $_h, $_d, $type, $icon);
             }

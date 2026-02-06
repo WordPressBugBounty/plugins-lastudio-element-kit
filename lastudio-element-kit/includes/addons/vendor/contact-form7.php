@@ -46,6 +46,10 @@ class LaStudioKit_Contact_Form7 extends LaStudioKit_Base {
             $active_form = array_keys( $available_forms )[0];
         }
 
+        $input_selector = '.wpcf7 .wpcf7-form-control:not(.wpcf7-submit, .wpcf7-acceptance, .wpcf7-checkbox, .wpcf7-radio)';
+        $input_selector_focus = '.wpcf7 .wpcf7-form-control:not(.wpcf7-submit, .wpcf7-acceptance, .wpcf7-checkbox, .wpcf7-radio):focus';
+        $input_selector_invalid = '.wpcf7 .wpcf7-form-control:not(.wpcf7-submit, .wpcf7-acceptance, .wpcf7-checkbox, .wpcf7-radio).wpcf7-not-valid';
+
         $this->add_control( 'form_shortcode', array(
             'label'   => esc_html__( 'Select Form', 'lastudio-kit' ),
             'type'    => Controls_Manager::SELECT,
@@ -173,7 +177,7 @@ class LaStudioKit_Contact_Form7 extends LaStudioKit_Base {
             Group_Control_Background::get_type(),
             array(
                 'name'     => 'input_background',
-                'selector' => '{{WRAPPER}} .wpcf7 .wpcf7-form-control:not(.wpcf7-submit):not([type="checkbox"]):not([type="radio"]):not(.wpcf7-acceptance)',
+                'selector' => '{{WRAPPER}} ' . $input_selector,
             )
         );
 
@@ -183,7 +187,7 @@ class LaStudioKit_Contact_Form7 extends LaStudioKit_Base {
                 'label'     => esc_html__( 'Color', 'lastudio-kit' ),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => array(
-                    '{{WRAPPER}} .wpcf7 .wpcf7-form-control:not(.wpcf7-submit):not([type="checkbox"]):not([type="radio"])' => 'color: {{VALUE}}',
+                    '{{WRAPPER}} ' . $input_selector => 'color: {{VALUE}}',
                 ),
             )
         );
@@ -205,7 +209,7 @@ class LaStudioKit_Contact_Form7 extends LaStudioKit_Base {
             Group_Control_Typography::get_type(),
             array(
                 'name'     => 'input_typography',
-                'selector' => '{{WRAPPER}} .wpcf7 .wpcf7-form-control:not(.wpcf7-submit):not([type="checkbox"]):not([type="radio"])',
+                'selector' => '{{WRAPPER}} ' . $input_selector,
             )
         );
 
@@ -216,7 +220,7 @@ class LaStudioKit_Contact_Form7 extends LaStudioKit_Base {
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => array( 'px', '%', 'em' ),
                 'selectors'  => array(
-                    '{{WRAPPER}} .wpcf7 .wpcf7-form-control:not(.wpcf7-submit):not([type="checkbox"]):not([type="radio"])' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} ' . $input_selector => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ),
             )
         );
@@ -239,7 +243,7 @@ class LaStudioKit_Contact_Form7 extends LaStudioKit_Base {
                 'name'           => 'input_border',
                 'label'          => esc_html__( 'Border', 'lastudio-kit' ),
                 'placeholder'    => '1px',
-                'selector'       => '{{WRAPPER}} .wpcf7 .wpcf7-form-control:not(.wpcf7-submit):not([type="checkbox"]):not([type="radio"]):not(.wpcf7-acceptance)',
+                'selector'       => '{{WRAPPER}} ' . $input_selector,
             )
         );
 
@@ -250,7 +254,7 @@ class LaStudioKit_Contact_Form7 extends LaStudioKit_Base {
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => array( 'px', '%' ),
                 'selectors'  => array(
-                    '{{WRAPPER}} .wpcf7 .wpcf7-form-control:not(.wpcf7-submit):not([type="checkbox"]):not([type="radio"]):not(.wpcf7-acceptance)' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} ' . $input_selector => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ),
             )
         );
@@ -259,7 +263,7 @@ class LaStudioKit_Contact_Form7 extends LaStudioKit_Base {
             Group_Control_Box_Shadow::get_type(),
             array(
                 'name'     => 'input_box_shadow',
-                'selector' => '{{WRAPPER}} .wpcf7 .wpcf7-form-control:not(.wpcf7-submit):not([type="checkbox"]):not([type="radio"]):not(.wpcf7-acceptance)',
+                'selector' => '{{WRAPPER}} ' . $input_selector,
             )
         );
 
@@ -276,7 +280,7 @@ class LaStudioKit_Contact_Form7 extends LaStudioKit_Base {
             Group_Control_Background::get_type(),
             array(
                 'name'     => 'input_focus_background',
-                'selector' => '{{WRAPPER}} .wpcf7 .wpcf7-form-control:not(.wpcf7-submit):not([type="checkbox"]):not([type="radio"]):not(.wpcf7-acceptance):focus',
+                'selector' => '{{WRAPPER}} '. $input_selector_focus,
             )
         );
 
@@ -286,7 +290,7 @@ class LaStudioKit_Contact_Form7 extends LaStudioKit_Base {
                 'label'     => esc_html__( 'Color', 'lastudio-kit' ),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => array(
-                    '{{WRAPPER}} .wpcf7 .wpcf7-form-control:not(.wpcf7-submit):not([type="checkbox"]):not([type="radio"]):not(.wpcf7-acceptance):focus' => 'color: {{VALUE}}',
+                    '{{WRAPPER}} ' . $input_selector_focus => 'color: {{VALUE}}',
                 ),
             )
         );
@@ -310,7 +314,7 @@ class LaStudioKit_Contact_Form7 extends LaStudioKit_Base {
                 'name'           => 'input_focus_border',
                 'label'          => esc_html__( 'Border', 'lastudio-kit' ),
                 'placeholder'    => '1px',
-                'selector'       => '{{WRAPPER}} .wpcf7 .wpcf7-form-control:not(.wpcf7-submit):not([type="checkbox"]):not([type="radio"]):not(.wpcf7-acceptance):focus',
+                'selector'       => '{{WRAPPER}} ' . $input_selector_focus,
             )
         );
 
@@ -318,7 +322,7 @@ class LaStudioKit_Contact_Form7 extends LaStudioKit_Base {
             Group_Control_Box_Shadow::get_type(),
             array(
                 'name'     => 'input_focus_box_shadow',
-                'selector' => '{{WRAPPER}} .wpcf7 .wpcf7-form-control:not(.wpcf7-submit):not([type="checkbox"]):not([type="radio"]):not(.wpcf7-acceptance):focus',
+                'selector' => '{{WRAPPER}} ' . $input_selector_focus,
             )
         );
 
@@ -335,7 +339,7 @@ class LaStudioKit_Contact_Form7 extends LaStudioKit_Base {
             Group_Control_Background::get_type(),
             array(
                 'name'     => 'input_invalid_background',
-                'selector' => '{{WRAPPER}} .wpcf7 .wpcf7-form-control:not(.wpcf7-submit):not([type="checkbox"]):not([type="radio"]).wpcf7-not-valid',
+                'selector' => '{{WRAPPER}} ' . $input_selector_invalid,
             )
         );
 
@@ -345,7 +349,7 @@ class LaStudioKit_Contact_Form7 extends LaStudioKit_Base {
                 'label'     => esc_html__( 'Color', 'lastudio-kit' ),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => array(
-                    '{{WRAPPER}} .wpcf7 .wpcf7-form-control:not(.wpcf7-submit):not([type="checkbox"]):not([type="radio"]).wpcf7-not-valid' => 'color: {{VALUE}}',
+                    '{{WRAPPER}} ' . $input_selector_invalid,
                 ),
             )
         );
@@ -356,7 +360,7 @@ class LaStudioKit_Contact_Form7 extends LaStudioKit_Base {
                 'name'           => 'input_invalid_border',
                 'label'          => esc_html__( 'Border', 'lastudio-kit' ),
                 'placeholder'    => '1px',
-                'selector'       => '{{WRAPPER}} .wpcf7 .wpcf7-form-control:not(.wpcf7-submit):not([type="checkbox"]):not([type="radio"]).wpcf7-not-valid',
+                'selector'       => '{{WRAPPER}} ' . $input_selector_invalid,
             )
         );
 
@@ -364,7 +368,7 @@ class LaStudioKit_Contact_Form7 extends LaStudioKit_Base {
             Group_Control_Box_Shadow::get_type(),
             array(
                 'name'     => 'input_invalid_box_shadow',
-                'selector' => '{{WRAPPER}} .wpcf7 .wpcf7-form-control:not(.wpcf7-submit):not([type="checkbox"]):not([type="radio"]).wpcf7-not-valid',
+                'selector' => '{{WRAPPER}} ' . $input_selector_invalid,
             )
         );
 

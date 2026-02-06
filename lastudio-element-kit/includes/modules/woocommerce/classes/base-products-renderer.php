@@ -224,6 +224,7 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
         }
 
         \wc_set_loop_prop('lakit_unique_id', $this->settings['unique_id']);
+        \wc_set_loop_prop('lakit_widget_id', $this->settings['widget_id']);
         \wc_set_loop_prop('lakit_paginate', $this->settings['paginate']);
 
         if( !lastudio_kit()->get_theme_support('elementor::product-grid-v2') ) {
@@ -232,7 +233,11 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
         }
         \wc_set_loop_prop('lakit_paginate_as_loadmore', $this->settings['paginate_as_loadmore']);
         \wc_set_loop_prop('lakit_loadmore_text', $this->settings['loadmore_text']);
-        \wc_set_loop_prop('lakit_paginate_infinite', isset($this->settings['paginate_infinite']) ? $this->settings['paginate_infinite'] : '');
+        \wc_set_loop_prop('lakit_paginate_infinite', $this->settings['paginate_infinite'] ?? '');
+        \wc_set_loop_prop('lakit_countdown_label_day', $this->settings['countdown_label_day'] ?? '');
+        \wc_set_loop_prop('lakit_countdown_label_hour', $this->settings['countdown_label_hour'] ?? '');
+        \wc_set_loop_prop('lakit_countdown_label_minute', $this->settings['countdown_label_minute'] ?? '');
+        \wc_set_loop_prop('lakit_countdown_label_second', $this->settings['countdown_label_second'] ?? '');
 
 //        \wc_set_loop_prop('is_filtered', \is_filtered());
     }
@@ -339,7 +344,8 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
     }
 
     public function loop_item_thumbnail_overlay(){
-        echo '<span class="item--overlay"></span>';
+        global $product;
+        echo '<span class="item--overlay"></span><span class="screen-reader-text">'. esc_html($product->get_title()) .'</span>';
     }
 
     public function loop_item_info_open(){
@@ -489,7 +495,7 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
 
     public function add_zone_image(){
 
-        $unique_id = !empty($this->settings['widget_id']) ? $this->settings['widget_id'] : '';
+        $unique_id = wc_get_loop_prop('lakit_unique_id');
 
         $zone_1 = $this->get_setting_zone_content('product_image_zone_1');
         $zone_2 = $this->get_setting_zone_content('product_image_zone_2');
@@ -505,7 +511,7 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
     }
 
     public function add_zone_content(){
-        $unique_id = !empty($this->settings['widget_id']) ? $this->settings['widget_id'] : '';
+        $unique_id = wc_get_loop_prop('lakit_unique_id');
         $zone_content = $this->get_setting_zone_content('product_content_zone');
         $zone_4_hide_on = !empty($this->get_setting_zone_content('zone_4_hide_on')) ? ' elementor-hidden-' . join(' elementor-hidden-', $this->get_setting_zone_content('zone_4_hide_on')) : '';
         echo $this->render_zone_content($zone_content, 'lakitp-zone lakitp-zone-d'. $zone_4_hide_on, 'lakit-tooltip-zone-d--id-' . $unique_id); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
@@ -617,10 +623,10 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
 
                 case 'product_countdown':
                     $item_html = $this->v2_loop_countdown($el_class, [
-                        'days' => $this->get_widget_setting('countdown_label_day'),
-                        'hours' => $this->get_widget_setting('countdown_label_hour'),
-                        'minutes' => $this->get_widget_setting('countdown_label_minute'),
-                        'seconds' => $this->get_widget_setting('countdown_label_second'),
+                        'days' => wc_get_loop_prop('lakit_countdown_label_day'),
+                        'hours' => wc_get_loop_prop('lakit_countdown_label_hour'),
+                        'minutes' => wc_get_loop_prop('lakit_countdown_label_minute'),
+                        'seconds' => wc_get_loop_prop('lakit_countdown_label_second'),
                     ]);
                     $html .= apply_filters('lastudio-kit/products/zone_item_html', $item_html, $el_class, $setting);
                     break;
@@ -698,12 +704,14 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
             $button_class .= ' lakit--hint';
         }
 
+        $arial_label = sprintf(_x( 'Toggle actions for &ldquo;%1$s&rdquo;', 'button arial label', 'lastudio-kit' ), $product->get_title());
         return apply_filters('lastudio-kit/products/loop/toggle-button', sprintf(
-            '<a class="%1$s" href="%2$s" data-hint="%3$s" rel="nofollow">%4$s</a>',
+            '<a class="%1$s" href="%2$s" data-hint="%3$s" rel="nofollow" aria-label="%5$s">%4$s</a>',
             esc_attr($button_class),
             esc_url( $product->get_permalink() ),
             esc_attr($button_text),
-            $button_icon
+            $button_icon,
+            esc_url($arial_label)
         ), $product, $args);
     }
 
@@ -777,8 +785,10 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
         }
         $button_class = apply_filters('lastudio-kit/products/loop/wishlist-button/class', $button_class);
 
+        $arial_label = sprintf(_x( '%1$s for &ldquo;%2$s&rdquo;', 'button arial label', 'lastudio-kit' ), $button_text, $product->get_title());
+
         return apply_filters('lastudio-kit/products/loop/wishlist-button', sprintf(
-            '<a class="%1$s" href="%2$s" data-hint="%3$s" rel="nofollow" data-product_title="%4$s" data-product_id="%5$s" data-tip-class="%8$s">%7$s<span class="lakit-btn--text">%6$s</span></a>',
+            '<a class="%1$s" href="%2$s" data-hint="%3$s" rel="nofollow" data-product_title="%4$s" data-product_id="%5$s" data-tip-class="%8$s" aria-label="%9$s">%7$s<span class="lakit-btn--text">%6$s</span></a>',
             esc_attr($button_class),
             esc_url( $product->get_permalink() ),
             esc_attr($button_text),
@@ -786,7 +796,8 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
             esc_attr($product->get_id()),
             esc_attr($button_text),
             $button_icon,
-            $args['tip_class']
+            $args['tip_class'],
+            esc_attr($arial_label),
         ), $product, $args);
     }
 
@@ -800,9 +811,9 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
             $button_class .= ' lakit--hint';
         }
         $button_class = apply_filters('lastudio-kit/products/loop/compare-button/class', $button_class);
-
+        $arial_label = sprintf(_x( '%1$s for &ldquo;%2$s&rdquo;', 'button arial label', 'lastudio-kit' ), $button_text, $product->get_title());
         return apply_filters('lastudio-kit/products/loop/compare-button', sprintf(
-            '<a class="%1$s" href="%2$s" data-hint="%3$s" rel="nofollow" data-product_title="%4$s" data-product_id="%5$s" data-tip-class="%8$s">%7$s<span class="lakit-btn--text">%6$s</span></a>',
+            '<a class="%1$s" href="%2$s" data-hint="%3$s" rel="nofollow" data-product_title="%4$s" data-product_id="%5$s" data-tip-class="%8$s" aria-label="%9$s">%7$s<span class="lakit-btn--text">%6$s</span></a>',
             esc_attr($button_class),
             esc_url( $product->get_permalink() ),
             esc_attr($button_text),
@@ -810,7 +821,8 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
             esc_attr($product->get_id()),
             esc_attr($button_text),
             $button_icon,
-            $args['tip_class']
+            $args['tip_class'],
+            $arial_label
         ), $product, $args);
     }
 
@@ -825,9 +837,9 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
             $button_class .= ' lakit--hint';
         }
         $button_class = apply_filters('lastudio-kit/products/loop/quickview-button/class', $button_class);
-
+        $arial_label = sprintf(_x( '%1$s for &ldquo;%2$s&rdquo;', 'button arial label', 'lastudio-kit' ), $button_text, $product->get_title());
         return apply_filters('lastudio-kit/products/loop/quickview-button', sprintf(
-            '<a class="%1$s" href="%2$s" data-href="%8$s" data-hint="%3$s" rel="nofollow" data-product_title="%4$s" data-product_id="%5$s" data-tip-class="%9$s">%7$s<span class="lakit-btn--text">%6$s</span></a>',
+            '<a class="%1$s" href="%2$s" data-href="%8$s" data-hint="%3$s" rel="nofollow" data-product_title="%4$s" data-product_id="%5$s" data-tip-class="%9$s" aria-label="%10$s">%7$s<span class="lakit-btn--text">%6$s</span></a>',
             esc_attr($button_class),
             esc_url( $product->get_permalink() ),
             esc_attr($button_text),
@@ -836,7 +848,8 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
             esc_attr($button_text),
             $button_icon,
             esc_url(add_query_arg('product_quickview', $product->get_id(), $product->get_permalink())),
-            $args['tip_class']
+            $args['tip_class'],
+            $arial_label,
         ), $product, $args);
     }
 
@@ -950,7 +963,11 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
     }
 
     private function v2_loop_countdown( $elClass = '', $labels = [] ){
+        /**
+         * @var \WC_Product $product
+         */
         global $product;
+
         $html = '';
         if( $product->is_on_sale() ){
             $sale_price_dates_to = $product->get_date_on_sale_to() && ( $date = $product->get_date_on_sale_to()->getOffsetTimestamp() ) ? $date : '';
@@ -975,6 +992,42 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
                 );
             }
         }
+
+        if( empty($html) ){
+            $lakit_countdown_start  = $product->get_meta( '_la_product_countdown_start' );
+            $lakit_countdown_end    = $product->get_meta( '_la_product_countdown_end' );
+            $now = current_time('timestamp');
+            $end_date = '';
+            if($now > $lakit_countdown_start && $now < $lakit_countdown_end){
+                $end_date = $lakit_countdown_end;
+            }
+            elseif ($now < $lakit_countdown_end){
+                $end_date = $lakit_countdown_end;
+            }
+
+            $end_date = apply_filters('lastudio-kit/products/loop/countdown-timer', $end_date, $product);
+
+            if(!empty($end_date)){
+                $day = '';
+                $tpl = '<div class="lakit-countdown-timer__item item-%1$s"><div class="lakit-countdown-timer__item-value" data-value="%1$s">%2$s</div><div class="lakit-countdown-timer__item-label">%3$s</div></div>';
+                $digit_placeholder = '<span class="lakit-countdown-timer__digit">0</span>';
+                if($end_date - $now > 86400){
+                    $day = sprintf($tpl, 'days', $digit_placeholder, !empty($labels['days']) ? $labels['days'] : esc_html__('Days', 'lastudio-kit'));
+                }
+                $hour = sprintf($tpl, 'hours', $digit_placeholder, !empty($labels['hours']) ? $labels['hours'] : esc_html__('Hrs', 'lastudio-kit'));
+                $min = sprintf($tpl, 'minutes', $digit_placeholder, !empty($labels['minutes']) ? $labels['minutes'] : esc_html__('Mins', 'lastudio-kit'));
+                $sec = sprintf($tpl, 'seconds', $digit_placeholder, !empty($labels['seconds']) ? $labels['seconds'] : esc_html__('Secs', 'lastudio-kit'));
+
+                $html = sprintf(
+                    '<div class="%1$s lakitp-zone-item product_item--countdown"><div class="lakit-countdown-timer" data-due-date="%2$s" data-show-days="%4$s">%3$s</div></div>',
+                    $elClass,
+                    $end_date,
+                    ($day . $hour . $min . $sec),
+                    !empty($day) ? 'yes' : 'no'
+                );
+            }
+        }
+
         return $html;
     }
 

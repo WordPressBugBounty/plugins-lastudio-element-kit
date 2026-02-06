@@ -208,8 +208,6 @@
 
     function la_update_swatches_gallery($form, variation ){
 
-        console.log('here1', variation)
-
         var $product_selector = $form.closest('.product'),
             $main_image_col = $product_selector.find('.woocommerce-product-gallery.images').parent(),
             _html = '',
@@ -677,78 +675,84 @@
         }
     }
 
-    $(function () {
-        let forms = [];
+    let forms = [];
 
-        $(document).on('mouseenter','.product_item .lakit-swatch-control .swatch-wrapper', function(e){
-            e.preventDefault();
-            let $swatch_control = $(this),
-                $image = $swatch_control.closest('.product_item').find('.p_img-first img').first(),
-                $btn_cart = $swatch_control.closest('.product_item').find('.la-addcart'),
-                $product_link = $swatch_control.closest('.product_item').find('.woocommerce-loop-product__link, .product_item--title a');
-
-            if($swatch_control.hasClass('selected')) return;
-            $swatch_control.addClass('selected').siblings().removeClass('selected');
-            if(!$image.hasClass('--has-changed')){
-                $image.attr('data-o-src', $image.attr('src')).attr('data-o-sizes', $image.attr('sizes')).attr('data-o-srcset', $image.attr('srcset')).addClass('--has-changed');
-            }
-            $image.attr('src', ($swatch_control.attr('data-thumb') ? $swatch_control.attr('data-thumb') : $image.attr('data-o-src'))).removeAttr('sizes srcset');
-            if($btn_cart.length > 0){
-                let _href = $btn_cart.attr('href');
-                _href = addQueryArg(_href, 'attribute_' + $swatch_control.attr('data-attribute'), $swatch_control.attr('data-value'));
-                $btn_cart.attr('href', _href);
-            }
-            if($product_link.length > 0){
-                let _href = $product_link.eq(0).attr('href');
-                _href = addQueryArg(_href, 'attribute_' + $swatch_control.attr('data-attribute'), $swatch_control.attr('data-value'));
-                $product_link.attr('href', _href);
-            }
-        })
-
-        $(document).on('wc_variation_form', 'form.variations_form',  function (e) {
-            let $form = $(e.target);
-            forms.push($form);
-            if ( !$form.data('lakit_has_swatches_form') ) {
-                if ($form.find('.swatch-control').length) {
-                    $form.data('lakit_has_swatches_form', true);
-                    $form.lakit_variation_form();
-                    $form.trigger('bind_calculator');
-                    $form.on('reload_product_variations', function () {
-                        for (var i = 0; i < forms.length; i++) {
-                            forms[i].trigger('woocommerce_variation_has_changed');
-                            forms[i].trigger('bind_calculator');
-                            forms[i].trigger('woocommerce_variation_has_changed');
-                        }
-                    })
-                }
-            }
-        });
-
-        $(document).on('lastudio-kit/ajax-loadmore/success lastudio-kit/ajax-pagination/success lastudio-kit/ajax-load-template/after lastudio-kit/carousel/init_success lastudio-kit/hamburger/after', function (e, data){
-            $('form.variations_form').trigger('wc_variation_form');
-            let max_item = parseInt(LaStudioKitSettings.i18n.swatches_max_item) || 0;
-            if(max_item > 0){
-                $('.lakit-swatch-control', data.parentContainer).each(function (){
-                    if( $('.swatch-wrapper-more', $(this)).length === 0 ){
-                        let p_link = $(this).closest('.product_item').find('a.woocommerce-loop-product__link').first().attr('href')
-                        $('.swatch-wrapper', $(this)).eq(max_item).before('<div class="swatch-wrapper-more"><a href="'+p_link+'"><i class="lastudioicon-i-add"></i><span>'+LaStudioKitSettings.i18n.swatches_more_text+'</span></a></div>');
+    $(document).on('wc_variation_form', 'form.variations_form',  function (e) {
+        let $form = $(e.target);
+        forms.push($form);
+        if ( !$form.data('lakit_has_swatches_form') ) {
+            if ($form.find('.swatch-control').length) {
+                $form.data('lakit_has_swatches_form', true);
+                $form.lakit_variation_form();
+                $form.trigger('bind_calculator');
+                $form.on('reload_product_variations', function () {
+                    for (var i = 0; i < forms.length; i++) {
+                        forms[i].trigger('woocommerce_variation_has_changed');
+                        forms[i].trigger('bind_calculator');
+                        forms[i].trigger('woocommerce_variation_has_changed');
                     }
                 })
             }
-        });
+        }
+    });
 
-        $(window).on('elementor/frontend/init', function (){
-            window.elementorFrontend.hooks.addAction('frontend/element_ready/lakit-wooproducts.default', function ($scope) {
-                let max_item = parseInt(LaStudioKitSettings.i18n.swatches_max_item) || 0;
-                if(max_item > 0){
-                    $scope.find('.lakit-swatch-control').each(function (){
-                        if( $('.swatch-wrapper-more', $(this)).length === 0 ) {
-                            let p_link = $(this).closest('.product_item').find('a.woocommerce-loop-product__link').first().attr('href')
-                            $('.swatch-wrapper', $(this)).eq(max_item).before('<div class="swatch-wrapper-more"><a href="' + p_link + '"><i class="lastudioicon-i-add"></i><span>' + LaStudioKitSettings.i18n.swatches_more_text + '</span></a></div>');
-                        }
-                    })
+    $(document).on('mouseenter','.product_item .lakit-swatch-control .swatch-wrapper', function(e){
+        e.preventDefault();
+        let $swatch_control = $(this),
+            $image = $swatch_control.closest('.product_item').find('.p_img-first img').first(),
+            $btn_cart = $swatch_control.closest('.product_item').find('.la-addcart'),
+            $product_link = $swatch_control.closest('.product_item').find('.woocommerce-loop-product__link, .product_item--title a');
+
+        if($swatch_control.hasClass('selected')) return;
+        $swatch_control.addClass('selected').siblings().removeClass('selected');
+        if(!$image.hasClass('--has-changed')){
+            $image.attr('data-o-src', $image.attr('src')).attr('data-o-sizes', $image.attr('sizes')).attr('data-o-srcset', $image.attr('srcset')).addClass('--has-changed');
+        }
+        const newImgSrc = $swatch_control.attr('data-thumb') ? $swatch_control.attr('data-thumb') : $image.attr('data-o-src')
+        if(newImgSrc !== $image.attr('src')){
+            $image.attr('src', newImgSrc).removeAttr('sizes srcset');
+        }
+        if($btn_cart.length > 0){
+            let _href = $btn_cart.attr('href');
+            _href = addQueryArg(_href, 'attribute_' + $swatch_control.attr('data-attribute'), $swatch_control.attr('data-value'));
+            $btn_cart.attr('href', _href);
+        }
+        if($product_link.length > 0){
+            let _href = $product_link.eq(0).attr('href');
+            _href = addQueryArg(_href, 'attribute_' + $swatch_control.attr('data-attribute'), $swatch_control.attr('data-value'));
+            $product_link.attr('href', _href);
+        }
+    })
+
+    const renderMoreText = ( $parentSelector ) => {
+        let max_item = parseInt(LaStudioKitSettings.i18n.swatches_max_item) || 0;
+        let moreHTML = '<i class="lastudioicon-i-add"></i>'
+        if(LaStudioKitSettings.i18n.swatches_more_text){
+            moreHTML += `<span>${LaStudioKitSettings.i18n.swatches_more_text}</span>`
+        }
+        if(max_item > 0 && $parentSelector.length > 0){
+            $parentSelector.each(function (){
+                if( $('.swatch-wrapper-more', $(this)).length === 0 ){
+                    let p_link = $(this).closest('.product_item').find('a.woocommerce-loop-product__link').first().attr('href')
+                    $('.swatch-wrapper', $(this)).eq(max_item).before(`<div class="swatch-wrapper-more"><a href="${p_link}">${moreHTML}</a></div>`);
                 }
-            });
+            })
+        }
+    }
+
+    $(document).on('LaStudioTheme:AjaxShopFilter:success', function (e, data){
+        $('form.variations_form').trigger('wc_variation_form');
+        renderMoreText($('.lakit-swatch-control', data.parentContainer))
+    })
+
+    $(document).on('lastudio-kit/ajax-loadmore/success lastudio-kit/ajax-pagination/success lastudio-kit/ajax-load-template/after lastudio-kit/carousel/init_success lastudio-kit/hamburger/after', function (e, data){
+        $('form.variations_form').trigger('wc_variation_form');
+        renderMoreText($('.lakit-swatch-control', data.parentContainer))
+    });
+
+    $(window).on('elementor/frontend/init', function (){
+        window.elementorFrontend.hooks.addAction('frontend/element_ready/lakit-wooproducts.default', function ($scope) {
+            renderMoreText($scope.find('.lakit-swatch-control'))
         });
     });
 

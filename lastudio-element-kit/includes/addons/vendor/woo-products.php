@@ -89,6 +89,7 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
                             'featured' => esc_html__( 'Featured', 'lastudio-kit' ),
                             'related' => esc_html__( 'Related', 'lastudio-kit' ),
                             'upsells' => esc_html__( 'Up-Sells', 'lastudio-kit' ),
+                            'crosssells' => esc_html__( 'Cross-Sells', 'lastudio-kit' ),
                             'by_id' => esc_html_x( 'Manual Selection', 'Posts Query Control', 'lastudio-kit' ),
                         ],
                     ],
@@ -5680,16 +5681,63 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
                 'tab' => Controls_Manager::TAB_STYLE,
             ]
         );
+        $this->add_control(
+            'countdown_box_bg',
+            [
+                'label' => esc_html__( 'Background Color', 'lastudio-kit' ),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .product_item--countdown' => 'background-color: {{VALUE}}',
+                ]
+            ]
+        );
+        $this->add_responsive_control(
+            'countdown_padding',
+            [
+                'label' => esc_html__( 'Padding', 'lastudio-kit' ),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', 'em' ],
+                'selectors' => [
+                    '{{WRAPPER}} .product_item--countdown' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}',
+                ]
+            ]
+        );
 
         $this->add_responsive_control(
             'countdown_spacing',
             [
                 'label' => esc_html__( 'Margin', 'lastudio-kit' ),
                 'type' => Controls_Manager::DIMENSIONS,
-                'size_units' => [ 'px', 'em' ],
+                'size_units' => [ 'px', 'em', 'custom' ],
                 'selectors' => [
                     '{{WRAPPER}} .product_item--countdown' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}',
                 ]
+            ]
+        );
+        $this->add_group_control(
+            Group_Control_Border::get_type(),
+            [
+                'name' => 'countdown_border',
+                'selector' => '{{WRAPPER}} .product_item--countdown',
+            ]
+        );
+
+        $this->add_responsive_control(
+            'countdown_radius',
+            [
+                'label' => esc_html__( 'Border Radius', 'lastudio-kit' ),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', '%' ],
+                'selectors' => [
+                    '{{WRAPPER}} .product_item--countdown' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}; overflow: hidden',
+                ],
+            ]
+        );
+        $this->add_group_control(
+            Group_Control_Box_Shadow::get_type(),
+            [
+                'name' => 'countdown_shadow',
+                'selector' => '{{WRAPPER}} .product_item--countdown',
             ]
         );
 
@@ -5742,6 +5790,17 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
                 'selectors' => [
                     '{{WRAPPER}}' => '--lakit-zone--countdown-padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}',
                 ]
+            ]
+        );
+        $this->add_responsive_control(
+            'countdown_item_radius',
+            [
+                'label' => esc_html__( 'Border Radius', 'lastudio-kit' ),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', '%' ],
+                'selectors' => [
+                    '{{WRAPPER}} .lakit-countdown-timer__item' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}; overflow: hidden',
+                ],
             ]
         );
 
@@ -5807,6 +5866,27 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
                 'selectors' => [
                     '{{WRAPPER}}' => '--lakit-zone--countdown-label-color: {{VALUE}}',
                 ]
+            ]
+        );
+        $this->_add_responsive_control(
+            'countdown_label_layout',
+            [
+                'label' => esc_html_x( 'Layout', 'Flex Container Control', 'lastudio-kit'),
+                'type' => Controls_Manager::CHOOSE,
+                'options' => [
+                    'row' => [
+                        'title' => esc_html_x( 'Inline', 'Flex Container Control', 'lastudio-kit' ),
+                        'icon' => 'eicon-arrow-right',
+                    ],
+                    'column' => [
+                        'title' => esc_html_x( 'Block', 'Flex Container Control', 'lastudio-kit' ),
+                        'icon' => 'eicon-arrow-down',
+                    ],
+                ],
+                'default' => '',
+                'selectors' => [
+                    '{{WRAPPER}}' => '--lakit-zone--countdown-direction: {{VALUE}};',
+                ],
             ]
         );
 
@@ -6025,7 +6105,7 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
 
     protected function render() {
 
-		$w_id = esc_attr($this->get_id());
+		$w_id = \esc_attr($this->get_id());
 
         if(self::$__called_item == $w_id){
             self::$__called_index++;

@@ -142,7 +142,7 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
 		$bn_title = $this->_loop_item( ['title'] );
 		if(!empty($image_data[0])){
 			$giflazy = $image_data[0];
-			$srcset = sprintf('width="%1$d" height="%2$d" alt="%4$s" style="--img-height:%3$dpx"', $image_data[1], $image_data[2], $image_data[2], esc_attr(!empty($image_data[3]) ? $image_data[3] : $bn_title));
+			$srcset = sprintf('width="%1$d" height="%2$d" alt="%4$s" style="--img-height:%3$dpx"', $image_data[1], $image_data[2], $image_data[2], esc_attr(!empty($image_data[3]) ? $image_data[3] : ''));
 			$_img_html = sprintf( apply_filters('lastudio-kit/banner-list/image-format', '<img src="%1$s" loading="lazy" class="%3$s" %4$s>'), $giflazy, $image_data[0], 'lakit-bannerlist__image-instance' , $srcset);
 			$html = sprintf($format, $_img_html);
 		}

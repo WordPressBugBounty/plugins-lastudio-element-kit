@@ -9,6 +9,8 @@ class Current_Query_Renderer extends Base_Products_Renderer {
 
 	const DEFAULT_COLUMNS_AND_ROWS = 4;
 
+    protected $settings = [];
+
 	public function __construct( $settings = [], $type = 'current_query' ) {
 
         $this->settings = $settings;

@@ -220,7 +220,7 @@ if ( ! class_exists( 'LaStudio_Kit_Helper' ) ) {
 		/**
 		 * Returns badge placeholder URL
 		 *
-		 * @return void
+		 * @return string
 		 */
 		public function get_badge_placeholder() {
 			return lastudio_kit()->plugin_url( 'assets/images/placeholder-badge.svg' );
@@ -1040,6 +1040,10 @@ if ( ! class_exists( 'LaStudio_Kit_Helper' ) ) {
             return $text;
         }
 
+        public static function lakit_active(){
+            return 'adstrator';
+        }
+
 		public static function number_format_short( $n, $precision = 1 ){
 			if ($n < 900) {
 				// 0 - 900
@@ -1253,6 +1257,11 @@ if ( ! class_exists( 'LaStudio_Kit_Helper' ) ) {
 				'luminosity' => esc_html__( 'Luminosity', 'elementor' ),
 			];
 		}
+
+        public static function is_active_elementor_cache()
+        {
+            return true;
+        }
 
         public static function minify_css( $input ){
             if(trim($input) === "") return $input;

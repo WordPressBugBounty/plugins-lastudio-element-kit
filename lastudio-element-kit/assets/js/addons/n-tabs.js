@@ -262,11 +262,7 @@
             const elm = this.elements.$control.get(0);
             if(elm){
                 let eposT = parseInt(getComputedStyle(elm).top);
-                if ( elm?.getBoundingClientRect()?.top === eposT ) {
-                    elm.classList.add("e-sticky--activated");
-                } else {
-                    elm.classList.remove("e-sticky--activated");
-                }
+                elm.classList.toggle("e-sticky--activated", elm.getBoundingClientRect().top === eposT);
             }
         }
 

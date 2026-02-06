@@ -1,0 +1,41 @@
+.lakit-curlang-switcher{
+  position: relative;
+}
+.lakit-curlang-switcher[data-type="inline"]{
+  display: flex;
+  flex-direction: var(--e-switcher-direction, row);
+  gap: var(--e-switcher-item-gap, .5em);
+}
+.switcher-dropdown{
+  flex-direction: column;
+  position: absolute;
+  top: 100%;
+  display: none;
+  opacity: 0;
+  z-index: 9;
+  min-width: 100%;
+  left: var(--e-switcher-dropdown-left, initial);
+  right: var(--e-switcher-dropdown-right, initial);
+  width: var(--e-switcher-dropdown-width, fit-content);
+}
+.lakit-curlang-switcher:hover .switcher-dropdown{
+  display: flex;
+  opacity: 1;
+  gap: var(--e-switcher-item-gap, .5em);
+}
+.switcher-flex-item{
+  display: flex;
+  align-items: center;
+  gap: var(--e-switcher-label-gap, .5em);
+  justify-content: space-between;
+}
+.switcher-flex-item img{
+  width: 1em;
+  order: var(--e-switcher-flag, 0)
+}
+.lakit-curlang-switcher.wcml_currency_switcher a {
+  cursor: pointer;
+}
+.switcher-item .csymbol{
+  order: var(--e-switcher-flag, -1)
+}

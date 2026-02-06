@@ -286,7 +286,7 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
                 'tablet_default' => 2,
                 'mobile_default' => 1,
                 'selectors'      => array(
-                    '{{WRAPPER}} ' . $css_scheme['item'] => 'flex: 0 0 calc(100%/{{VALUE}}); max-width: calc(100%/{{VALUE}});',
+                    '{{WRAPPER}}' => '--htimeline-column: {{VALUE}}',
                 ),
                 'render_type'    => 'template',
             )
@@ -367,8 +367,9 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
                 'type'    => Controls_Manager::SELECT,
                 'default' => 'scroll-bar',
                 'options' => array(
-                    'scroll-bar' => esc_html__( 'Scroll Bar', 'lastudio-kit' ),
-                    'arrows-nav' => esc_html__( 'Arrows Navigation', 'lastudio-kit' ),
+                    'scroll-bar'    => esc_html__( 'Scroll Bar', 'lastudio-kit' ),
+                    'arrows-nav'    => esc_html__( 'Arrows Navigation', 'lastudio-kit' ),
+                    'full-timeline' => esc_html__( 'Full Timeline', 'lastudio-kit' ),
                 )
             )
         );
@@ -429,9 +430,8 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
                     ),
                 ),
                 'selectors' => array(
-                    '{{WRAPPER}} ' . $css_scheme['item'] => 'padding-left: calc({{SIZE}}{{UNIT}}/2); padding-right: calc({{SIZE}}{{UNIT}}/2);',
+                    '{{WRAPPER}}'=> '--htimeline-gap: {{SIZE}}{{UNIT}}',
                 ),
-                'render_type' => 'template',
             )
         );
 
@@ -485,6 +485,21 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
         );
 
         $this->add_responsive_control(
+            'cards_item_width',
+            array(
+                'label' => esc_html__( 'Custom Width', 'lastudio-kit' ),
+                'type'  => Controls_Manager::SLIDER,
+                'size_units' => array( 'px', '%', 'em' ),
+                'selectors'  => array(
+                    '{{WRAPPER}} .lakit-htimeline-item' => '--htimeline-card-item-width: {{SIZE}}{{UNIT}}',
+                ),
+                'condition' => array(
+                    'navigation_type' => 'full-timeline',
+                ),
+            )
+        );
+
+        $this->add_responsive_control(
             'cards_spacing',
             array(
                 'label' => esc_html__( 'Spacing', 'lastudio-kit' ),
@@ -496,8 +511,7 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
                     ),
                 ),
                 'selectors'  => array(
-                    '{{WRAPPER}} .lakit-htimeline-list--top ' . $css_scheme['card'] => 'margin-bottom: {{SIZE}}{{UNIT}};',
-                    '{{WRAPPER}} .lakit-htimeline-list--bottom ' . $css_scheme['card'] => 'margin-top: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}}' => '--htimeline-card-gap: {{SIZE}}{{UNIT}}',
                 ),
                 'separator' => 'after'
             )
@@ -657,7 +671,7 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
                     ),
                 ),
                 'selectors'  => array(
-                    '{{WRAPPER}} ' . $css_scheme['card_arrow'] => 'width:{{SIZE}}{{UNIT}}; height: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}}' => '--htimeline-arrow-size: {{SIZE}}{{UNIT}};'
                 ),
                 'condition' => array(
                     'show_card_arrows' => 'yes',
@@ -678,8 +692,7 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
                     ),
                 ),
                 'selectors'  => array(
-                    '{{WRAPPER}} .lakit-htimeline--align-left ' . $css_scheme['card_arrow'] => 'left: {{SIZE}}{{UNIT}};',
-                    '{{WRAPPER}} .lakit-htimeline--align-right ' . $css_scheme['card_arrow'] => 'right: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}}' => '--htimeline-arrow-offset: {{SIZE}}{{UNIT}};'
                 ),
                 'condition' => array(
                     'show_card_arrows' => 'yes',
@@ -1052,12 +1065,32 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
             )
         );
 
+        $this->add_control(
+            'move_meta2_content',
+            array(
+                'label'   => esc_html__( 'Show meta in content', 'lastudio-kit' ),
+                'type'    => Controls_Manager::SWITCHER,
+                'default' => '',
+                'condition' => array(
+                    'navigation_type' => 'full-timeline',
+                ),
+            )
+        );
+
         $this->add_group_control(
             Group_Control_Typography::get_type(),
             array(
                 'name'     => 'meta_typography',
                 'selector' => '{{WRAPPER}} ' .  $css_scheme['item_meta'],
             )
+        );
+
+        $this->add_group_control(
+            Group_Control_Text_Stroke::get_type(),
+            [
+                'name' => 'meta_text_stroke',
+                'selector' => '{{WRAPPER}} ' .  $css_scheme['item_meta'],
+            ]
         );
 
         $this->add_group_control(
@@ -1090,7 +1123,7 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => array( 'px', '%' ),
                 'selectors'  => array(
-                    '{{WRAPPER}} ' . $css_scheme['item_meta'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}}' => '--htimeline-meta-padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ),
             )
         );
@@ -1107,8 +1140,7 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
                     ),
                 ),
                 'selectors' => array(
-                    '{{WRAPPER}} .lakit-htimeline-list--top ' . $css_scheme['item_meta'] => 'margin-bottom: {{SIZE}}{{UNIT}};',
-                    '{{WRAPPER}} .lakit-htimeline-list--bottom ' . $css_scheme['item_meta'] => 'margin-top: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}}' => '--htimeline-meta-gap: {{SIZE}}{{UNIT}};',
                 ),
                 'separator' => 'after'
             )
@@ -1129,7 +1161,7 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
                 'label'     => esc_html__( 'Color', 'lastudio-kit' ),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => array(
-                    '{{WRAPPER}} ' . $css_scheme['item_meta'] => 'color: {{VALUE}};',
+                    '{{WRAPPER}}' => '--htimeline-meta-color: {{VALUE}};',
                 ),
             )
         );
@@ -1140,7 +1172,7 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
                 'label'     => esc_html__( 'Background Color', 'lastudio-kit' ),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => array(
-                    '{{WRAPPER}} ' . $css_scheme['item_meta'] => 'background-color: {{VALUE}};',
+                    '{{WRAPPER}}' => '--htimeline-meta-bgcolor: {{VALUE}};',
                 ),
             )
         );
@@ -1168,7 +1200,7 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
                 'label'     => esc_html__( 'Color', 'lastudio-kit' ),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => array(
-                    '{{WRAPPER}} ' . $css_scheme['item'] . '.is-hover ' . $css_scheme['item_meta'] => 'color: {{VALUE}};',
+                    '{{WRAPPER}}' => '--htimeline-meta-color-hover: {{VALUE}};',
                 ),
             )
         );
@@ -1179,7 +1211,7 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
                 'label'     => esc_html__( 'Background Color', 'lastudio-kit' ),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => array(
-                    '{{WRAPPER}} ' . $css_scheme['item'] . '.is-hover ' . $css_scheme['item_meta'] => 'background-color: {{VALUE}};',
+                    '{{WRAPPER}}' => '--htimeline-meta-bgcolor-hover: {{VALUE}};',
                 ),
             )
         );
@@ -1190,7 +1222,7 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
                 'label'     => esc_html__( 'Border Color', 'lastudio-kit' ),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => array(
-                    '{{WRAPPER}} ' . $css_scheme['item'] . '.is-hover ' . $css_scheme['item_meta'] => 'border-color: {{VALUE}};',
+                    '{{WRAPPER}}' => '--htimeline-meta-border-color-hover: {{VALUE}};',
                 ),
                 'condition' => array(
                     'meta_border_border!' => '',
@@ -1202,7 +1234,7 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
             Group_Control_Box_Shadow::get_type(),
             array(
                 'name'     => 'meta_hover_box_shadow',
-                'selector' => '{{WRAPPER}} ' . $css_scheme['item'] . '.is-hover ' . $css_scheme['item_meta'],
+                'selector' => '{{WRAPPER}} .is-hover ' . $css_scheme['item_meta'],
             )
         );
 
@@ -1221,7 +1253,7 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
                 'label'     => esc_html__( 'Color', 'lastudio-kit' ),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => array(
-                    '{{WRAPPER}} ' . $css_scheme['item'] . '.is-active ' . $css_scheme['item_meta'] => 'color: {{VALUE}};',
+                    '{{WRAPPER}}' => '--htimeline-meta-color-active: {{VALUE}};',
                 ),
             )
         );
@@ -1232,7 +1264,7 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
                 'label'     => esc_html__( 'Background Color', 'lastudio-kit' ),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => array(
-                    '{{WRAPPER}} ' . $css_scheme['item'] . '.is-active ' . $css_scheme['item_meta'] => 'background-color: {{VALUE}};',
+                    '{{WRAPPER}}' => '--htimeline-meta-bgcolor-active: {{VALUE}};',
                 ),
             )
         );
@@ -1243,7 +1275,7 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
                 'label'     => esc_html__( 'Border Color', 'lastudio-kit' ),
                 'type'      => Controls_Manager::COLOR,
                 'selectors' => array(
-                    '{{WRAPPER}} ' . $css_scheme['item'] . '.is-active ' . $css_scheme['item_meta'] => 'border-color: {{VALUE}};',
+                    '{{WRAPPER}}' => '--htimeline-meta-border-color-active: {{VALUE}};',
                 ),
                 'condition' => array(
                     'meta_border_border!' => '',
@@ -1255,7 +1287,7 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
             Group_Control_Box_Shadow::get_type(),
             array(
                 'name'     => 'meta_active_box_shadow',
-                'selector' => '{{WRAPPER}} ' . $css_scheme['item'] . '.is-active ' . $css_scheme['item_meta'],
+                'selector' => '{{WRAPPER}} .is-active ' . $css_scheme['item_meta'],
             )
         );
 
@@ -1273,6 +1305,9 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
             array(
                 'label' => esc_html__( 'Point', 'lastudio-kit' ),
                 'tab'   => Controls_Manager::TAB_STYLE,
+                'condition' => array(
+                    'navigation_type!' => 'full-timeline',
+                ),
             )
         );
 
@@ -1522,6 +1557,9 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
             array(
                 'label' => esc_html__( 'Line', 'lastudio-kit' ),
                 'tab'   => Controls_Manager::TAB_STYLE,
+                'condition' => array(
+                    'navigation_type!' => 'full-timeline',
+                ),
             )
         );
 
@@ -1888,6 +1926,87 @@ class LaStudioKit_Timeline_Horizontal extends LaStudioKit_Base {
             )
         );
 
+        $this->end_controls_section();
+        $this->start_controls_section(
+            'section_timelinebar',
+            array(
+                'label' => esc_html__( 'Timeline Bar', 'lastudio-kit' ),
+                'tab'   => Controls_Manager::TAB_STYLE,
+                'condition' => array(
+                    'navigation_type' => 'full-timeline',
+                ),
+            )
+        );
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            array(
+                'name'     => 'tlbar_typography',
+                'selector' => '{{WRAPPER}} .lakit-htimeline-timelinebar',
+            )
+        );
+        $this->add_control(
+            'tlbar_color',
+            array(
+                'label'     => esc_html__( 'Text Color', 'lastudio-kit' ),
+                'type'      => Controls_Manager::COLOR,
+                'selectors' => array(
+                    '{{WRAPPER}}' => '--htimeline-tlbar-color: {{VALUE}};',
+                ),
+            )
+        );
+        $this->add_responsive_control(
+            'tlbar_item_width',
+            array(
+                'label' => esc_html__( 'Item Width', 'lastudio-kit' ),
+                'type'  => Controls_Manager::SLIDER,
+                'size_units' => array( 'px', '%' ),
+                'selectors' => array(
+                    '{{WRAPPER}}'=> '--htimeline-tlbar-item-width: {{SIZE}}{{UNIT}}',
+                ),
+            )
+        );
+        $this->add_responsive_control(
+            'tlbar_item_gap',
+            array(
+                'label' => esc_html__( 'Item Gap', 'lastudio-kit' ),
+                'type'  => Controls_Manager::SLIDER,
+                'size_units' => array( 'px', 'em' ),
+                'selectors' => array(
+                    '{{WRAPPER}}'=> '--htimeline-tlbar-item-gap: {{SIZE}}{{UNIT}}',
+                ),
+            )
+        );
+        $this->add_control(
+            'tlbar_line_color',
+            array(
+                'label'     => esc_html__( 'Line Background Color', 'lastudio-kit' ),
+                'type'      => Controls_Manager::COLOR,
+                'selectors' => array(
+                    '{{WRAPPER}}' => '--htimeline-tlbar-linecolor: {{VALUE}};',
+                ),
+            )
+        );
+        $this->add_control(
+            'tlbar_line_active_color',
+            array(
+                'label'     => esc_html__( 'Line Active Background Color', 'lastudio-kit' ),
+                'type'      => Controls_Manager::COLOR,
+                'selectors' => array(
+                    '{{WRAPPER}}' => '--htimeline-tlbar-linecolor-active: {{VALUE}};',
+                ),
+            )
+        );
+        $this->add_responsive_control(
+            'tlbar_line_height',
+            array(
+                'label' => esc_html__( 'Line Height', 'lastudio-kit' ),
+                'type'  => Controls_Manager::SLIDER,
+                'size_units' => array( 'px'),
+                'selectors' => array(
+                    '{{WRAPPER}}'=> '--htimeline-tlbar-height: {{SIZE}}{{UNIT}}',
+                ),
+            )
+        );
         $this->end_controls_section();
     }
 

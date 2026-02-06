@@ -1,1 +1,467 @@
-!function(e){"use strict";var a={noticeCreate:function(a,s,t){var i,n,r,o=0;if(!s||"true"===(t||!1))return!1;i=e('<div class="lakit-handler-notice '+a+'"><span class="dashicons"></span><div class="inner">'+s+"</div></div>"),e("body").prepend(i),r=100,e(".lakit-handler-notice").each((function(){e(this).css({top:r}),r+=e(this).outerHeight(!0)})),o=-1*(i.outerWidth(!0)+10),i.css({right:o}),n=setTimeout((function(){i.css({right:10}).addClass("show-state")}),100),n=setTimeout((function(){o=-1*(i.outerWidth(!0)+10),i.css({right:o}).removeClass("show-state")}),4e3),n=setTimeout((function(){i.remove(),clearTimeout(n)}),4500)},serializeObject:function(a){var s=this,t={},i={},n={validate:/^[a-zA-Z][a-zA-Z0-9_-]*(?:\[(?:\d*|[a-zA-Z0-9_-]+)\])*$/,key:/[a-zA-Z0-9_-]+|(?=\[\])/g,push:/^$/,fixed:/^\d+$/,named:/^[a-zA-Z0-9_-]+$/};return this.build=function(e,a,s){return e[a]=s,e},this.push_counter=function(e){return void 0===i[e]&&(i[e]=0),i[e]++},e.each(a.serializeArray(),(function(){var a,i,r,o;if(n.validate.test(this.name)){for(i=this.name.match(n.key),r=this.value,o=this.name;void 0!==(a=i.pop());)o=o.replace(new RegExp("\\["+a+"\\]$"),""),a.match(n.push)?r=s.build([],s.push_counter(o),r):a.match(n.fixed)?r=s.build([],a,r):a.match(n.named)&&(r=s.build({},a,r));t=e.extend(!0,t,r)}})),t}},s=function(s){var t=this,i={handlerId:"",cache:!1,processData:!0,url:"",async:!1,beforeSendCallback:function(){},errorCallback:function(){},successCallback:function(){},completeCallback:function(){}};s&&e.extend(i,s),t.handlerSettings=window.lakitSubscribeConfig||{},t.ajaxRequest=null,t.ajaxProcessing=!1,t.data={action:t.handlerSettings.action,nonce:t.handlerSettings.nonce},""===i.url&&(i.url=t.handlerSettings.ajax_url),t.send=function(){t.ajaxProcessing&&a.noticeCreate("error-notice",t.handlerSettings.sys_messages.wait_processing,t.handlerSettings.is_public),t.ajaxProcessing=!0,t.ajaxRequest=e.ajax({type:t.handlerSettings.type,url:i.url,data:t.data,cache:i.cache,dataType:t.handlerSettings.data_type,processData:i.processData,beforeSend:function(e,a){null===t.ajaxRequest||i.async||t.ajaxRequest.abort(),i.beforeSendCallback&&"function"==typeof i.beforeSendCallback&&i.beforeSendCallback(e,a)},error:function(a,s,t){e(document).trigger({type:"lakit-ajax-handler-error",jqXHR:a,textStatus:s,errorThrown:t}),i.errorCallback&&"function"==typeof i.errorCallback&&i.errorCallback(a,s,t)},success:function(a,s,n){t.ajaxProcessing=!1,e(document).trigger({type:"lakit-ajax-handler-success",response:a,jqXHR:n,textStatus:s}),i.successCallback&&"function"==typeof i.successCallback&&i.successCallback(a,s,n)},complete:function(a,s){e(document).trigger({type:"lakit-ajax-handler-complete",jqXHR:a,textStatus:s}),i.completeCallback&&"function"==typeof i.completeCallback&&i.completeCallback(a,s)}})},t.sendData=function(e){var a=e||{};t.data={action:"lakit_ajax",_nonce:t.handlerSettings.nonce,actions:JSON.stringify({newsletter_subscribe:{action:"newsletter_subscribe",data:a}})},t.send()},t.sendFormData=function(s){var i,n=e(s);i=a.serializeObject(n),t.sendData(i)}};e(window).on("elementor/frontend/init",(function(){elementorFrontend.hooks.addAction("frontend/element_ready/lakit-subscribe-form.default",(function(a){!function(a){var t=a.find(".lakit-subscribe-form"),i=a.data("id"),n=t.data("settings"),r=e(".lakit-subscribe-form__form",t),o=(e(".lakit-subscribe-form__fields",t),e(".lakit-subscribe-form__mail-field",t)),c=o.data("instance-data"),l=e(".lakit-subscribe-form__submit",t),d=e(".lakit-subscribe-form__message",t),u=window.lakitSubscribeConfig.sys_messages.invalid_mail,b=new s({handlerId:"lakit_elementor_subscribe_form_ajax",errorCallback:function(a,s,i){var n=window.lakitSubscribeConfig.sys_messages.invalid_nonce,r="lakit-subscribe-form--response-error";l.removeClass("loading"),t.addClass(r),e("span",d).html(n),d.css({visibility:"visible"}),setTimeout((function(){d.css({visibility:"hidden"}),t.removeClass(r)}),2e4)},successCallback:function(a){var s,r,o;a.success?a.data.responses.newsletter_subscribe.success?(r=a.data.responses.newsletter_subscribe.data.message,s=a.data.responses.newsletter_subscribe.data.type):(r=a.data.responses.newsletter_subscribe.data,s="error"):(s="error",r=a.responses.error.data),o="lakit-subscribe-form--response-"+s,l.removeClass("loading"),t.removeClass("lakit-subscribe-form--response-error"),t.addClass(o),e("span",d).html(r),d.css({visibility:"visible"}),setTimeout((function(){d.css({visibility:"hidden"}),t.removeClass(o)}),2e4),n.redirect&&(window.location.href=n.redirect_url),e(window).trigger({type:"lastudio-kit/subscribe",elementId:i,successType:s,inputData:c})}});function f(){var a=o.val(),s={email:a,use_target_list_id:n.use_target_list_id||!1,target_list_id:n.target_list_id||"",data:c},i=r.serializeArray(),f={};/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(a)?(e.each(i,(function(e,a){"email"===a.name?s[a.name]=a.value:f[a.name]=a.value})),s.additional=f,b.sendData(s),l.addClass("loading")):(o.addClass("mail-invalid"),t.addClass("lakit-subscribe-form--response-error"),e("span",d).html(u),d.css({visibility:"visible"}),setTimeout((function(){t.removeClass("lakit-subscribe-form--response-error"),d.css({visibility:"hidden"}),o.removeClass("mail-invalid")}),2e4))}o.on("focus",(function(){o.removeClass("mail-invalid")})),e(document).keydown((function(e){if(13===e.keyCode&&o.is(":focus"))return f(),!1})),l.on("click",(function(){return f(),!1}))}(a)}))}))}(jQuery);
+(function ($) {
+
+    "use strict";
+
+
+    /**
+     * Ajax Handlers
+     */
+    var LakitHandlerUtils = {
+        /**
+         * Rendering notice message
+         *
+         * @param  {String} type    Message type
+         * @param  {String} message Message content
+         * @return {Void}
+         */
+        noticeCreate: function (type, message, isPublicPage) {
+            var notice,
+                rightDelta = 0,
+                timeoutId,
+                isPublic = isPublicPage || false;
+
+            if (!message || 'true' === isPublic) {
+                return false;
+            }
+
+            notice = $('<div class="lakit-handler-notice ' + type + '"><span class="dashicons"></span><div class="inner">' + message + '</div></div>');
+
+            $('body').prepend(notice);
+            reposition();
+            rightDelta = -1 * (notice.outerWidth(true) + 10);
+            notice.css({'right': rightDelta});
+
+            timeoutId = setTimeout(function () {
+                notice.css({'right': 10}).addClass('show-state');
+            }, 100);
+            timeoutId = setTimeout(function () {
+                rightDelta = -1 * (notice.outerWidth(true) + 10);
+                notice.css({right: rightDelta}).removeClass('show-state');
+            }, 4000);
+            timeoutId = setTimeout(function () {
+                notice.remove();
+                clearTimeout(timeoutId);
+            }, 4500);
+
+            function reposition() {
+                var topDelta = 100;
+
+                $('.lakit-handler-notice').each(function () {
+                    $(this).css({top: topDelta});
+                    topDelta += $(this).outerHeight(true);
+                });
+            }
+        },
+
+        /**
+         * Serialize form into
+         *
+         * @return {Object}
+         */
+        serializeObject: function (form) {
+
+            var self = this,
+                json = {},
+                pushCounters = {},
+                patterns = {
+                    'validate': /^[a-zA-Z][a-zA-Z0-9_-]*(?:\[(?:\d*|[a-zA-Z0-9_-]+)\])*$/,
+                    'key': /[a-zA-Z0-9_-]+|(?=\[\])/g,
+                    'push': /^$/,
+                    'fixed': /^\d+$/,
+                    'named': /^[a-zA-Z0-9_-]+$/
+                };
+
+            this.build = function (base, key, value) {
+                base[key] = value;
+
+                return base;
+            };
+
+            this.push_counter = function (key) {
+                if (undefined === pushCounters[key]) {
+                    pushCounters[key] = 0;
+                }
+
+                return pushCounters[key]++;
+            };
+
+            $.each(form.serializeArray(), function () {
+                var k, keys, merge, reverseKey;
+
+                // Skip invalid keys
+                if (!patterns.validate.test(this.name)) {
+                    return;
+                }
+
+                keys = this.name.match(patterns.key);
+                merge = this.value;
+                reverseKey = this.name;
+
+                while (undefined !== (k = keys.pop())) {
+
+                    // Adjust reverseKey
+                    reverseKey = reverseKey.replace(new RegExp('\\[' + k + '\\]$'), '');
+
+                    // Push
+                    if (k.match(patterns.push)) {
+                        merge = self.build([], self.push_counter(reverseKey), merge);
+                    } else if (k.match(patterns.fixed)) {
+                        merge = self.build([], k, merge);
+                    } else if (k.match(patterns.named)) {
+                        merge = self.build({}, k, merge);
+                    }
+                }
+
+                json = $.extend(true, json, merge);
+            });
+
+            return json;
+        }
+    };
+
+    var LakitAjaxHandler = function (options) {
+        /**
+         * General default settings
+         *
+         * @type {Object}
+         */
+        var self = this,
+            settings = {
+                'handlerId': '',
+                'cache': false,
+                'processData': true,
+                'url': '',
+                'async': false,
+                'beforeSendCallback': function () { },
+                'errorCallback': function () { },
+                'successCallback': function () { },
+                'completeCallback': function () { }
+            };
+
+        /**
+         * Checking options, settings and options merging
+         *
+         */
+        if (options) {
+            $.extend(settings, options);
+        }
+
+        /**
+         * Set handler settings from localized global variable
+         *
+         * @type {Object}
+         */
+        self.handlerSettings = window.lakitSubscribeConfig || {};
+
+        /**
+         * Ajax request instance
+         *
+         * @type {Object}
+         */
+        self.ajaxRequest = null;
+
+        /**
+         * Ajax processing state
+         *
+         * @type {Boolean}
+         */
+        self.ajaxProcessing = false;
+
+        /**
+         * Set ajax request data
+         *
+         * @type {Object}
+         */
+        self.data = {
+            'action': self.handlerSettings.action,
+            'nonce': self.handlerSettings.nonce
+        };
+
+        /**
+         * Check ajax url is empty
+         */
+        if ('' === settings.url) {
+            // Check public request
+            settings.url = self.handlerSettings.ajax_url;
+        }
+
+        /**
+         * Init ajax request
+         *
+         * @return {void}
+         */
+        self.send = function () {
+            if (self.ajaxProcessing) {
+                LakitHandlerUtils.noticeCreate('error-notice', self.handlerSettings.sys_messages.wait_processing, self.handlerSettings.is_public);
+            }
+            self.ajaxProcessing = true;
+
+            self.ajaxRequest = $.ajax({
+                type: self.handlerSettings.type,
+                url: settings.url,
+                data: self.data,
+                cache: settings.cache,
+                dataType: self.handlerSettings.data_type,
+                processData: settings.processData,
+                beforeSend: function (jqXHR, ajaxSettings) {
+                    if (null !== self.ajaxRequest && !settings.async) {
+                        self.ajaxRequest.abort();
+                    }
+
+                    if (settings.beforeSendCallback && 'function' === typeof (settings.beforeSendCallback)) {
+                        settings.beforeSendCallback(jqXHR, ajaxSettings);
+                    }
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    $(document).trigger({
+                        type: 'lakit-ajax-handler-error',
+                        jqXHR: jqXHR,
+                        textStatus: textStatus,
+                        errorThrown: errorThrown
+                    });
+
+                    if (settings.errorCallback && 'function' === typeof (settings.errorCallback)) {
+                        settings.errorCallback(jqXHR, textStatus, errorThrown);
+                    }
+                },
+                success: function (data, textStatus, jqXHR) {
+                    self.ajaxProcessing = false;
+
+                    $(document).trigger({
+                        type: 'lakit-ajax-handler-success',
+                        response: data,
+                        jqXHR: jqXHR,
+                        textStatus: textStatus
+                    });
+
+                    if (settings.successCallback && 'function' === typeof (settings.successCallback)) {
+                        settings.successCallback(data, textStatus, jqXHR);
+                    }
+
+                    //LakitHandlerUtils.noticeCreate(data.type, data.message, self.handlerSettings.is_public);
+                },
+                complete: function (jqXHR, textStatus) {
+                    $(document).trigger({
+                        type: 'lakit-ajax-handler-complete',
+                        jqXHR: jqXHR,
+                        textStatus: textStatus
+                    });
+
+                    if (settings.completeCallback && 'function' === typeof (settings.completeCallback)) {
+                        settings.completeCallback(jqXHR, textStatus);
+                    }
+                }
+
+            });
+        };
+
+        /**
+         * Send data ajax request
+         *
+         * @param  {Object} data User data
+         * @return {void}
+         */
+        self.sendData = function (data) {
+            var sendData = data || {};
+            self.data = {
+                'action': 'lakit_ajax',
+                '_nonce': self.handlerSettings.nonce,
+                'actions': JSON.stringify({
+                    'newsletter_subscribe' : {
+                        'action': 'newsletter_subscribe',
+                        'data': sendData
+                    }
+                }),
+            };
+
+            self.send();
+        };
+
+        /**
+         * Send form serialized data
+         * @param  {String} formId Form selector
+         * @return {void}
+         */
+        self.sendFormData = function (formId) {
+            var form = $(formId),
+                data;
+
+            data = LakitHandlerUtils.serializeObject(form);
+
+            self.sendData(data);
+        };
+    };
+
+    var LakitSubscribeForm = function( $scope ) {
+        var $target = $scope.find('.lakit-subscribe-form'),
+            scoreId = $scope.data('id'),
+            settings = $target.data('settings'),
+            subscribeFormAjaxId = 'lakit_elementor_subscribe_form_ajax',
+            $subscribeForm = $('.lakit-subscribe-form__form', $target),
+            $fields = $('.lakit-subscribe-form__fields', $target),
+            $mailField = $('.lakit-subscribe-form__mail-field', $target),
+            $inputData = $mailField.data('instance-data'),
+            $submitButton = $('.lakit-subscribe-form__submit', $target),
+            $subscribeFormMessage = $('.lakit-subscribe-form__message', $target),
+            timeout = null,
+            invalidMailMessage = window.lakitSubscribeConfig.sys_messages.invalid_mail,
+            $agreementField = $('input[name="agreement_checkbox"]', $target),
+            $agreementWrap = $('.lakit-subscribe-form__agreements', $target),
+            requireFieldMessage = window.lakitSubscribeConfig.sys_messages.require_field;
+
+        var lakitSubscribeFormAjax = new LakitAjaxHandler({
+            handlerId: subscribeFormAjaxId,
+
+            errorCallback: function (jqXHR, textStatus, errorThrown){
+                var message = window.lakitSubscribeConfig.sys_messages.invalid_nonce,
+                    responceClass = 'lakit-subscribe-form--response-error';
+
+                $submitButton.removeClass('loading');
+
+                $target.addClass(responceClass);
+
+                $('span', $subscribeFormMessage).html(message);
+                $subscribeFormMessage.css({'visibility': 'visible'});
+
+                timeout = setTimeout(function () {
+                    $subscribeFormMessage.css({'visibility': 'hidden'});
+                    $target.removeClass(responceClass);
+                }, 20000);
+            },
+            successCallback: function ( response ) {
+                var successType, message, responceClass;
+                if(response.success){
+                    if(response.data.responses.newsletter_subscribe.success){
+                        message = response.data.responses.newsletter_subscribe.data.message;
+                        successType = response.data.responses.newsletter_subscribe.data.type;
+                    }
+                    else{
+                        message = response.data.responses.newsletter_subscribe.data;
+                        successType = 'error';
+                    }
+                }
+                else {
+                    successType = 'error';
+                    message = response.responses.error.data;
+                }
+
+                responceClass = 'lakit-subscribe-form--response-' + successType;
+
+                $submitButton.removeClass('loading');
+
+                $target.removeClass('lakit-subscribe-form--response-error');
+                $target.addClass(responceClass);
+
+                $('span', $subscribeFormMessage).html(message);
+                $subscribeFormMessage.css({'visibility': 'visible'});
+
+                timeout = setTimeout(function () {
+                    $subscribeFormMessage.css({'visibility': 'hidden'});
+                    $target.removeClass(responceClass);
+                }, 20000);
+
+                if (settings['redirect']) {
+                    window.location.href = settings['redirect_url'];
+                }
+
+                $(window).trigger({
+                    type: 'lastudio-kit/subscribe',
+                    elementId: scoreId,
+                    successType: successType,
+                    inputData: $inputData
+                });
+            }
+        });
+
+        $mailField.on('focus', function () {
+            $mailField.removeClass('mail-invalid');
+        });
+        $agreementField.on('change', function () {
+            if ($(this).is(':checked')) {
+                $agreementWrap.removeClass('agreement-invalid');
+            }
+        });
+
+        $(document).keydown(function (event) {
+
+            if (13 === event.keyCode && $mailField.is(':focus')) {
+                subscribeHandle();
+
+                return false;
+            }
+        });
+
+        $submitButton.on('click', function () {
+            subscribeHandle();
+            return false;
+        });
+
+        function validateEmail (email) {
+            var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+            return re.test(email);
+        }
+
+        function subscribeHandle() {
+            var inputValue = $mailField.val(),
+                sendData = {
+                    'email': inputValue,
+                    'use_target_list_id': settings['use_target_list_id'] || false,
+                    'target_list_id': settings['target_list_id'] || '',
+                    'data': $inputData
+                },
+                serializeArray = $subscribeForm.serializeArray(),
+                additionalFields = {};
+
+            $subscribeFormMessage.css({'visibility': 'hidden'});
+
+            if($agreementField.length > 0){
+                if(!$agreementField.is(':checked')){
+                    $agreementWrap.addClass('agreement-invalid');
+                    $target.addClass('lakit-subscribe-form--response-error');
+                    $('span', $subscribeFormMessage).html(requireFieldMessage);
+                    $subscribeFormMessage.css({'visibility': 'visible'});
+                    return false;
+                }
+            }
+
+            if (validateEmail(inputValue)) {
+
+                $.each(serializeArray, function (key, fieldData) {
+
+                    if ('email' === fieldData.name) {
+                        sendData[fieldData.name] = fieldData.value;
+                    } else {
+                        additionalFields[fieldData.name] = fieldData.value;
+                    }
+                });
+
+                sendData['additional'] = additionalFields;
+
+                lakitSubscribeFormAjax.sendData(sendData);
+
+                $submitButton.addClass('loading');
+            }
+            else {
+                $mailField.addClass('mail-invalid');
+
+                $target.addClass('lakit-subscribe-form--response-error');
+                $('span', $subscribeFormMessage).html(invalidMailMessage);
+                $subscribeFormMessage.css({'visibility': 'visible'});
+
+                timeout = setTimeout(function () {
+                    $target.removeClass('lakit-subscribe-form--response-error');
+                    $subscribeFormMessage.css({'visibility': 'hidden'});
+                    $mailField.removeClass('mail-invalid');
+                }, 20000);
+            }
+        }
+    }
+
+    $(window).on('elementor/frontend/init', function () {
+        elementorFrontend.hooks.addAction('frontend/element_ready/lakit-subscribe-form.default', function ($scope) {
+            LakitSubscribeForm($scope);
+        });
+    });
+
+}(jQuery));

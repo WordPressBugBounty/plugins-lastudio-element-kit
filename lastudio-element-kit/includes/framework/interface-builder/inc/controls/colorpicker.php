@@ -45,7 +45,7 @@ if ( ! class_exists( 'CX_Control_Colorpicker' ) ) {
 		}
 
 		/**
-		 * Retrun scripts dependencies list for current control.
+		 * Return scripts dependencies list for current control.
 		 *
 		 * @return array
 		 */
@@ -54,7 +54,7 @@ if ( ! class_exists( 'CX_Control_Colorpicker' ) ) {
 		}
 
 		/**
-		 * Retrun styles dependencies list for current control.
+		 * Return styles dependencies list for current control.
 		 *
 		 * @return array
 		 */

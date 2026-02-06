@@ -24,19 +24,6 @@ class Header_Vertical {
 
 	    add_filter( 'body_class', [ $this, 'body_class' ], 20);
 	    add_action( 'wp_body_open', [ $this, 'wp_body_open' ], 0);
-
-        add_action('elementor/theme/before_do_header', [ $this, 'detect_seciton_in_header' ], PHP_INT_MAX );
-        add_action('elementor/theme/after_do_header', [ $this, 'un_detect_seciton_in_header' ], PHP_INT_MAX );
-    }
-
-    public function detect_seciton_in_header(){
-        global $lakit_is_header_loc;
-        $lakit_is_header_loc = true;
-    }
-
-    public function un_detect_seciton_in_header(){
-        global $lakit_is_header_loc;
-        $lakit_is_header_loc = false;
     }
 
     public function add_transparency_controls( $stack ){

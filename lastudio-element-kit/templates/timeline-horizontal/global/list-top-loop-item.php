@@ -2,8 +2,8 @@
 /**
  * Timeline list item template
  */
-$settings      = $this->get_settings_for_display();
-$layout        = $settings['vertical_layout'];
+$nav_type      = $this->get_settings_for_display('navigation_type');
+$layout        = $this->get_settings_for_display('vertical_layout');
 $item_settings = $this->_processed_item;
 
 $this->add_render_attribute(
@@ -20,32 +20,39 @@ $this->add_render_attribute(
 if ( filter_var( $item_settings['is_item_active'], FILTER_VALIDATE_BOOLEAN ) ) {
 	$this->add_render_attribute( 'item_top_' . $item_settings['_id'], 'class', 'is-active' );
 }
+
 ?>
 
 <div <?php $this->print_render_attribute_string( 'item_top_' . $item_settings['_id'] ) ?>>
 	<?php
-	switch ( $layout ) {
-		case 'top':
 
-			include $this->_get_global_template( 'card' );
+    if( 'full-timeline' === $nav_type){
+        include $this->_get_global_template( 'card' );
+    }
+    else{
+        switch ( $layout ) {
+            case 'top':
 
-			break;
+                include $this->_get_global_template( 'card' );
 
-		case 'chess':
+                break;
 
-			if ( $this->_processed_index % 2 ) {
-				include $this->_get_global_template( 'meta' );
-			} else {
-				include $this->_get_global_template( 'card' );
-			}
+            case 'chess':
 
-			break;
+                if ( $this->_processed_index % 2 ) {
+                    include $this->_get_global_template( 'meta' );
+                } else {
+                    include $this->_get_global_template( 'card' );
+                }
 
-		case 'bottom':
+                break;
 
-			include $this->_get_global_template( 'meta' );
+            case 'bottom':
 
-			break;
-	}
+                include $this->_get_global_template( 'meta' );
+
+                break;
+        }
+    }
 	?>
 </div>

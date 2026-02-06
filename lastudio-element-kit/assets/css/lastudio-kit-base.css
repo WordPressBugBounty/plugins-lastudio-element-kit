@@ -876,17 +876,6 @@ p + .wp-block-columns {
     transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg)
   }
 }
-@keyframes lakit-rotateplane {
-  0% {
-    transform: perspective(120px) rotateX(0) rotateY(0)
-  }
-  50% {
-    transform: perspective(120px) rotateX(-180.1deg) rotateY(0)
-  }
-  to {
-    transform: perspective(120px) rotateX(-180deg) rotateY(-179.9deg)
-  }
-}
 @keyframes lakit-scaleout {
   0% {
     transform: scale(0)
@@ -1107,7 +1096,8 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
     min-width: calc((100vw - var(--lakit-section-width)) / 2 + 100%);
     max-width: calc((100vw - var(--lakit-section-width)) / 2 + 100%)
   }
-  .e-con .elementor-widget.widget_full_right, .e-con.widget_full_right, .e-con > .elementor-widget.widget_full_right, .elementor-column .elementor-widget.widget_full_right {
+  .e-con .elementor-widget.widget_full_right, .e-con.widget_full_right,
+  .e-con > .elementor-widget.widget_full_right, .elementor-column .elementor-widget.widget_full_right {
     width: calc((100vw - var(--lakit-section-width)) / 2 + 100% - var(--scrollbar-width-o));
     min-width: calc((100vw - var(--lakit-section-width)) / 2 + 100% - var(--scrollbar-width-o))
   }
@@ -1117,6 +1107,11 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
   .elementor-column.elementor-col-35 {
     width: 35%
   }
+  .elementor-element.widget_full_left {
+    width: calc((100vw - var(--lakit-section-width)) / 2 + 100% - var(--scrollbar-width-o));
+    min-width: calc((100vw - var(--lakit-section-width)) / 2 + 100% - var(--scrollbar-width-o));
+    margin-left: calc( (100vw - var(--lakit-section-width)) / -2 );
+  }
 }
 .lakit-nav-item-desc, .wpcf7-form-control-wrap {
   display: block
@@ -1124,7 +1119,7 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
 .elementor-location-header.elementor-edit-mode.elementor-edit-area-active ~ main.site-main {
   min-height: 50vh
 }
-.e-con .elementor-motion-effects-layer, .elementor-editor-active .lakit-site-wrapper > .elementor-location-header:not(.elementor-edit-area-active), .lakit-nav__item > .menu-item-link:not(:hover):before, .lakit-posts__thumbnail:before, .tooltip[class*=lakit-tooltip-zone], body:not(.elementor-editor-active) .elementor-element.no-click-event {
+.e-con .elementor-motion-effects-layer, .elementor-editor-active .lakit-site-wrapper > .elementor-location-header:not(.elementor-edit-area-active), .lakit-nav__item > .menu-item-link:not(:hover):before, .lakit-posts__thumbnail:before, .swiper-wrapper[style*=grabbing] .swiper-slide, .tooltip[class*=lakit-tooltip-zone], body:not(.elementor-editor-active) .elementor-element.no-click-event {
   pointer-events: none
 }
 .elementor-editor-active .lakit-site-wrapper > .elementor-location-header:not(.elementor-edit-area-active) .elementor-sticky.elementor-sticky__spacer.lakit--transparency-yes, .lakit-nav__mobile-close-btn, body.body-loading .lakit-nav__sub, body:not(.lakit--js-ready) .lakit-nav__sub {
@@ -1450,15 +1445,15 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
 .lakit-mobile-menu--left-side.lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__mobile-close-btn, .lakit-mobile-menu--right-side.lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__mobile-close-btn {
   display: block;
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: var(--mm-close-icon-offset-y, 10px);
+  right: var(--mm-close-icon-offset-x, 10px);
   z-index: 9;
   padding: 10px;
   line-height: 1;
   cursor: pointer
 }
 .admin-bar .lakit-mobile-menu--left-side.lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__mobile-close-btn, .admin-bar .lakit-mobile-menu--right-side.lakit-nav-wrap.lakit-active--mbmenu .lakit-nav__mobile-close-btn {
-  top: 46px
+  top: calc(var(--mm-close-icon-offset-y, 10px) + 32px)
 }
 .lakit-mobile-menu--full-width.lakit-nav-wrap.lakit-active--mbmenu[data-mobile-breakpoint=all] .lakit-nav:not(.ignore-docs-style), .lakit-nav-wrap {
   max-width: 100%
@@ -1666,43 +1661,56 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
 .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget.include-docs-style .elementor-icon {
   border-color: inherit
 }
-.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-element .elementor-icon:not(.ignore-docs-style), .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget-icon-list:not(.ignore-docs-style) .elementor-icon-list-item, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget.include-docs-style .elementor-icon, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .main-color:not(.ignore-docs-style),
-.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .main-color.lakit-nav__mobile-trigger:not(.ignore-docs-style){
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .switcher-item--default,
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .lakit-curlang-switcher[data-type=inline] a.switcher-flex-item,
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .elementor-widget .elementor-icon,
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .elementor-icon-list-item,
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget.include-docs-style .elementor-icon,
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .main-color.lakit-nav__mobile-trigger,
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .main-color {
   color: var(--lakit-doc-headerts-link-color, var(--lakit-secondary-color))
 }
-.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-element .elementor-icon:hover:not(.ignore-docs-style), .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget-icon-list:not(.ignore-docs-style) .elementor-icon-list-item:hover, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget.include-docs-style .elementor-icon:hover, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .main-color:not(.ignore-docs-style):hover,
-.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .main-color.lakit-nav__mobile-trigger:not(.ignore-docs-style):hover{
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .switcher-item--default:hover,
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .lakit-curlang-switcher[data-type=inline] a.switcher-flex-item:hover,
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .elementor-widget .elementor-icon:hover,
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .elementor-icon-list-item:hover,
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget.include-docs-style .elementor-icon:hover,
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .main-color.lakit-nav__mobile-trigger:hover,
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .main-color:hover {
   color: var(--lakit-doc-headerts-link-hover-color, var(--lakit-primary-color))
 }
-.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-heading-title:not(.ignore-docs-style), .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-lakit-search:not(.ignore-docs-style) .lakit-search__form .lakit-search__field, .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget-text-editor:not(.ignore-docs-style) {
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .elementor-heading-title,
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .elementor-lakit-search .lakit-search__form .lakit-search__field,
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .elementor-widget-text-editor {
   color: var(--lakit-doc-headerts-text-color, var(--lakit-secondary-color))
 }
-.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget-divider:not(.ignore-docs-style) {
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .elementor-widget-divider {
   --divider-color: var(--lakit-doc-headerts-text-color, var(--lakit-secondary-color))
 }
-.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-social-icon:not(.ignore-docs-style) :is(i,svg), .lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-widget-icon-list:not(.ignore-docs-style) .elementor-icon-list-item :is(i,svg,span) {
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .elementor-social-icon :is(i,svg),
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .elementor-widget-icon-list .elementor-icon-list-item :is(i,svg,span) {
   color: inherit !important;
   fill: currentColor !important
 }
 .lakitdoc-h-t.lakitdoc-s-l .e-loc-h:not(.elementor-sticky--effects) .lakit-logo__t {
   display: inherit
 }
-.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-button:not(.ignore-docs-style) {
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .elementor-button {
   color: var(--lakit-doc-headerts-button-color, var(--lakit-secondary-color));
   border-color: var(--lakit-doc-headerts-button-border-color, var(--lakit-secondary-color));
   background-color: var(--lakit-doc-headerts-button-bgcolor, transparent)
 }
-.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-button:not(.ignore-docs-style):hover {
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .elementor-button:hover {
   border-color: var(--lakit-doc-headerts-button-hover-border-color, var(--lakit-doc-headerts-link-hover-color));
   color: var(--lakit-doc-headerts-button-hover-color, var(--lakit-doc-headerts-link-hover-color));
   background-color: var(--lakit-doc-headerts-button-hover-bgcolor, transparent)
 }
-.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-lakit-nav-menu:not(.ignore-docs-style) .lakit-nav-wrap:not(.lakit-mobile-menu-active) .menu-item-link.menu-item-link-depth-0:not(.ignore-docs-style) {
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .elementor-lakit-nav-menu .lakit-nav-wrap:not(.lakit-mobile-menu-active) .menu-item-link.menu-item-link-depth-0:not(.ignore-docs-style) {
   color: var(--lakit-doc-headerts--menu-color, var(--lakit-doc-headerts-link-color));
   border-color: var(--lakit-doc-headerts--menu-bdcolor, transparent);
   background-color: var(--lakit-doc-headerts--menu-bgcolor, transparent)
 }
-.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects) .elementor-lakit-nav-menu:not(.ignore-docs-style) .lakit-nav-wrap:not(.lakit-mobile-menu-active) .lakit-nav__item:is(.current-menu-item,:hover) > .menu-item-link-depth-0:not(.ignore-docs-style) {
+.lakitdoc-h-t .e-loc-h:not(.elementor-sticky--effects):not(.ignore-docs-style) .elementor-lakit-nav-menu .lakit-nav-wrap:not(.lakit-mobile-menu-active) .lakit-nav__item:is(.current-menu-item,:hover) > .menu-item-link-depth-0:not(.ignore-docs-style) {
   color: var(--lakit-doc-headerts--menua-color, var(--lakit-doc-headerts-link-hover-color));
   border-color: var(--lakit-doc-headerts--menua-bdcolor, transparent);
   background-color: var(--lakit-doc-headerts--menua-bgcolor, transparent)
@@ -2110,7 +2118,7 @@ span.lakit-btn-more-icon, span.lakit-btn_play-icon {
   line-height: 2em;
   color: var(--lakit-three-color)
 }
-.lakit-embla__arrow[disabled], .lakitp-zone .lakit-btn.loading > span {
+.lakit-embla__arrow[disabled], .lakit-posts__btn-donate.loading .btn__text, .lakitp-zone .lakit-btn.loading > span {
   opacity: 0
 }
 .lakit-blocks-new-template-link, .lakit-embla__arrow:hover, .lakit-posts__meta a {
@@ -2851,7 +2859,8 @@ body .e-con-inner > .elementor-widget-spacer > .elementor-widget-container > .el
 }
 .lastudio-kit .lakit-carousel .swiper-scrollbar {
   width: var(--swiper-scrollbar-width, 100%);
-  height: var(--swiper-scrollbar-height, 3px)
+  height: var(--swiper-scrollbar-height, 3px);
+  z-index: 3
 }
 .lastudio-kit .lakit-carousel .swiper-scrollbar .swiper-scrollbar-drag {
   width: var(--swiper-scrollbar-drag-width, 100%);
@@ -2932,7 +2941,7 @@ body .e-con-inner > .elementor-widget-spacer > .elementor-widget-container > .el
   --ellipsis-move-speed: 10s;
   --ellipsis-move-delay: 0s
 }
-.lakit-icon-move-ellipsis.elementor-widget-icon .elementor-icon {
+.lakit-icon-move-ellipsis.elementor-widget-icon .elementor-icon, .switcher-flex-item img {
   width: 1em
 }
 .lakit-icon-move-ellipsis .lakit-iconbox__box_icon svg, .lakit-icon-move-ellipsis.elementor-widget-icon .elementor-icon {
@@ -3443,12 +3452,14 @@ body:not(.e-has-header-sticky) .lakit-ntabs-heading.e--sticky {
 .lakitp-zone .lakit-countdown-timer {
   gap: var(--lakit-zone--countdown-gap, 5px)
 }
-.lakitp-zone .lakit-countdown-timer .lakit-countdown-timer__item {
+.lakitp-zone .lakit-countdown-timer__item {
   margin: 0;
   padding: var(--lakit-zone--countdown-padding);
   background-color: var(--lakit-zone--countdown-bg);
   color: var(--lakit-zone--countdown-color);
-  gap: var(--lakit-zone--countdown-number-gap, 0)
+  gap: var(--lakit-zone--countdown-number-gap, 0);
+  flex-direction: var(--lakit-zone--countdown-direction);
+  align-items: center
 }
 .lakitp-zone .lakit-countdown-timer__item-value {
   color: var(--lakit-zone--countdown-number-color)
@@ -3766,32 +3777,28 @@ body .elementor-widget-lakit-hotspots.elementor-widget-empty {
   margin: 0 auto;
   max-width: 100%
 }
-.lakit-posts__btn-donate.loading .btn__text {
-  opacity: 0
-}
 .lakit-posts__meta__item {
   gap: .2em
 }
-
-.lakit-popup--wrap {
+.lakit-popup--givewp.lakit-popup--wrap {
   display: none;
   position: fixed;
   left: 0;
   top: 0;
   right: 0;
   bottom: 0;
-  z-index: 101;
+  z-index: 101
 }
-.lakit-popup--overlay {
+.lakit-popup--givewp .lakit-popup--overlay {
   position: fixed;
   left: 0;
   top: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 8;
+  background: rgba(0, 0, 0, .5);
+  z-index: 8
 }
-.lakit-popup--content {
+.lakit-popup--givewp .lakit-popup--content {
   position: relative;
   margin: auto;
   max-width: 100%;
@@ -3801,27 +3808,25 @@ body .elementor-widget-lakit-hotspots.elementor-widget-empty {
   height: 100%;
   align-items: center;
   overflow: hidden auto;
-  padding: 30px 10px;
+  padding: 30px 10px
 }
-
-.lakit-popup--iframe {
+.lakit-popup--givewp .lakit-popup--iframe {
   max-width: 100%;
   width: 770px;
   margin: auto;
   position: relative;
-  z-index: 9;
+  z-index: 9
 }
-.lakit-popup--iframe.frame-multi-step {
-  width: 600px;
+.lakit-popup--givewp .lakit-popup--iframe.frame-multi-step {
+  width: 600px
 }
-.lakit-popup--iframe iframe{
+.lakit-popup--givewp .lakit-popup--iframe iframe {
   width: 100%;
   height: 100%;
   border: none;
-  border-radius: 8px;
+  border-radius: 8px
 }
-
-.lakit-popup--close {
+.lakit-popup--givewp .lakit-popup--close {
   position: fixed;
   top: 15px;
   right: 15px;
@@ -3836,12 +3841,12 @@ body .elementor-widget-lakit-hotspots.elementor-widget-empty {
   justify-content: center;
   color: #fff;
   background: #0000001a;
-  border-radius: 5px;
+  border-radius: 5px
 }
 .lakit-no-scroll {
-  overflow: hidden !important;
+  overflow: hidden !important
 }
-.lakit-popup--loading {
+.lakit-popup--givewp .lakit-popup--loading {
   position: fixed;
   left: 0;
   top: 0;
@@ -3850,27 +3855,18 @@ body .elementor-widget-lakit-hotspots.elementor-widget-empty {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(0, 0, 0, 0.2);
+  background: rgba(0, 0, 0, .2)
 }
-.lakit-popup--is-ready .lakit-popup--loading {
-  display: none;
+.lakit-popup--is-loading .lakit-popup--iframe, .lakit-popup--is-loading .lakit-popup--overlay, .lakit-popup--is-ready .lakit-popup--loading, .switcher-dropdown, .wpcf7 .hidden-fields-container {
+  display: none
 }
-.lakit-popup--is-loading .lakit-popup--iframe {
-  display: none;
-}
-.lakit-popup--is-loading .lakit-popup--overlay {
-  display: none;
-}
-@media(max-width: 900px){
-  .lakit-popup--close {
+@media (max-width: 900px) {
+  .lakit-popup--givewp .lakit-popup--close {
     color: #333
   }
 }
 .lakit-cart__icon.lakit-blocks-icon svg {
-  vertical-align: inherit;
-}
-.wpcf7 .hidden-fields-container{
-  display: none
+  vertical-align: inherit
 }
 .wpcf7 .screen-reader-response {
   position: absolute;
@@ -3882,12 +3878,15 @@ body .elementor-widget-lakit-hotspots.elementor-widget-empty {
   margin: -1px;
   padding: 0;
   border: 0;
-  word-wrap: normal !important;
+  word-wrap: normal !important
 }
 .elementor-lakit-button .elementor-button-icon {
   font-size: var(--icon-size, 1em);
-  margin-top: var(--icon-vgap, 0);
+  margin-top: var(--icon-vgap, 0)
 }
 .elementor-lakit-button .elementor-button-content-wrapper {
   gap: var(--icon-gap, 0)
+}
+.switcher-flex-item {
+  gap: var(--e-switcher-label-gap, .5em)
 }

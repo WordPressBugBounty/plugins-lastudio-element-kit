@@ -51,7 +51,22 @@ class Rest_Api {
 	// Here initialize our namespace and resource name.
 	public function __construct() {
 		add_action( 'rest_api_init', array( $this, 'register_routes' ) );
+		add_filter( 'rest_pre_dispatch', array( $this, 'rest_pre_dispatch' ), 10, 3 );
 	}
+
+    public function rest_pre_dispatch($result, $server, $request)
+    {
+        if ( !str_contains($request->get_route(), $this->api_namespace) ) {
+            return $result;
+        }
+        $passed_rate_limit = Template_Helper::apply_rate_limit();
+        if(!is_wp_error($passed_rate_limit)){
+            return $result;
+        }
+        else{
+            return $passed_rate_limit;
+        }
+    }
 
 	/**
 	 * Initialize all LaStudioKit related Rest API endpoints
@@ -64,8 +79,8 @@ class Rest_Api {
 
 		$this->register_endpoint( new Endpoints\Elementor_Template() );
 		$this->register_endpoint( new Endpoints\Plugin_Settings() );
-		$this->register_endpoint( new Endpoints\Get_Menu_Items() );
-		$this->register_endpoint( new Endpoints\Elementor_Widget() );
+//		$this->register_endpoint( new Endpoints\Get_Menu_Items() );
+//		$this->register_endpoint( new Endpoints\Elementor_Widget() );
 
 		do_action( 'lastudio-kit/rest/init-endpoints', $this );
 

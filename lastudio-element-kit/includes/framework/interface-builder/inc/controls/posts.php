@@ -60,7 +60,7 @@ if ( ! class_exists( 'CX_Control_Posts' ) ) {
 		}
 
 		/**
-		 * Retrun scripts dependencies list for current control.
+		 * Return scripts dependencies list for current control.
 		 *
 		 * @return array
 		 */
@@ -69,7 +69,7 @@ if ( ! class_exists( 'CX_Control_Posts' ) ) {
 		}
 
 		/**
-		 * Retrun styles dependencies list for current control.
+		 * Return styles dependencies list for current control.
 		 *
 		 * @return array
 		 */

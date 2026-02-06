@@ -14,31 +14,15 @@ class General_Extensions {
         add_action('elementor/element/column/layout/before_section_end', [ $this , 'add_order_into_column' ], 99);
 	    add_action('elementor/element/container/section_layout_container/before_section_end', [ $this , 'add_control_to_container' ], 99);
         add_action('elementor/element/before_section_end', [ $this , 'add_order_into_widget' ], 99, 2);
-//        if ( version_compare( ELEMENTOR_VERSION, '3.4.0', '<' ) ) {
-//            add_action('elementor/element/before_section_end', [ $this , 'add_breakpoint_visible_control' ], 99, 2);
-//        }
-
 		add_action('elementor/element/after_add_attributes', [ $this, 'add_render_attributes' ] );
-//	    add_filter( 'elementor/frontend/builder_content_data', [ $this, 'filter_builder_content_data' ], 99, 2 );
-
         add_action('elementor/element/after_section_end', [ $this, 'remove_pro_fields' ], 99, 3);
     }
-
-	public function filter_builder_content_data( $data, $post_id ){
-		foreach ($data as &$item){
-			if(isset($item['elType']) && 'container' === $item['elType']){
-				$item['LaIsRoot'] = true;
-			}
-		}
-		return $data;
-	}
 
     /**
      * @param \Elementor\Element_Base $stack
      * @return void
      */
 	public function add_render_attributes( $stack ){
-        global $lakit_is_header_loc;
 		$classes = [];
 		$settings = $stack->get_data('settings');
 		if( (!empty($settings['animation']) && $settings['animation'] === 'none') || (!empty($settings['_animation']) && $settings['_animation'] === 'none')){
@@ -50,17 +34,23 @@ class General_Extensions {
             if(empty($stack->get_data('isInner'))){
                 $classes[] = 'e-root-container';
                 $classes[] = 'elementor-top-section';
-                if($lakit_is_header_loc){
-                    $classes[] = 'e-loc-h';
-                }
+                try {
+                    $current_document =   lastudio_kit()->elementor()->documents->get_current();
+                    if('header' === $current_document->get_template_type()){
+                        $classes[] = 'e-loc-h';
+                    }
+                }catch (\Exception $e){}
             }
 		}
         if( 'section' === $stack->get_type() ){
             if(empty($stack->get_data('isInner'))){
                 $classes[] = 'e-parent';
-                if($lakit_is_header_loc){
-                    $classes[] = 'e-loc-h';
-                }
+                try {
+                    $current_document =   lastudio_kit()->elementor()->documents->get_current();
+                    if('header' === $current_document->get_template_type()){
+                        $classes[] = 'e-loc-h';
+                    }
+                }catch (\Exception $e){}
             }
         }
 		if(!empty($classes)){
@@ -167,39 +157,6 @@ class General_Extensions {
 			        'return_value' => 'widget_full_right',
 		        ]
 	        );
-        }
-    }
-
-    public function add_breakpoint_visible_control( $stack, $section_id ){
-        if( '_section_responsive' === $section_id ) {
-            if(lastudio_kit()->elementor()->breakpoints->get_active_breakpoints('laptop')){
-                $stack->add_control(
-                    'hide_laptop',
-                    [
-                        'label' => __( 'Hide On Laptop', 'lastudio-kit' ),
-                        'type' => Controls_Manager::SWITCHER,
-                        'default' => '',
-                        'prefix_class' => 'elementor-',
-                        'label_on' => 'Hide',
-                        'label_off' => 'Show',
-                        'return_value' => 'hidden-laptop',
-                    ]
-                );
-            }
-            if(lastudio_kit()->elementor()->breakpoints->get_active_breakpoints('mobile_extra')){
-                $stack->add_control(
-                    'hide_mobile_extra',
-                    [
-                        'label' => __( 'Hide On Mobile Extra', 'lastudio-kit' ),
-                        'type' => Controls_Manager::SWITCHER,
-                        'default' => '',
-                        'prefix_class' => 'elementor-',
-                        'label_on' => 'Hide',
-                        'label_off' => 'Show',
-                        'return_value' => 'hidden-mobile-extra',
-                    ]
-                );
-            }
         }
     }
 

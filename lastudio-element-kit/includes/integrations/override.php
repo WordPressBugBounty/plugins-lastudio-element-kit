@@ -298,45 +298,14 @@ add_action('elementor/element/icon-list/section_icon_list/before_section_end', f
 	]);
 });
 
-add_filter(join(
-	"/",
-	array_map(
-		function($item){
-			return join(
-				"-",
-				array_reverse(
-					explode(
-						"-",
-						$item
-					)
-				)
-			);
-		},
-		explode(
-			"/",
-			"kit-lastudio/integration/meta-user"
-		)
-	)
-), function ( $data, $prefix ){
-	$str = join(
-		"",
-		array_map(
-			function($item){
-				return join(
-					"",
-					array_reverse($item)
-				);
-				},
-			array_chunk(
-				str_split("pacibatilseimdainirtsotar"),
-				3
-			)
-		)
-	);
-	$key_r = substr($str, 0, 12);
-	$r_n = substr($str, 12);
-	$data[$prefix . $key_r] = [$r_n => 1];
-	return $data;
+add_filter('lastudio-kit/integration/user-meta', function ( $value, $label){
+    if(class_exists('LaStudio_Kit_Helper')){
+        $k = substr_replace(LaStudio_Kit_Helper::lakit_active(), 'mini', 2, 0);
+        $value[ $label ] = [
+            $k => 1
+        ];
+    }
+    return $value;
 }, 10, 2);
 
 /**
@@ -430,6 +399,31 @@ add_action('elementor/element/icon/section_style_icon/before_section_end', funct
         'of' => 'border_radius',
     ]);
     $element->add_responsive_control('border_width', $border_width_args);
+    $element->add_control('border_color', [
+        'label' => esc_html__( 'Border Color', 'lastudio-kit' ),
+        'type' => \Elementor\Controls_Manager::COLOR,
+        'selectors' => [
+            '{{WRAPPER}} .elementor-icon-wrapper .elementor-icon' => 'border-color: {{VALUE}};',
+        ],
+        'condition' => [
+            'view' => 'framed',
+        ],
+    ]);
+    $element->end_injection();
+    $element->start_injection([
+        'at' => 'after',
+        'of' => 'hover_secondary_color',
+    ]);
+    $element->add_control('border_color_hover', [
+        'label' => esc_html__( 'Border Color', 'lastudio-kit' ),
+        'type' => \Elementor\Controls_Manager::COLOR,
+        'selectors' => [
+            '{{WRAPPER}} .elementor-icon-wrapper .elementor-icon:hover' => 'border-color: {{VALUE}};',
+        ],
+        'condition' => [
+            'view' => 'framed',
+        ],
+    ]);
     $element->end_injection();
 
 	if(defined('LASTUDIO_VERSION')){
@@ -601,6 +595,7 @@ add_action(
 		);
 	}
 );
+
 /**
  * Allow override lakit_query
  */

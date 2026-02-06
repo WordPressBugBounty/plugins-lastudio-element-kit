@@ -1,5 +1,4 @@
 (function ($) {
-
     "use strict";
 
     $(window).on('elementor/frontend/init', function () {
@@ -33,6 +32,8 @@
                     mobile: Math.max(0, (itemsCount - mobileColumns))
                 };
 
+            const $listTop = $('.lakit-htimeline-list--top', $scope);
+
             if ('ontouchstart' in window || 'ontouchend' in window) {
                 $items.on('touchend.LaStudioKitsTimeLineHorizontal', function (event) {
                     var itemId = $(this).data('item-id');
@@ -58,8 +59,11 @@
             $(window).on('resize.LaStudioKitsTimeLineHorizontal orientationchange.LaStudioKitsTimeLineHorizontal', setLinePosition);
 
             function setLinePosition() {
-                var $line = $scope.find('.lakit-htimeline__line'),
-                    $firstPoint = $scope.find('.lakit-htimeline-item__point-content:first'),
+                var $line = $scope.find('.lakit-htimeline__line')
+                if($line.length === 0){
+                    return;
+                }
+                let $firstPoint = $scope.find('.lakit-htimeline-item__point-content:first'),
                     $lastPoint = $scope.find('.lakit-htimeline-item__point-content:last'),
                     firstPointLeftPos = $firstPoint.position().left + parseInt($firstPoint.css('marginLeft')),
                     lastPointLeftPos = $lastPoint.position().left + parseInt($lastPoint.css('marginLeft')),
@@ -198,6 +202,54 @@
                 }
             }
 
+            function clamp(v){ return Math.max(0, Math.min(100, v)); }
+
+            const $linebars = $scope.find('.lakit-htimeline-timelinebar')
+
+            $timelineTrack.first().on('scroll', (evt) => {
+                const elm = evt.currentTarget;
+                let scrollLeft = Math.abs($(elm).scrollLeft());
+                let scrollWidth = elm.scrollWidth;
+                let clientWidth = $(elm).innerWidth();
+                let percent = clamp((scrollLeft / (scrollWidth - clientWidth)) * 100);
+                $('.lakit-htimeline-inner', $scope).css({
+                    '--timeline-bar-width': percent.toFixed(3) + '%'
+                })
+            });
+            function scrollToCenter(container, element, duration = 100) {
+                const elementWidth = element.offsetWidth;
+                const containerWidth = container.clientWidth;
+                const elementOffset = element.offsetLeft;
+                let scrollPosition = elementOffset - (containerWidth / 2) + (elementWidth / 2);
+                $(container).animate({ scrollLeft: scrollPosition }, duration);
+            }
+
+            $items.on('click', function (evt){
+                const element = evt.currentTarget;
+                const container = element.closest('.lakit-htimeline-track');
+                scrollToCenter(container, element, 100)
+                if( $linebars.length > 0 ){
+                    $(element).addClass('is-active is-current');
+                    const refId = element.getAttribute('data-item-id');
+                    const $refElm = $(`.lakit-htimeline-timelinebar[data-item-id="${refId}"]`);
+                    $(element).siblings().removeClass('is-current');
+                    $(element).prevAll().addClass('is-active');
+                    $(element).nextAll().removeClass('is-active');
+                    $refElm.addClass('is-active is-current')
+                    $refElm.siblings().removeClass('is-current');
+                    $refElm.prevAll().addClass('is-active');
+                    $refElm.nextAll().removeClass('is-active');
+                }
+            })
+            if( $linebars.length > 0 ){
+                $linebars.on('click', (evt) => {
+                    const eId = evt.currentTarget.getAttribute('data-item-id');
+                    const element = evt.currentTarget;
+                    const container = element.closest('.lakit-htimeline-track');
+                    scrollToCenter(container, element, 100)
+                    $(`.lakit-htimeline-item[data-item-id="${eId}"]`).trigger('click')
+                })
+            }
         });
     });
 

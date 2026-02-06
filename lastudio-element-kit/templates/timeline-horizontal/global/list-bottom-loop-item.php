@@ -3,8 +3,7 @@
  * Timeline list item template
  */
 
-$settings      = $this->get_settings_for_display();
-$layout        = $settings['vertical_layout'];
+$layout        = $this->get_settings_for_display('vertical_layout');
 $item_settings = $this->_processed_item;
 
 $this->add_render_attribute(

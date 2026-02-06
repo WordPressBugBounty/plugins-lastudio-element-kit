@@ -344,7 +344,7 @@ abstract class LaStudioKit_Base extends Widget_Base
         $item = $this->_processed_item;
 
         $key = $keys[0];
-        $nested_key = isset($keys[1]) ? $keys[1] : false;
+        $nested_key = $keys[1] ?? false;
 
         if (empty($item) || !isset($item[$key])) {
             return false;
@@ -353,13 +353,13 @@ abstract class LaStudioKit_Base extends Widget_Base
         if (false === $nested_key || !is_array($item[$key])) {
             $value = $item[$key];
         } else {
-            $value = isset($item[$key][$nested_key]) ? $item[$key][$nested_key] : false;
+            $value = $item[$key][$nested_key] ?? false;
         }
 
         if (!empty($value)) {
             return sprintf($format, $value);
         }
-
+        return false;
     }
 
     /**
@@ -1175,10 +1175,10 @@ abstract class LaStudioKit_Base extends Widget_Base
                     '{{WRAPPER}} .lakit-carousel-inner.sw--horizontal' => '{{VALUE}}',
                 ],
                 'selectors_dictionary' => [
-                    'both' => 'clip-path: inset(-50% -200% -50% -200%)',
-                    'left' => 'clip-path: inset(-50% calc(-1 * var(--lakit-carousel-item-right-space, 0px)) -50% -200%)',
-                    'right' => 'clip-path: inset(-50% -200% -50% calc(-1 * var(--lakit-carousel-item-left-space, 0px)))',
-                    'none' => 'clip-path: inset(-50% calc(-1 * var(--lakit-carousel-item-right-space, 0px)) -50% calc(-1 * var(--lakit-carousel-item-left-space, 0px)))',
+                    'both'  => 'clip-path: inset(-50% -200% -50% -200%)',
+                    'left'  => is_rtl() ? 'clip-path: inset(-50% -200% -50% calc(-1 * var(--lakit-carousel-item-right-space, 0px)))' : 'clip-path: inset(-50% calc(-1 * var(--lakit-carousel-item-right-space, 0px)) -50% -200%)',
+                    'right' => is_rtl() ? 'clip-path: inset(-50% calc(-1 * var(--lakit-carousel-item-left-space, 0px)) -50% -200%)' : 'clip-path: inset(-50% -200% -50% calc(-1 * var(--lakit-carousel-item-left-space, 0px)))',
+                    'none'  => 'clip-path: inset(-50% calc(-1 * var(--lakit-carousel-item-right-space, 0px)) -50% calc(-1 * var(--lakit-carousel-item-left-space, 0px)))',
                 ]
 		    )
 	    );
@@ -1623,7 +1623,8 @@ abstract class LaStudioKit_Base extends Widget_Base
                     ),
                 ),
                 'selectors' => array(
-                    '{{WRAPPER}}' => '--lakit-carousel-padding-left: {{SIZE}}{{UNIT}};',
+                    'body:not(.rtl) {{WRAPPER}}' => '--lakit-carousel-padding-left: {{SIZE}}{{UNIT}};',
+                    'body.rtl {{WRAPPER}}' => '--lakit-carousel-padding-right: {{SIZE}}{{UNIT}};',
                 ),
                 'condition' => array(
                     'enable_carousel' => 'yes'
@@ -1652,7 +1653,8 @@ abstract class LaStudioKit_Base extends Widget_Base
                     ),
                 ),
                 'selectors' => array(
-                    '{{WRAPPER}}' => '--lakit-carousel-padding-right: {{SIZE}}{{UNIT}}',
+                    'body:not(.rtl) {{WRAPPER}}' => '--lakit-carousel-padding-right: {{SIZE}}{{UNIT}}',
+                    'body.rtl {{WRAPPER}}' => '--lakit-carousel-padding-left: {{SIZE}}{{UNIT}}',
                 ),
                 'condition' => array(
                     'enable_carousel' => 'yes'
@@ -1910,7 +1912,8 @@ abstract class LaStudioKit_Base extends Widget_Base
                     'carousel_prev_arrow_h_position_by' => 'left',
                 ),
                 'selectors' => array(
-                    '{{WRAPPER}} .lakit-carousel .lakit-arrow.prev-arrow' => 'left: {{SIZE}}{{UNIT}}; right: auto;',
+                    'body:not(.rtl) {{WRAPPER}} .lakit-carousel .lakit-arrow.prev-arrow' => 'left: {{SIZE}}{{UNIT}}; right: auto;',
+                    'body.rtl {{WRAPPER}} .lakit-carousel .lakit-arrow.prev-arrow' => 'right: {{SIZE}}{{UNIT}}; left: auto;',
                 ),
             )
         );
@@ -1939,7 +1942,8 @@ abstract class LaStudioKit_Base extends Widget_Base
                     'carousel_prev_arrow_h_position_by' => 'right',
                 ),
                 'selectors' => array(
-                    '{{WRAPPER}} .lakit-carousel .lakit-arrow.prev-arrow' => 'right: {{SIZE}}{{UNIT}}; left: auto;',
+                    'body:not(.rtl) {{WRAPPER}} .lakit-carousel .lakit-arrow.prev-arrow' => 'right: {{SIZE}}{{UNIT}}; left: auto;',
+                    'body.rtl {{WRAPPER}} .lakit-carousel .lakit-arrow.prev-arrow' => 'left: {{SIZE}}{{UNIT}}; right: auto;',
                 ),
             )
         );
@@ -2061,7 +2065,8 @@ abstract class LaStudioKit_Base extends Widget_Base
                     'carousel_next_arrow_h_position_by' => 'left',
                 ),
                 'selectors' => array(
-                    '{{WRAPPER}} .lakit-carousel .lakit-arrow.next-arrow' => 'left: {{SIZE}}{{UNIT}}; right: auto;',
+                    'body:not(.rtl) {{WRAPPER}} .lakit-carousel .lakit-arrow.next-arrow' => 'left: {{SIZE}}{{UNIT}}; right: auto;',
+                    'body.rtl {{WRAPPER}} .lakit-carousel .lakit-arrow.next-arrow' => 'right: {{SIZE}}{{UNIT}}; left: auto;',
                 ),
             )
         );
@@ -2090,7 +2095,8 @@ abstract class LaStudioKit_Base extends Widget_Base
                     'carousel_next_arrow_h_position_by' => 'right',
                 ),
                 'selectors' => array(
-                    '{{WRAPPER}} .lakit-carousel .lakit-arrow.next-arrow' => 'right: {{SIZE}}{{UNIT}}; left: auto;',
+                    'body:not(.rtl) {{WRAPPER}} .lakit-carousel .lakit-arrow.next-arrow' => 'right: {{SIZE}}{{UNIT}}; left: auto;',
+                    'body.rtl {{WRAPPER}} .lakit-carousel .lakit-arrow.next-arrow' => 'left: {{SIZE}}{{UNIT}}; right: auto;',
                 ),
             )
         );
@@ -2486,7 +2492,10 @@ abstract class LaStudioKit_Base extends Widget_Base
             'asFor' => $settings['carousel_as_for'],
             'thumbs' => $settings['carousel_thumbs'] ?? '',
             'autoHeight' => filter_var($carousel_autoheight, FILTER_VALIDATE_BOOLEAN),
-            'scrollbar' => filter_var($settings['carousel_scrollbar'], FILTER_VALIDATE_BOOLEAN),
+            'scrollbar' => [
+                'enabled' => filter_var($settings['carousel_scrollbar'], FILTER_VALIDATE_BOOLEAN),
+                'el'    => '.lakit-carousel__scrollbar_' . $widget_id
+            ],
             'directionbkp' => $carousel_direction_resp,
         );
         if ($carousel_columns === false) {
@@ -3496,7 +3505,8 @@ abstract class LaStudioKit_Base extends Widget_Base
 		    // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
 		    $utf8_pcre = @preg_match( '/^./u', 'a' );
 	    }
-	    if ( ! seems_utf8( $filename ) ) {
+        $callback_utf8 = function_exists('wp_is_valid_utf8') ? 'wp_is_valid_utf8' : 'seems_utf8';
+	    if ( ! $callback_utf8( $filename ) ) {
 		    $_ext     = pathinfo( $filename, PATHINFO_EXTENSION );
 		    $_name    = pathinfo( $filename, PATHINFO_FILENAME );
 		    $filename = sanitize_title_with_dashes( $_name ) . '.' . $_ext;
@@ -3690,10 +3700,20 @@ abstract class LaStudioKit_Base extends Widget_Base
         $this->add_control(
             'dot_color',
             [
-                'label' => esc_html__( 'Color', 'lastudio-kit' ),
+                'label' => esc_html__( 'Background Color', 'lastudio-kit' ),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}}' => '--e-dot-color: {{VALUE}}',
+                ],
+            ]
+        );
+        $this->add_control(
+            'dot_border_color',
+            [
+                'label' => esc_html__( 'Border Color', 'lastudio-kit' ),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}}' => '--e-dot-border-color: {{VALUE}}',
                 ],
             ]
         );
@@ -3754,10 +3774,20 @@ abstract class LaStudioKit_Base extends Widget_Base
         $this->add_control(
             'dot_active_color',
             [
-                'label' => esc_html__( 'Color', 'lastudio-kit' ),
+                'label' => esc_html__( 'Background Color', 'lastudio-kit' ),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
                     '{{WRAPPER}}' => '--e-dot-active-color: {{VALUE}}',
+                ],
+            ]
+        );
+        $this->add_control(
+            'dot_active_border_color',
+            [
+                'label' => esc_html__( 'Border Color', 'lastudio-kit' ),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}}' => '--e-dot-active-border-color: {{VALUE}}',
                 ],
             ]
         );

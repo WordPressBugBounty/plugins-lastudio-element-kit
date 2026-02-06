@@ -2,7 +2,6 @@
 /**
  * Timeline list item template
  */
-$settings      = $this->get_settings_for_display();
 $item_settings = $this->_processed_item;
 
 $this->add_render_attribute(

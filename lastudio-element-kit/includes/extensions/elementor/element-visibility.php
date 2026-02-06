@@ -34,7 +34,8 @@ class Element_Visibility {
 
         $data = [
             'lakit-vlogic-guest' => esc_html__('Guests', 'lastudio-kit'),
-            'lakit-vlogic-user' => esc_html__('Logged in users', 'lastudio-kit')
+            'lakit-vlogic-user' => esc_html__('Logged in users', 'lastudio-kit'),
+            'wc_cart_empty' => esc_html__('WC Cart Empty', 'lastudio-kit')
         ];
 
         foreach ( $editable_roles as $k => $role ) {
@@ -158,11 +159,18 @@ class Element_Visibility {
         if ( !empty($settings['lakit_vlogic_enabled']) && $settings['lakit_vlogic_enabled'] === 'yes' ) {
             //visible for
             if ( ! empty( $settings['lakit_vlogic_role_visible'] ) ) {
+
+                if( in_array('wc_cart_empty', $settings['lakit_vlogic_role_visible'], true ) ) {
+                    if( function_exists('WC') && !is_null(WC()->cart)) {
+                        return WC()->cart->is_empty();
+                    }
+                }
+
                 if ( in_array( 'lakit-vlogic-guest', $settings['lakit_vlogic_role_visible'] ) ) {
 	                if(function_exists('is_lost_password_page') && is_lost_password_page()){
 		                return false;
 	                }
-                    if ( $user_state == true ) {
+                    if ( $user_state === true ) {
                         return false;
                     }
                 }
@@ -170,12 +178,12 @@ class Element_Visibility {
 	                if(function_exists('is_lost_password_page') && is_lost_password_page()){
 		                return true;
 	                }
-                    if ( $user_state == false ) {
+                    if ( $user_state === false ) {
                         return false;
                     }
                 }
                 else {
-                    if ( $user_state == false ) {
+                    if ( $user_state === false ) {
                         return false;
                     }
                     $user = wp_get_current_user();
@@ -193,6 +201,12 @@ class Element_Visibility {
 
             } //hidden for
             elseif ( ! empty( $settings['lakit_vlogic_role_hidden'] ) ) {
+
+                if( in_array('wc_cart_empty', $settings['lakit_vlogic_role_hidden'], true ) ) {
+                    if( function_exists('WC') && !is_null(WC()->cart) ) {
+                        return !WC()->cart->is_empty();
+                    }
+                }
 
                 if ( $user_state === false && in_array( 'lakit-vlogic-guest', $settings['lakit_vlogic_role_hidden'], false ) ) {
                     if(function_exists('is_lost_password_page') && is_lost_password_page()){

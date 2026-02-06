@@ -51,3 +51,7 @@ select.cx-ui-select:focus {
 .lakit-swatches-term-metaboxes .cx-control__title {
     margin: 0;
 }
+.cx-ui-group-container {
+    display: flex;
+    gap: 1em;
+}

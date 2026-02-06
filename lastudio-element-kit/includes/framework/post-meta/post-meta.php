@@ -341,12 +341,28 @@ if ( ! class_exists( 'Cherry_X_Post_Meta' ) ) {
                     $field['options'] = call_user_func( $field['options_callback'] );
                 }
 
-                $value = $this->prepare_field_value( $field, $value );
+                $field['type']  = $this->get_arg( $field, 'type', '' );
+                if( 'group' === $field['type']){
+                    $group_value = [];
+                    if( !empty( $field['fields'] ) ){
+                        foreach ( $field['fields'] as $g_field ) {
+                            if( !empty($g_field['name']) ){
+                                $g_key = $g_field['name'];
+                                $_g_value = $this->get_meta( $post, $g_key, $default, $g_field );
+                                $_g_value = $this->prepare_field_value( $g_field, $_g_value );
+                                $group_value[ $g_key ] = $_g_value;
+                            }
+                        }
+                    }
+                    $value = $group_value;
+                }
+                else{
+                    $value = $this->prepare_field_value( $field, $value );
+                }
 
                 $element        = $this->get_arg( $field, 'element', 'control' );
                 $field['id']    = $this->get_arg( $field, 'id', $key );
                 $field['name']  = $this->get_arg( $field, 'name', $key );
-                $field['type']  = $this->get_arg( $field, 'type', '' );
                 $field['value'] = $value;
 
                 if ( 'textarea' === $field['type'] ) {
@@ -371,6 +387,7 @@ if ( ! class_exists( 'Cherry_X_Post_Meta' ) ) {
          *
          * @param $field
          * @param $value
+         * @param $post
          *
          * @return array
          */
@@ -379,6 +396,7 @@ if ( ! class_exists( 'Cherry_X_Post_Meta' ) ) {
             $field_type = isset( $field['type'] ) ? $field['type'] : false;
 
             switch ( $field_type ) {
+
                 case 'repeater':
 
                     if ( is_array( $value ) && ! empty( $field['fields'] ) ) {
@@ -388,7 +406,7 @@ if ( ! class_exists( 'Cherry_X_Post_Meta' ) ) {
                         foreach ( $value as $item_id => $item_value ) {
                             foreach ( $item_value as $repeater_field_id => $repeater_field_value ) {
 
-                                $r_field = isset( $repeater_fields[ $repeater_field_id ] ) ? $repeater_fields[ $repeater_field_id ] : false;
+                                $r_field = $repeater_fields[$repeater_field_id] ?? false;
                                 $value[ $item_id ][ $repeater_field_id ] = $this->prepare_field_value( $r_field, $repeater_field_value );
 
                             }
@@ -550,7 +568,6 @@ if ( ! class_exists( 'Cherry_X_Post_Meta' ) ) {
             }
 
             foreach ( $_POST[ $meta_key ] as $key => $value ) {
-
                 $new_meta_value[ $key ] = $this->sanitize_meta( $key, $value );
             }
 
@@ -559,9 +576,11 @@ if ( ! class_exists( 'Cherry_X_Post_Meta' ) ) {
 
             if ( $new_meta_value && '' == $meta_value ) {
                 add_post_meta( $post_id, $meta_key, $new_meta_value, true );
-            } elseif ( $new_meta_value && $new_meta_value != $meta_value ) {
+            }
+            elseif ( $new_meta_value && $new_meta_value != $meta_value ) {
                 update_post_meta( $post_id, $meta_key, $new_meta_value );
-            } elseif ( empty( $new_meta_value ) && $meta_value ) {
+            }
+            elseif ( empty( $new_meta_value ) && $meta_value ) {
                 delete_post_meta( $post_id, $meta_key, $meta_value );
             }
         }
@@ -577,6 +596,10 @@ if ( ! class_exists( 'Cherry_X_Post_Meta' ) ) {
             foreach ( $this->args['fields'] as $key => $field ) {
 
                 if ( isset( $field['element'] ) && 'control' !== $field['element'] ) {
+                    continue;
+                }
+
+                if( !empty($field['ignore_save']) ){
                     continue;
                 }
 
@@ -605,7 +628,12 @@ if ( ! class_exists( 'Cherry_X_Post_Meta' ) ) {
                         $this->delete_repeater_separate_fields( $post_id, $key, $field );
                     }
 
-                    update_post_meta( $post_id, $key, false );
+                    if('group' === $field['type']){
+                        $this->save_group_fields($post_id, $field);
+                    }
+                    else{
+                        update_post_meta( $post_id, $key, false );
+                    }
 
                     continue;
 
@@ -843,6 +871,29 @@ if ( ! class_exists( 'Cherry_X_Post_Meta' ) ) {
                         $this->get_repeater_separate_field_key( $key, $repeater_field_key ),
                         $repeater_field_value
                     );
+                }
+            }
+        }
+
+        public function save_group_fields( $post_id, $group_fields ){
+            if( !empty($group_fields['fields']) && is_array( $group_fields['fields'] ) ) {
+                foreach ( $group_fields['fields'] as $field ) {
+                    if(!empty($field['name'])){
+                        $field_name = $field['name'];
+                        $fields = [
+                            $field_name => $field
+                        ];
+                        $field_value = $_POST[ $field_name ] ?: null;
+                        if($field_value){
+                            $field_value = $this->sanitize_meta( $field_name, $field_value, $fields );
+                        }
+                        if($field_value === null){
+                            delete_post_meta( $post_id, $field_name );
+                        }
+                        else{
+                            update_post_meta( $post_id, $field_name, $field_value );
+                        }
+                    }
                 }
             }
         }

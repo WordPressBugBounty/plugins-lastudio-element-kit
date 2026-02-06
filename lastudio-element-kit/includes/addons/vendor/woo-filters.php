@@ -1591,7 +1591,7 @@ class LaStudioKit_Woo_Filters extends LaStudioKit_Base {
             }
             echo '<div class="lakit-woofilters_area">';
             echo '<div class="lakit-woofilters_block">';
-            foreach ($filters as $filter){
+            foreach ($filters as $idx => $filter){
                 $this->_processed_item = $filter;
 
                 $el_class = 'lakit-wfi-source_' . $filter['filter_source'];
@@ -1619,6 +1619,10 @@ class LaStudioKit_Woo_Filters extends LaStudioKit_Base {
                     $el_class .= ' elementor-hidden-' . join(' elementor-hidden-', $filter['hide_on']);
                 }
 
+                if($idx < 2){
+                    $el_class .= ' e-open';
+                }
+
                 $block_title_html = '';
                 $item_label = !empty($filter['filter_label']) ? '<span class="woofilter-bitem-title">'.$filter['filter_label'].'</span>' : '';
                 $item_icon = $this->_get_icon_setting($filter['filter_icon'], '<span class="woofilter-bitem-icon elementor-button-icon">%s</span>');
@@ -1637,12 +1641,18 @@ class LaStudioKit_Woo_Filters extends LaStudioKit_Base {
                     esc_attr($filter['nav_menu'])
                 );
 
+                $d_s = $filter['filter_source'];
+                if('product_attribute' === $filter['filter_source']){
+                    $d_s = 'filter_' . $filter['attribute'];
+                }
                 echo sprintf(
-                    '<div class="lakit-woofilters_block_item elementor-repeater-item-%1$s %4$s">%2$s%3$s</div>',
+                    '<div class="lakit-woofilters_block_item elementor-repeater-item-%1$s %4$s" data-source="%5$s" data-eid="e_%6$s">%2$s%3$s</div>',
                     esc_attr($filter['_id']),
                     $block_title_html,
                     $block_filter_html,
-                    esc_attr($el_class)
+                    esc_attr($el_class),
+                    esc_attr($d_s),
+                    esc_attr($filter['_id'])
                 );
                 $this->_processed_index++;
             }

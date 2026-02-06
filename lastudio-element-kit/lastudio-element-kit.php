@@ -3,7 +3,7 @@
  * Plugin Name:       LA-Studio Element Kit for Elementor
  * Plugin URI:        https://la-studioweb.com/lastudio-element-kit/
  * Description:       Additional widgets for Elementor page builder. It has 60 highly customizable widgets
- * Version:           1.5.5.4
+ * Version:           1.6.0
  * Requires at least: 5.2
  * Requires PHP:      7.2
  * Author:            LA-Studio
@@ -13,14 +13,14 @@
  * Text Domain:       lastudio-kit
  * Domain Path:       /languages
  *
- * Elementor tested up to: 3.31.x
- * Elementor Pro tested up to: 3.31.x
- * WooCommerce tested up to: 10.1.x
+ * Elementor tested up to: 3.34.1
+ * Elementor Pro tested up to: 3.34.1
+ * WooCommerce tested up to: 10.4.30
  *
  * @package lastudio-kit
  * @author  LA-Studio
  * @license GPL-2.0+
- * @copyright  2025, LA-Studio
+ * @copyright  2026, LA-Studio
  */
 
 // If this file is called directly, abort.
@@ -62,7 +62,7 @@ if(!class_exists('LaStudio_Kit')){
          *
          * @var string
          */
-        private $version = '1.5.5.4';
+        private $version = '1.6.0';
 
         /**
          * Framework component
@@ -148,7 +148,7 @@ if(!class_exists('LaStudio_Kit')){
 	        $this->ajax_manager = new LaStudio_Kit_Ajax_Manager();
 
             // WPML Integrations
-            add_action( 'init', [ $this, 'solve_wpml_missing_st_addon' ], -10);
+            add_action( 'init', [ $this, 'solve_wpml_missing_addon' ], -10);
         }
 
         /**
@@ -317,7 +317,13 @@ if(!class_exists('LaStudio_Kit')){
                 $message .= sprintf( '<p><a href="%s" class="button-primary">%s</a></p>', $install_url, esc_html__( 'Install Elementor Now', 'lastudio-kit' ) );
             }
 
-            printf( '<div class="notice notice-warning is-dismissible"><p>%s</p></div>', wp_kses( $message, \LaStudio_Kit_Helper::kses_allowed_tags() ) );
+            printf( '<div class="notice notice-warning is-dismissible">%s</div>', wp_kses( $message, [
+                'p' => [],
+                'a' => [
+                    'href' => true,
+                    'class' => true,
+                ],
+            ] ) );
         }
 
         /**
@@ -368,9 +374,10 @@ if(!class_exists('LaStudio_Kit')){
             require_once $this->plugin_path( 'includes/rest-api/rest-api.php' );
             require_once $this->plugin_path( 'includes/rest-api/endpoints/base.php' );
             require_once $this->plugin_path( 'includes/rest-api/endpoints/elementor-template.php' );
-            require_once $this->plugin_path( 'includes/rest-api/endpoints/elementor-widget.php' );
             require_once $this->plugin_path( 'includes/rest-api/endpoints/plugin-settings.php' );
-            require_once $this->plugin_path( 'includes/rest-api/endpoints/get-menu-items.php' );
+
+//            require_once $this->plugin_path( 'includes/rest-api/endpoints/elementor-widget.php' );
+//            require_once $this->plugin_path( 'includes/rest-api/endpoints/get-menu-items.php' );
 
 	        require_once $this->plugin_path( 'includes/integrations/override.php' );
 	        require_once $this->plugin_path( 'includes/integrations/advance.php' );
@@ -674,7 +681,7 @@ if(!class_exists('LaStudio_Kit')){
 			return $is_optimized_css_loading && ! $this->elementor()->preview->is_preview_mode();
 		}
 
-        public function solve_wpml_missing_st_addon(){
+        public function solve_wpml_missing_addon(){
             new LaStudioKitIntegrations\WPML\Base();
             if( !defined('WPML_ST_VERSION') && class_exists('\WPML_Elementor_Translate_IDs_Factory')){
                 $factory = new \WPML_Elementor_Translate_IDs_Factory();

@@ -103,7 +103,7 @@ if ( ! class_exists( 'CX_Control_Iconpicker' ) ) {
 		}
 
 		/**
-		 * Retrun scripts dependencies list for current control.
+		 * Return scripts dependencies list for current control.
 		 *
 		 * @return array
 		 */

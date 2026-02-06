@@ -1539,7 +1539,7 @@ class LaStudioKit_Hotspots extends Widget_Image {
           if ( $product_obj ) {
             $tpl                     = '<div class="lakit-hotspot__product">%1$s<div class="lakit-hotspot__product_info">%2$s%3$s%4$s</div></div>';
             $product_image           = $product_obj->get_image();
-            $product_title           = sprintf( '<a class="product_item--title" href="%1$s">%2$s</a>', esc_url( $product_obj->get_permalink() ), $product_obj->get_title() );
+            $product_title           = sprintf( '<a class="product_item--title" title="%3$s" href="%1$s">%2$s</a>', esc_url( $product_obj->get_permalink() ), esc_html($product_obj->get_title()), esc_attr($product_obj->get_title()) );
             $product_price           = sprintf( '<span class="product_item--price price">%1$s</span>', $product_obj->get_price_html() );
 
             $add_card__key = $trigger_repeater_setting_key . '_addcart';
@@ -1559,8 +1559,8 @@ class LaStudioKit_Hotspots extends Widget_Image {
       }
       else {
           $tpl                     = '<div class="lakit-hotspot__product">%1$s<div class="lakit-hotspot__product_info">%2$s%3$s</div>%4$s</div>';
-          $product_title           = !empty($hotspot['hotspot_tooltip_title']) ? sprintf( '<div class="product_item--title">%1$s</div>', $hotspot['hotspot_tooltip_title'] ) : '';
-          $product_price           = !empty($hotspot['hotspot_tooltip_content']) ? sprintf( '<div class="product_item--price">%1$s</div>', $hotspot['hotspot_tooltip_content'] ) : '';
+          $product_title           = !empty($hotspot['hotspot_tooltip_title']) ? sprintf( '<div class="product_item--title">%1$s</div>', esc_html($hotspot['hotspot_tooltip_title']) ) : '';
+          $product_price           = !empty($hotspot['hotspot_tooltip_content']) ? sprintf( '<div class="product_item--price">%1$s</div>', esc_html($hotspot['hotspot_tooltip_content']) ) : '';
           $product_image           = '';
           if(!empty($hotspot['hotspot_tooltip_image']['id'])){
               $product_image = wp_get_attachment_image($hotspot['hotspot_tooltip_image']['id'], 'full');
@@ -1568,7 +1568,7 @@ class LaStudioKit_Hotspots extends Widget_Image {
           $product_link = '';
           if(!empty( $hotspot['hotspot_link']['url'] )){
               $this->add_link_attributes( $hotspot_repeater_box_key, $hotspot['hotspot_link'] );
-              $product_link = sprintf('<a class="lakit-hotspot--linkoverlay" %1$s>%2$s</a>', $this->get_render_attribute_string( $hotspot_repeater_box_key ), $hotspot['hotspot_tooltip_title']);
+              $product_link = sprintf('<a class="lakit-hotspot--linkoverlay" %1$s>%2$s</a>', $this->get_render_attribute_string( $hotspot_repeater_box_key ), esc_html($hotspot['hotspot_tooltip_title']));
           }
           $hotspot_tooltip_content = sprintf( $tpl, $product_image, $product_title, $product_price, $product_link );
       }

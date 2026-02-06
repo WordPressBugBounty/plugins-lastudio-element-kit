@@ -17,7 +17,6 @@
 		<custom-field action="copy">event_organized_by</custom-field>
 		<custom-field action="copy">event_ticket_link</custom-field>
 		<custom-field action="copy">event_backtolink</custom-field>
-
 	</custom-fields>
 	<custom-fields-texts>
 		<key name="album_tracks">
@@ -26,4 +25,478 @@
 			<key name="lyrics" />
 		</key>
 	</custom-fields-texts>
+	<elementor-widgets>
+		<widget name="lakit-advanced-carousel">
+			<fields-in-item items="items_list">
+				<field type="Carousel Item: Title" editor_type="LINE">item_title</field>
+				<field type="Carousel Item: Description" editor_type="AREA">item_text</field>
+				<field type="Carousel Item: Link" editor_type="LINK" key_of="item_link">url</field>
+				<field type="Carousel Item: Button Text" editor_type="LINE">item_button_text</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-animated-box">
+			<fields>
+				<field type="AnimatedBox: Front Title" editor_type="LINE">front_side_title</field>
+				<field type="AnimatedBox: Front SubTitle" editor_type="LINE">front_side_subtitle</field>
+				<field type="AnimatedBox: Front Description" editor_type="AREA">front_side_description</field>
+				<field type="AnimatedBox: Back Title" editor_type="LINE">back_side_title</field>
+				<field type="AnimatedBox: Back SubTitle" editor_type="LINE">back_side_subtitle</field>
+				<field type="AnimatedBox: Back Description" editor_type="AREA">back_side_description</field>
+				<field type="AnimatedBox: Button Text" editor_type="LINE">back_side_button_text</field>
+				<field type="AnimatedBox: Button Link" editor_type="LINK" key_of="back_side_button_link">url</field>
+			</fields>
+		</widget>
+		<widget name="lakit-animated-text">
+			<fields>
+				<field type="AnimatedText: Before Text" editor_type="LINE">before_text_content</field>
+				<field type="AnimatedText: After Text" editor_type="LINE">after_text_content</field>
+			</fields>
+			<fields-in-item items="animated_text_list">
+				<field type="AnimatedText: Item Text" editor_type="LINE">item_text</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-author-box">
+			<fields>
+				<field type="AuthorBox: Name" editor_type="LINE">author_name</field>
+				<field type="AuthorBox: Website" editor_type="LINK" key_of="author_website">url</field>
+				<field type="AuthorBox: BIO" editor_type="AREA">author_bio</field>
+				<field type="AuthorBox: Archive Button" editor_type="LINK" key_of="posts_url">url</field>
+				<field type="AuthorBox: Button Text" editor_type="LINE">link_text</field>
+			</fields>
+		</widget>
+		<widget name="lakit-banner">
+			<fields>
+				<field type="Banner: Title" editor_type="LINE">banner_title</field>
+				<field type="Banner: Description" editor_type="AREA">banner_text</field>
+				<field type="Banner: Link" editor_type="LINK">banner_link</field>
+			</fields>
+		</widget>
+		<widget name="lakit-banner-list">
+			<fields-in-item items="image_list">
+				<field type="BannerList: Subtitle" editor_type="LINE">subtitle</field>
+				<field type="BannerList: Title" editor_type="LINE">title</field>
+				<field type="BannerList: Description" editor_type="AREA">description</field>
+				<field type="BannerList: SubDescription" editor_type="AREA">subdescription</field>
+				<field type="BannerList: Button" editor_type="LINE">button_text</field>
+				<field type="BannerList: Link" editor_type="LINK" key_of="link">url</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-breadcrumbs">
+			<fields>
+				<field type="Breadcrumb: Custom Page Title" editor_type="LINE">custom_page_title</field>
+				<field type="Breadcrumb: Prefix for the breadcrumb path" editor_type="LINE">browse_label</field>
+				<field type="Breadcrumb: Label for home page" editor_type="LINE">custom_home_page_label</field>
+				<field type="Breadcrumb: Custom Separator" editor_type="LINE">custom_separator</field>
+			</fields>
+		</widget>
+		<widget name="lakit-button">
+			<fields>
+				<field type="Button: Text" editor_type="LINE">text</field>
+				<field type="Button: Link" editor_type="LINK" key_of="link">url</field>
+			</fields>
+		</widget>
+		<widget name="lakit-countdown-timer">
+			<fields>
+				<field type="LINE" editor_type="LINE">label_days</field>
+				<field type="LINE" editor_type="LINE">label_hours</field>
+				<field type="LINE" editor_type="LINE">label_min</field>
+				<field type="LINE" editor_type="LINE">label_sec</field>
+			</fields>
+		</widget>
+		<widget name="lakit-google-maps">
+			<fields>
+				<field type="LINE" editor_type="LINE">map_center</field>
+			</fields>
+			<fields-in-item items="pins">
+				<field type="LINE" editor_type="LINE">pin_address</field>
+				<field type="AREA" editor_type="AREA">pin_desc</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-hamburger-panel">
+			<fields>
+				<field type="LINE" editor_type="LINE">panel_toggle_label</field>
+			</fields>
+		</widget>
+		<widget name="lakit-hotspots">
+			<fields-in-item items="hotspot">
+				<field type="LINE" editor_type="LINE">hotspot_label</field>
+				<field type="LINK" editor_type="LINK" key_of="hotspot_link">url</field>
+				<field type="VISUAL" editor_type="VISUAL">hotspot_tooltip_content</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-icon-box">
+			<fields>
+				<field type="LINE" editor_type="LINE">badge_title</field>
+				<field type="LINE" editor_type="LINE">title_text</field>
+				<field type="LINE" editor_type="LINE">subtitle_text</field>
+				<field type="AREA" editor_type="AREA">description_text</field>
+				<field type="LINE" editor_type="LINE">btn_text</field>
+				<field type="LINK" editor_type="LINK" key_of="btn_url">url</field>
+				<field type="LINK" editor_type="LINK" key_of="global_link">url</field>
+			</fields>
+		</widget>
+		<widget name="lakit-image-box">
+			<fields>
+				<field type="LINE" editor_type="LINE">box_title_text</field>
+				<field type="AREA" editor_type="AREA">box_description_text</field>
+				<field type="LINE" editor_type="LINE">box_btn_text</field>
+				<field type="LINK" editor_type="LINK" key_of="box_btn_url">url</field>
+				<field type="LINK" editor_type="LINK" key_of="box_website_link">url</field>
+			</fields>
+		</widget>
+		<widget name="lakit-images-layout">
+			<fields-in-item items="image_list">
+				<field type="LINE" editor_type="LINE">item_title</field>
+				<field type="AREA" editor_type="AREA">item_desc</field>
+				<field type="AREA" editor_type="AREA">item_link_text</field>
+				<field type="LINK" editor_type="LINK" key_of="item_url">url</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-login-frm">
+			<fields>
+				<field type="LINE" editor_type="LINE">label_username</field>
+				<field type="LINE" editor_type="LINE">username_placeholder</field>
+				<field type="LINE" editor_type="LINE">label_password</field>
+				<field type="LINE" editor_type="LINE">password_placeholder</field>
+				<field type="LINE" editor_type="LINE">label_remember</field>
+				<field type="LINE" editor_type="LINE">label_log_in</field>
+				<field type="LINE" editor_type="LINE">login_redirect_url</field>
+				<field type="LINE" editor_type="LINE">label_logged_in</field>
+				<field type="LINE" editor_type="LINE">lost_password_link_text</field>
+			</fields>
+		</widget>
+		<widget name="lakit-logo">
+			<fields>
+				<field type="LINE" editor_type="LINE">logo_text</field>
+			</fields>
+		</widget>
+		<widget name="lakit-nav-menu">
+			<fields>
+				<field type="LINE" editor_type="LINE">toggle_text</field>
+				<field type="LINE" editor_type="LINE">logo_text</field>
+			</fields>
+		</widget>
+		<widget name="lakit-portfolio">
+			<fields>
+				<field type="LINE" editor_type="LINE">nothing_found_message</field>
+			</fields>
+			<fields-in-item items="metadata1">
+				<field type="LINE" editor_type="LINE">item_label</field>
+			</fields-in-item>
+			<fields-in-item items="metadata2">
+				<field type="LINE" editor_type="LINE">item_label</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-portfolio-meta">
+			<fields-in-item items="metadata">
+				<field type="LINE" editor_type="LINE">item_label</field>
+				<field type="LINE" editor_type="LINE">item_fb</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-post-author">
+			<fields>
+				<field type="LINK" editor_type="LINK" key_of="link">url</field>
+			</fields>
+		</widget>
+		<widget name="lakit-post-date">
+			<fields>
+				<field type="LINK" editor_type="LINK" key_of="link">url</field>
+			</fields>
+		</widget>
+		<widget name="lakit-post-excerpt">
+			<fields>
+				<field type="LINK" editor_type="LINK" key_of="link">url</field>
+			</fields>
+		</widget>
+		<widget name="lakit-post-featured-image">
+			<fields>
+				<field type="LINK" editor_type="LINK" key_of="link">url</field>
+			</fields>
+		</widget>
+		<widget name="lakit-post-info">
+			<fields-in-item items="metadata">
+				<field type="LINE" editor_type="LINE">item_label</field>
+				<field type="LINE" editor_type="LINE">item_fb</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-post-meta">
+			<fields-in-item items="metadata">
+				<field type="LINE" editor_type="LINE">item_label</field>
+				<field type="LINE" editor_type="LINE">item_fb</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-post-navigation">
+			<fields>
+				<field type="LINE" editor_type="LINE">prev_label</field>
+				<field type="LINE" editor_type="LINE">next_label</field>
+				<field type="LINE" editor_type="LINE">menu_label</field>
+			</fields>
+		</widget>
+		<widget name="lakit-post-title">
+			<fields>
+				<field type="LINK" editor_type="LINK" key_of="link">url</field>
+			</fields>
+		</widget>
+		<widget name="lakit-posts">
+			<fields>
+				<field type="LINE" editor_type="LINE">nothing_found_message</field>
+				<field type="LINE" editor_type="LINE">loadmore_text</field>
+			</fields>
+			<fields-in-item items="metadata1">
+				<field type="LINE" editor_type="LINE">item_label</field>
+			</fields-in-item>
+			<fields-in-item items="metadata2">
+				<field type="LINE" editor_type="LINE">item_label</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-price-list">
+			<fields-in-item items="price_list">
+				<field type="LINE" editor_type="LINE">item_title</field>
+				<field type="LINE" editor_type="LINE">item_price</field>
+				<field type="AREA" editor_type="AREA">item_text</field>
+				<field type="LINK" editor_type="LINK" key_of="item_url">url</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-pricing-table">
+			<fields>
+				<field type="LINE" editor_type="LINE">title</field>
+				<field type="LINE" editor_type="LINE">subtitle</field>
+				<field type="LINE" editor_type="LINE">price_prefix</field>
+				<field type="LINE" editor_type="LINE">price</field>
+				<field type="LINE" editor_type="LINE">price_suffix</field>
+				<field type="AREA" editor_type="AREA">price_desc</field>
+				<field type="LINE" editor_type="LINE">button_before</field>
+				<field type="LINE" editor_type="LINE">button_after</field>
+				<field type="LINE" editor_type="LINE">button_text</field>
+				<field type="LINK" editor_type="LINK" key_of="button_url">url</field>
+			</fields>
+			<fields-in-item items="features_list">
+				<field type="LINE" editor_type="LINE">item_text</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-progress-bar">
+			<fields>
+				<field type="LINE" editor_type="LINE">title</field>
+			</fields>
+		</widget>
+		<widget name="lakit-register-frm">
+			<fields>
+				<field type="LINE" editor_type="LINE">label_email</field>
+				<field type="LINE" editor_type="LINE">placeholder_email</field>
+				<field type="LINE" editor_type="LINE">label_username</field>
+				<field type="LINE" editor_type="LINE">placeholder_username</field>
+				<field type="LINE" editor_type="LINE">label_pass</field>
+				<field type="LINE" editor_type="LINE">placeholder_pass</field>
+				<field type="LINE" editor_type="LINE">label_pass_confirm</field>
+				<field type="LINE" editor_type="LINE">placeholder_pass_confirm</field>
+				<field type="LINE" editor_type="LINE">label_submit</field>
+				<field type="LINE" editor_type="LINE">register_redirect_url</field>
+				<field type="LINE" editor_type="LINE">label_registered</field>
+				<field type="VISUAL" editor_type="VISUAL">show_extra_html</field>
+			</fields>
+		</widget>
+		<widget name="lakit-search">
+			<fields>
+				<field type="LINE" editor_type="LINE">search_placeholder</field>
+				<field type="LINE" editor_type="LINE">search_submit_label</field>
+				<field type="LINE" editor_type="LINE">search_trigger_label</field>
+				<field type="LINE" editor_type="LINE">search_tax_dropdown_opt_all</field>
+			</fields>
+		</widget>
+		<widget name="lakit-slides">
+			<fields-in-item items="slides">
+				<field type="LINE" editor_type="LINE">subheading</field>
+				<field type="LINE" editor_type="LINE">heading</field>
+				<field type="LINE" editor_type="LINE">description</field>
+				<field type="LINE" editor_type="LINE">subdescription1</field>
+				<field type="LINE" editor_type="LINE">subdescription2</field>
+				<field type="LINE" editor_type="LINE">button_text</field>
+				<field type="LINK" editor_type="LINK" key_of="link">url</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-social-share">
+			<fields>
+				<field type="LINE" editor_type="LINE">heading</field>
+			</fields>
+			<fields-in-item items="share_buttons">
+				<field type="LINE" editor_type="LINE">text</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-subscribe-form">
+			<fields>
+				<field type="LINE" editor_type="LINE">submit_button_text</field>
+				<field type="LINE" editor_type="LINE">submit_placeholder</field>
+				<field type="LINE" editor_type="LINE">target_list_id</field>
+				<field type="LINK" editor_type="LINK">redirect_url</field>
+				<field type="VISUAL" editor_type="VISUAL">agreement_content</field>
+			</fields>
+			<fields-in-item items="additional_fields">
+				<field type="LINE" editor_type="LINE">placeholder</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-table-of-contents">
+			<fields>
+				<field type="LINE" editor_type="LINE">title</field>
+			</fields>
+		</widget>
+		<widget name="lakit-tabs">
+			<fields>
+				<field type="LINE" editor_type="LINE">tab_text_intro</field>
+			</fields>
+			<fields-in-item items="tabs">
+				<field type="LINE" editor_type="LINE">item_label</field>
+				<field type="LINE" editor_type="LINE">item_sublabel</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-nested-tabs">
+			<fields>
+				<field type="LINE" editor_type="LINE">tab_text_intro</field>
+			</fields>
+			<fields-in-item items="tabs">
+				<field type="LINE" editor_type="LINE">tab_title</field>
+				<field type="LINE" editor_type="LINE">tab_subtitle</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-team-member">
+			<fields>
+				<field type="LINE" editor_type="LINE">loadmore_text</field>
+			</fields>
+			<fields-in-item items="items">
+				<field type="LINE" editor_type="LINE">name</field>
+				<field type="LINE" editor_type="LINE">role</field>
+				<field type="AREA" editor_type="AREA">description</field>
+				<field type="LINK" editor_type="LINK" key_of="link">url</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-testimonials">
+			<fields-in-item items="items">
+				<field type="LINE" editor_type="LINE">item_title</field>
+				<field type="VISUAL" editor_type="VISUAL">item_comment</field>
+				<field type="LINE" editor_type="LINE">item_name</field>
+				<field type="LINE" editor_type="LINE">item_position</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-timeline-horizontal">
+			<fields-in-item items="cards_list">
+				<field type="LINE" editor_type="LINE">item_title</field>
+				<field type="LINE" editor_type="LINE">item_meta</field>
+				<field type="AREA" editor_type="AREA">item_desc</field>
+				<field type="LINE" editor_type="LINE">item_point_text</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-timeline-vertical">
+			<fields-in-item items="cards_list">
+				<field type="LINE" editor_type="LINE">item_title</field>
+				<field type="LINE" editor_type="LINE">item_meta</field>
+				<field type="AREA" editor_type="AREA">item_desc</field>
+				<field type="LINE" editor_type="LINE">item_point_text</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-woofilters">
+			<fields>
+				<field type="LINE" editor_type="LINE">filter_label</field>
+			</fields>
+			<fields-in-item items="filters">
+				<field type="LINE" editor_type="LINE">filter_label</field>
+				<field type="LINE" editor_type="LINE">filter_price_list</field>
+				<field type="LINE" editor_type="LINE">nav_menu</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-menucart">
+			<fields>
+				<field type="LINE" editor_type="LINE">cart_label</field>
+				<field type="LINE" editor_type="LINE">count_format</field>
+				<field type="LINE" editor_type="LINE">total_format</field>
+				<field type="LINE" editor_type="LINE">cart_list_label</field>
+			</fields>
+		</widget>
+		<widget name="lakit-wooproducts">
+			<fields>
+				<field type="LINE" editor_type="LINE">nothing_found_message</field>
+				<field type="LINE" editor_type="LINE">heading</field>
+				<field type="LINE" editor_type="LINE">loadmore_text</field>
+			</fields>
+			<fields-in-item items="product_image_zone_1">
+				<field type="LINE" editor_type="LINE">item_label</field>
+				<field type="LINE" editor_type="LINE">item_label2</field>
+			</fields-in-item>
+			<fields-in-item items="product_image_zone_2">
+				<field type="LINE" editor_type="LINE">item_label</field>
+				<field type="LINE" editor_type="LINE">item_label2</field>
+			</fields-in-item>
+			<fields-in-item items="product_content_buttons">
+				<field type="LINE" editor_type="LINE">item_label</field>
+				<field type="LINE" editor_type="LINE">item_label2</field>
+			</fields-in-item>
+			<fields-in-item items="product_image_zone_3">
+				<field type="LINE" editor_type="LINE">stock_progress_label</field>
+				<field type="LINE" editor_type="LINE">countdown_label_day</field>
+				<field type="LINE" editor_type="LINE">countdown_label_hour</field>
+				<field type="LINE" editor_type="LINE">countdown_label_minute</field>
+				<field type="LINE" editor_type="LINE">countdown_label_second</field>
+			</fields-in-item>
+			<fields-in-item items="product_content_zone">
+				<field type="LINE" editor_type="LINE">stock_progress_label</field>
+				<field type="LINE" editor_type="LINE">countdown_label_day</field>
+				<field type="LINE" editor_type="LINE">countdown_label_hour</field>
+				<field type="LINE" editor_type="LINE">countdown_label_minute</field>
+				<field type="LINE" editor_type="LINE">countdown_label_second</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-wooproduct-meta">
+			<fields>
+				<field type="LINE" editor_type="LINE">category_caption_single</field>
+				<field type="LINE" editor_type="LINE">category_caption_plural</field>
+				<field type="LINE" editor_type="LINE">tag_caption_single</field>
+				<field type="LINE" editor_type="LINE">tag_caption_plural</field>
+				<field type="LINE" editor_type="LINE">sku_caption</field>
+				<field type="LINE" editor_type="LINE">sku_missing_caption</field>
+			</fields>
+		</widget>
+		<widget name="lastudiokit-woo-product">
+			<fields>
+				<field type="LINE" editor_type="LINE">text</field>
+			</fields>
+		</widget>
+		<widget name="lakit-events">
+			<fields>
+				<field type="LINE" editor_type="LINE">nothing_found_message</field>
+				<field type="LINE" editor_type="LINE">loadmore_text</field>
+			</fields>
+			<fields-in-item items="metadata1">
+				<field type="LINE" editor_type="LINE">item_label</field>
+			</fields-in-item>
+			<fields-in-item items="metadata2">
+				<field type="LINE" editor_type="LINE">item_label</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-album-lists">
+			<fields>
+				<field type="LINE" editor_type="LINE">nothing_found_message</field>
+				<field type="LINE" editor_type="LINE">loadmore_text</field>
+				<field type="LINE" editor_type="LINE">play_album_text</field>
+			</fields>
+			<fields-in-item items="metadata1">
+				<field type="LINE" editor_type="LINE">item_label</field>
+			</fields-in-item>
+			<fields-in-item items="metadata2">
+				<field type="LINE" editor_type="LINE">item_label</field>
+			</fields-in-item>
+		</widget>
+		<widget name="lakit-give-form-grid">
+			<fields>
+				<field type="LINE" editor_type="LINE">nothing_found_message</field>
+				<field type="LINE" editor_type="LINE">loadmore_text</field>
+				<field type="LINE" editor_type="LINE">raised_text</field>
+				<field type="LINE" editor_type="LINE">goal_text</field>
+				<field type="LINE" editor_type="LINE">donate_text</field>
+			</fields>
+			<fields-in-item items="metadata1">
+				<field type="LINE" editor_type="LINE">item_label</field>
+			</fields-in-item>
+			<fields-in-item items="metadata2">
+				<field type="LINE" editor_type="LINE">item_label</field>
+			</fields-in-item>
+		</widget>
+	</elementor-widgets>
 </wpml-config>

@@ -36,7 +36,7 @@ if ( ! class_exists( 'CX_Control_Repeater' ) ) {
 		);
 
 		/**
-		 * Stored data to process it while renderinr row
+		 * Stored data to process it while rendering row
 		 *
 		 * @var array
 		 */
@@ -98,7 +98,7 @@ if ( ! class_exists( 'CX_Control_Repeater' ) ) {
 		}
 
 		/**
-		 * Retrun scripts dependencies list for current control.
+		 * Return scripts dependencies list for current control.
 		 *
 		 * @return array
 		 */

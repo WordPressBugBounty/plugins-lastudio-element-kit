@@ -84,7 +84,7 @@ if ( ! class_exists( 'CX_Control_Select' ) ) {
 		}
 
 		/**
-		 * Retrun scripts dependencies list for current control.
+		 * Return scripts dependencies list for current control.
 		 *
 		 * @return array
 		 */
@@ -93,7 +93,7 @@ if ( ! class_exists( 'CX_Control_Select' ) ) {
 		}
 
 		/**
-		 * Retrun styles dependencies list for current control.
+		 * Return styles dependencies list for current control.
 		 *
 		 * @return array
 		 */

@@ -18,10 +18,10 @@
           <div class="lakit-popup--overlay"></div>
         </div>`;
         if(settings.showLoading){
-            ppHTML = `<div class="lakit-popup--wrap lakit-popup--show-loading lakit-popup--is-loading">${ppHTML}<div class="lakit-popup--loading"><div class="lakit-loader spinner3"><div class="dot1"></div><div class="dot2"></div><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div><div class="cube1"></div><div class="cube2"></div><div class="cube3"></div><div class="cube4"></div></div></div></div></div>`
+            ppHTML = `<div class="lakit-popup--wrap lakit-popup--givewp lakit-popup--show-loading lakit-popup--is-loading">${ppHTML}<div class="lakit-popup--loading"><div class="lakit-loader spinner3"><div class="dot1"></div><div class="dot2"></div><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div><div class="cube1"></div><div class="cube2"></div><div class="cube3"></div><div class="cube4"></div></div></div></div></div>`
         }
         else{
-            ppHTML = `<div class="lakit-popup--wrap lakit-popup--is-loading">${ppHTML}</div>`
+            ppHTML = `<div class="lakit-popup--wrap lakit-popup--givewp lakit-popup--is-loading">${ppHTML}</div>`
         }
         const popup = $(ppHTML);
         // Append to body

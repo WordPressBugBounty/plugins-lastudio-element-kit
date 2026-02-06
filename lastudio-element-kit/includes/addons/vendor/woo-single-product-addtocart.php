@@ -988,6 +988,7 @@ class LaStudioKit_Woo_Single_Product_AddToCart extends LaStudioKit_Base
                 'size_units' => [ 'px', '%', 'em', 'custom' ],
                 'selectors' => [
                     '{{WRAPPER}} .lakit-wrap-buynow' => 'width: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .ppc-button-wrapper' => 'width: {{SIZE}}{{UNIT}};',
                 ],
             ]
         );

@@ -28,11 +28,11 @@ document.addEventListener('DOMContentLoaded', function () {
         root.style.setProperty('--lakit-footer-height', `${footer?.clientHeight || 0}px`);
         root.style.setProperty('--lakit-pheader-height', `${pageHeader?.clientHeight || 0}px`);
         const hasSticky = document.querySelector('.elementor-location-header .e-con.elementor-sticky');
-        document.body.classList.toggle('e-has-header-sticky', !!hasSticky);
+        document.body.classList.toggle('e-has-header-sticky', !!hasSticky)
     }
     setHeaderHeight();
-    window.addEventListener('load', setHeaderHeight);
     window.addEventListener('resize', setHeaderHeight);
+    window.addEventListener('scroll', setHeaderHeight);
 });
 
 (function ($) {
@@ -444,10 +444,10 @@ document.addEventListener('DOMContentLoaded', function () {
             let elementSettings = $carousel.data('slider_options'),
                 slidesToShow = parseInt(elementSettings.slidesToShow.desktop) || 1,
                 elementorBreakpoints = elementorFrontend.config.responsive.activeBreakpoints,
-                carousel_id = elementSettings.uniqueID,
+                carousel_id = elementSettings?.uniqueID ?? LaStudioKits.makeID(10),
                 eUniqueId = $carousel.closest('.elementor-element').data('id'),
                 e_dRows = parseInt(elementSettings.rows.desktop || 1),
-                _directionBase = elementSettings.directionbkp.desktop ?? 'horizontal'
+                _directionBase = elementSettings?.directionbkp?.desktop ?? 'horizontal'
 
             let swiperOptions = {
                 slidesPerView: slidesToShow,
@@ -484,6 +484,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     _per_group = _per_view;
                 }
                 let _bkp_gRows = +elementSettings.rows[breakpointName] || 1
+                let _direction_b = _directionBase;
+                if( elementSettings?.directionbkp && typeof elementSettings?.directionbkp[breakpointName] !== "undefined"){
+                    _direction_b = elementSettings?.directionbkp[breakpointName] || _directionBase
+                }
                 _bkpData[elementorBreakpoints[breakpointName].value] = {
                     slidesPerView: _per_view,
                     slidesPerGroup: _per_group,
@@ -491,14 +495,29 @@ document.addEventListener('DOMContentLoaded', function () {
                         rows: _bkp_gRows,
                         fill: 'row'
                     },
-                    direction: elementSettings.directionbkp[breakpointName] || _directionBase,
+                    direction: _direction_b,
                     loop: _bkp_gRows > 1 ? false : elementSettings.infinite,
-                    loopFillGroupWithBlank: _bkp_gRows > 1 ? true : false
+                    loopFillGroupWithBlank: _bkp_gRows > 1
                 }
                 lastBreakpointSlidesToShowValue = +elementSettings.slidesToShow[breakpointName] || defaultSlidesToShow;
             });
 
             let last_bkp_index = ''
+
+            var enableScrollbar = elementSettings?.scrollbar?.enabled ?? false;
+
+            if(!!enableScrollbar){
+                swiperOptions.scrollbar = {
+                    el: elementSettings?.scrollbar?.el ?? '.lakit-carousel__scrollbar_' + eUniqueId,
+                    draggable: true,
+                    enabled: true,
+                    snapOnRelease: true,
+                }
+            }
+            else{
+                swiperOptions.scrollbar = false
+            }
+
 
             const adjustBreakpointConfigs = ( bkp ) => {
                 const elementorBreakpointValues = elementorFrontend.breakpoints.getBreakpointValues();
@@ -534,7 +553,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 slidesPerGroup: swiperOptions.slidesPerGroup,
                 grid: swiperOptions.grid,
                 direction: swiperOptions.direction,
-                loop: swiperOptions.loop
+                loop: swiperOptions.loop,
             }
 
             swiperOptions.breakpoints = _bkpDataModified;
@@ -683,19 +702,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             }
 
-            var enableScrollbar = elementSettings.scrollbar || false;
-
-            if (!enableScrollbar) {
-                swiperOptions.scrollbar = false;
-            }
-            else {
-                swiperOptions.scrollbar = {
-                    el: '.lakit-carousel__scrollbar_' + eUniqueId,
-                    draggable: true,
-                    snapOnRelease: true,
-                }
-            }
-
             var _has_slidechange_effect = false,
                 _slide_change_effect_in = elementSettings.content_effect_in || 'fadeInUp',
                 _slide_change_effect_out = elementSettings.content_effect_out || 'fadeOutDown';
@@ -717,8 +723,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if(typeof elementSettings.asFor !== "undefined" && elementSettings.asFor.trim() !== ''){
                 swiperOptions.slideToClickedSlide = true;
             }
-
-
 
             $('.swiper-slide .lakit-has-entrance-animation', $scope).each(function (){
                 const _settings = $(this).data('settings');
@@ -832,7 +836,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 afterInit: ( _swiper ) => {
                     $('.swiper-slide-duplicate .lakit-embla_wrap.embla--inited', _swiper.$wrapperEl).removeClass('embla--inited').trigger('lastudio-kit/init-embla-slider');
-                    if(swiperOptions.scrollbar?.el){
+                    if(swiperOptions?.scrollbar?.el){
                         $('.swiper-scrollbar-drag', $(swiperOptions.scrollbar?.el)).append('<span/>').wrap('<div class="lakit-carousel__scrollbar-inner"/>')
                         $(swiperOptions.scrollbar?.el).addClass('la_modified')
                     }
@@ -892,13 +896,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 swiperOptions.loop = false;
                 swiperOptions.noSwipingSelector = '.swiper-slide > .e-con .elementor-element';
             }
+
             const Swiper = LaStudioKits.utils.Swiper;
             new Swiper($swiperContainer, swiperOptions).then(function (SwiperInstance) {
 
                 LaStudioKits.swiperInstances[carousel_id] = SwiperInstance
 
                 if(elementSettings?.variableWidth || elementSettings?.infiniteEffect){
-                    console.log('here..')
                     SwiperInstance.update()
                 }
 
@@ -1281,8 +1285,8 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         let $data = $response.find('.elementor-element-' + widgetId + ' ' + itemSelector);
 
-                        if ($parentContainer.find('.swiper-container').length > 0) {
-                            let swiper = $parentContainer.find('.swiper-container').get(0).swiper;
+                        if ($parentContainer.find('.swiper-container:not(.nested-swiper)').length > 0) {
+                            let swiper = $parentContainer.find('.swiper-container:not(.nested-swiper)').get(0).swiper;
                             swiper.removeAllSlides();
                             swiper.appendSlide($data);
                         }
@@ -1752,6 +1756,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
                 window?.elementorFrontend?.hooks?.doAction('frontend/element_ready/global', $this, $);
             });
+            const $format_gallery = $selector.find('.postformat-content .lakit-carousel');
+            if($format_gallery.length > 0){
+                $format_gallery.removeClass('inited')
+                $selector.find('.postformat-content').each(function (){
+                    LaStudioKits.initCarousel($(this))
+                })
+            }
         },
 
         initAnimationsHandlers: function ($selector) {
@@ -2806,7 +2817,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (options) {
                 $.extend(settings, options);
             }
-
+            console.log({
+                settings
+            })
             /**
              * Set handler settings from localized global variable
              *
@@ -4184,7 +4197,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 $(this).trigger('lastudio-kit/LazyloadSequenceEffects');
             }
         });
-
         LaStudioKits.reInitMotionEffects(data.parentContainer)
     });
 
@@ -4564,6 +4576,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     type: 'GET',
                     nonce: ''
                 },
+                ajaxSettings: {
+                    headers: {
+                        'X-WP-Nonce': LaStudioKitSettings.restNonce
+                    },
+                },
                 successCallback: _successCb
             }).send();
         })
@@ -4685,7 +4702,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 const updateHeadingRepeat = () => {
                     const headingEl = $scope.find('.elementor-heading-title').get(0)
                     if (!headingEl.dataset.originalText) {
-                        headingEl.dataset.originalText = headingEl.innerText;
+                        headingEl.dataset.originalText = headingEl.innerHTML;
                     }
                     const originalText = headingEl.dataset.originalText;
                     const spacedText = originalText + ' ';
@@ -4693,16 +4710,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     span.style.visibility = "hidden";
                     span.style.whiteSpace = "nowrap";
                     span.style.position = "absolute";
-                    span.innerText = originalText;
+                    span.innerHTML = originalText;
                     document.body.appendChild(span);
 
                     const textWidth = span.offsetWidth;
                     const targetWidth = 3 * window.innerWidth;
                     if (textWidth < targetWidth) {
                         const repeatCount = Math.round(targetWidth / textWidth);
-                        headingEl.innerText = spacedText.repeat(repeatCount).trim();
+                        headingEl.innerHTML = spacedText.repeat(repeatCount).trim();
                     } else {
-                        headingEl.innerText = originalText;
+                        headingEl.innerHTML = originalText;
                     }
                     document.body.removeChild(span);
                 }

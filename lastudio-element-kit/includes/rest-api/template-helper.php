@@ -58,32 +58,36 @@ class Template_Helper {
 
     public function callback( $args, $type = 'rest' ) {
 
+        if($type !== 'rest'){
+            $passed_rate_limit = self::apply_rate_limit();
+            if(!$passed_rate_limit){
+                return $passed_rate_limit;
+            }
+        }
+
+        $default = [
+            'template_content' => '',
+            'template_scripts' => [],
+            'template_styles'  => [],
+            'template_metadata' => []
+        ];
+
         $template_id = ! empty( $args['id'] ) ? $args['id'] : false;
         $dynamic_id = ! empty( $args['dynamic_id'] ) ? $args['dynamic_id'] : 0;
 
-        $is_dev = isset($args['dev']) ? $args['dev'] : false;
+        $is_dev = $args['dev'] ?? false;
 
-        $dev = filter_var( $is_dev, FILTER_VALIDATE_BOOLEAN ) ? true : false;
+        $dev = (bool)filter_var($is_dev, FILTER_VALIDATE_BOOLEAN);
 
         if ( ! $template_id || !defined('ELEMENTOR_VERSION' ) ) {
-            $template_data = [
-                'template_content' => '',
-                'template_scripts' => [],
-                'template_styles'  => [],
-                'template_metadata' => []
-            ];
+            $template_data = $default;
             return $type == 'rest' ? rest_ensure_response( $template_data ) : $template_data;
         }
 
 	    $rest_allow_types = apply_filters('lastudio-kit/rest/elmenetor/allow_types', ['elementor_library', 'nav_menu_item']);
 
-        if( !in_array(get_post_type($template_id), $rest_allow_types) ){
-	        $template_data = [
-		        'template_content' => '',
-		        'template_scripts' => [],
-		        'template_styles'  => [],
-		        'template_metadata' => []
-	        ];
+        if( !in_array(get_post_type($template_id), $rest_allow_types) || get_post_status($template_id) !== 'publish' ){
+	        $template_data = $default;
 	        return $type == 'rest' ? rest_ensure_response( $template_data ) : $template_data;
         }
 
@@ -97,6 +101,9 @@ class Template_Helper {
         $template_data = get_transient( $transient_key );
 
         if ( !empty( $template_data ) && !$dev ) {
+            if(!is_user_logged_in()){
+                $template_data['template_metadata'] = [];
+            }
             return $type == 'rest' ? rest_ensure_response( $template_data ) : $template_data;
         }
 
@@ -154,6 +161,9 @@ class Template_Helper {
 			self::set_transient_key('post_type', $dynamic_id, $transient_key );
 		}
 
+        if(!is_user_logged_in()){
+            $template_data['template_metadata'] = [];
+        }
         return $type == 'rest' ? rest_ensure_response( $template_data ) : $template_data;
     }
 
@@ -451,6 +461,16 @@ class Template_Helper {
     }
 
     public function widget_callback( $args, $type = 'rest' ) {
+
+        if($type !== 'rest'){
+            $passed_rate_limit = self::apply_rate_limit();
+            if(!$passed_rate_limit){
+                return $passed_rate_limit;
+            }
+        }
+
+        $default_response = [ 'template_content' => '' ];
+
         $template_id = ! empty( $args['template_id'] ) ? $args['template_id'] : false;
         $widget_id = ! empty( $args['widget_id'] ) ? $args['widget_id'] : false;
         $is_dev = isset($args['dev']) ? filter_var( $args['dev'], FILTER_VALIDATE_BOOLEAN ) : false;
@@ -459,6 +479,7 @@ class Template_Helper {
         $cache_timeout = 15 * DAY_IN_SECONDS;
 
         $custom_paged_key = $_REQUEST['lakitpagedkey'] ?? false;
+
         $paged_key = (!empty($custom_paged_key) && isset($_REQUEST[$custom_paged_key])) ? $_REQUEST[$custom_paged_key] : 0;
 
         if(!empty($custom_paged_key) && !empty($paged_key)){
@@ -466,11 +487,11 @@ class Template_Helper {
         }
 
         if ( (empty($template_id) && empty($widget_id)) || !defined('ELEMENTOR_VERSION' ) ) {
-	        return $type == 'rest' ? rest_ensure_response( [ 'template_content' => '' ] ) : [ 'template_content' => '' ];
+	        return $type == 'rest' ? rest_ensure_response( $default_response ) : $default_response;
         }
 
-	    if( false === get_post_type($template_id) ){
-		    return $type == 'rest' ? rest_ensure_response( [ 'template_content' => '' ] ) : [ 'template_content' => '' ];
+	    if( false === get_post_type($template_id) || 'publish' !== get_post_status($template_id) ){
+		    return $type == 'rest' ? rest_ensure_response( $default_response ) : $default_response;
 	    }
 
 	    $cache_name = sprintf( 'lakit_doc_%1$s_widget_%2$s_paged_%3$s', $template_id, $widget_id, $paged_key );
@@ -489,19 +510,19 @@ class Template_Helper {
         $doc_meta = get_post_meta( $template_id, '_elementor_data', true );
 
         if(empty($doc_meta)){
-	        return $type == 'rest' ? rest_ensure_response( [ 'template_content' => '' ] ) : [ 'template_content' => '' ];
+	        return $type == 'rest' ? rest_ensure_response( $default_response ) : $default_response;
         }
 
         $doc_meta = @json_decode($doc_meta, true);
 
         if(empty($doc_meta)){
-	        return $type == 'rest' ? rest_ensure_response( [ 'template_content' => '' ] ) : [ 'template_content' => '' ];
+	        return $type == 'rest' ? rest_ensure_response( $default_response ) : $default_response;
         }
 
 		$widget_data = $this->find_widget_data($doc_meta, $widget_id);
 
         if(empty($widget_data) || ( !empty($widget_data) && !is_array($widget_data) )){
-	        return $type == 'rest' ? rest_ensure_response( [ 'template_content' => '' ] ) : [ 'template_content' => '' ];
+	        return $type == 'rest' ? rest_ensure_response( $default_response ) : $default_response;
         }
 
 	    if(!empty($widget_args['filter'])){
@@ -557,6 +578,34 @@ class Template_Helper {
             }
         }
         return $return;
+    }
+
+    /**
+     * @param string $key_prefix
+     * @return true|\WP_Error
+     */
+    public static function apply_rate_limit( $key_prefix = 'lakit_rl_rest_' ){
+        $user_ip = $_SERVER['REMOTE_ADDR'];
+        $key = $key_prefix . md5($user_ip);
+        $limit = 30;
+        $time = MINUTE_IN_SECONDS;
+        $data = get_transient($key);
+        if (!$data) {
+            $data = ['count' => 1, 'start' => time()];
+            set_transient($key, $data, $time);
+        }
+        else {
+            $data['count']++;
+            if ($data['count'] > $limit) {
+                return new \WP_Error(
+                    'rate_limited',
+                    'Too many requests. Please wait a moment.',
+                    ['status' => 429]
+                );
+            }
+            set_transient($key, $data, $time - (time() - $data['start']));
+        }
+        return true;
     }
 }
 

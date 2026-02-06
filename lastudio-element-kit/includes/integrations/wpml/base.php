@@ -622,8 +622,8 @@ class Base {
                 'widgetType' => 'lakit-post-author'
             ],
             'fields'            => [
-                'link' => [
-                    'field'       => 'url',
+                [
+                    'field'       => 'link',
                     'type'        => __( 'Post Author: Link', 'lastudio-kit' ),
                     'editor_type' => 'LINK'
                 ],
@@ -635,8 +635,8 @@ class Base {
                 'widgetType' => 'lakit-post-date'
             ],
             'fields'            => [
-                'link' => [
-                    'field'       => 'url',
+                [
+                    'field'       => 'link',
                     'type'        => __( 'Post Date: Link', 'lastudio-kit' ),
                     'editor_type' => 'LINK'
                 ],
@@ -648,8 +648,8 @@ class Base {
                 'widgetType' => 'lakit-post-excerpt'
             ],
             'fields'            => [
-                'link' => [
-                    'field'       => 'url',
+                [
+                    'field'       => 'link',
                     'type'        => __( 'Post Excerpt: Link', 'lastudio-kit' ),
                     'editor_type' => 'LINK'
                 ],
@@ -661,8 +661,8 @@ class Base {
                 'widgetType' => 'lakit-post-featured-image'
             ],
             'fields'            => [
-                'link' => [
-                    'field'       => 'url',
+                [
+                    'field'       => 'link',
                     'type'        => __( 'Post Image: Link', 'lastudio-kit' ),
                     'editor_type' => 'LINK'
                 ],
@@ -951,6 +951,11 @@ class Base {
                     'field'       => 'label_registered',
                     'type'        => __( 'Register Form: User Registered Message', 'lastudio-kit' ),
                     'editor_type' => 'LINE'
+                ],
+                [
+                    'field'       => 'show_extra_html',
+                    'type'        => __( 'Register Form: Extra Content', 'lastudio-kit' ),
+                    'editor_type' => 'VISUAL'
                 ]
             ],
         ];
@@ -1020,7 +1025,7 @@ class Base {
                         'type'        => __( 'Slides: button text', 'lastudio-kit' ),
                         'editor_type' => 'LINE'
                     ],
-                    'link' => [
+                    [
                         'field'       => 'url',
                         'type'        => __( 'Slides: button link', 'lastudio-kit' ),
                         'editor_type' => 'LINK'
@@ -1071,10 +1076,15 @@ class Base {
                     'type'        => __( 'Subscribe: Mailchimp list id', 'lastudio-kit' ),
                     'editor_type' => 'LINE'
                 ],
-                'redirect_url' => [
-                    'field'       => 'url',
+                [
+                    'field'       => 'redirect_url',
                     'type'        => __( 'Subscribe: redirect url', 'lastudio-kit' ),
                     'editor_type' => 'LINK'
+                ],
+                [
+                    'field'       => 'agreement_content',
+                    'type'        => __( 'Subscribe: Agreement Content', 'lastudio-kit' ),
+                    'editor_type' => 'VISUAL'
                 ]
             ],
             'fields_in_item'    => [
@@ -1183,7 +1193,7 @@ class Base {
                         'type'        => __( 'Member: description', 'lastudio-kit' ),
                         'editor_type' => 'AREA'
                     ],
-                    'link' => [
+                    [
                         'field'       => 'url',
                         'type'        => __( 'Member: link', 'lastudio-kit' ),
                         'editor_type' => 'LINK'

@@ -44,7 +44,7 @@ if ( ! class_exists( 'CX_Control_Media' ) ) {
 		}
 
 		/**
-		 * Retrun scripts dependencies list for current control.
+		 * Return scripts dependencies list for current control.
 		 *
 		 * @return array
 		 */
