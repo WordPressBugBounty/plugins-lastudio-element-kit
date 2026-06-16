@@ -5,6 +5,7 @@ use Elementor\Controls_Manager;
 use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Tag as DynamicTagsTag;
 use LaStudioKitThemeBuilder\Modules\DynamicTags\Module as DynamicTagsModule;
 use LaStudioKitExtensions\Elementor\Controls\Control_Query as QueryControlModule;
+use Elementor\Core\Base\Document;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly

@@ -27,7 +27,9 @@ class Module extends Module_Base {
     /**
      * @var array
      */
-    public static $iconResources = [];
+    protected static $iconResources = null;
+
+    private $shouldRenderSource = null;
 
     public function __construct()
     {
@@ -61,9 +63,9 @@ class Module extends Module_Base {
         }
 
         add_action('lastudiokit/renderIconSVGSprite', [ $this, 'getRenderSVGSprite' ]);
-        add_action('wp_footer', [ $this, 'getRenderSVGSprite' ], 9999);
+        add_action('lastudio-kit/renderIconSVGSprite', [ $this, 'getRenderSVGSprite' ]);
+        add_action('wp_footer', [ $this, 'getRenderSVGSprite' ], 10);
 
-        $this->loadSVGJSON();
     }
 
     public static function is_active(){
@@ -353,26 +355,17 @@ class Module extends Module_Base {
         wp_send_json( array(
             'results' => lastudio_kit_helper()->search_terms_by_tax( $tax, $query, $ids ),
         ) );
-
     }
 
-    public function addIconFontCache( $type, $icon )  {
-        $tmp = explode(' ', $icon);
-        if(isset($tmp[1])){
-            $icon = $tmp[1];
-        }
-        $icon = str_replace('lastudioicon-', '', $icon);
+    public function addIconFontCache($type, $icon) {
 
-        $oldData = self::$cacheIconFonts;
-        if(empty($oldData[$type])){
-            $oldData[$type] = [ $icon ];
+        $icon = $this->normalizeIconName($icon);
+
+        if (!isset(self::$cacheIconFonts[$type])) {
+            self::$cacheIconFonts[$type] = [];
         }
-        else{
-            if(!in_array($icon, $oldData[$type])){
-                $oldData[$type][] = $icon;
-            }
-        }
-        self::$cacheIconFonts = $oldData;
+
+        self::$cacheIconFonts[$type][$icon] = true;
     }
 
     private function render_callback_icon( $icon, $attributes, $tag, $type){
@@ -388,62 +381,69 @@ class Module extends Module_Base {
     }
 
     public function loadSVGJSON(){
-        if( !empty(self::$iconResources) ){
+
+        if (self::$iconResources !== null) {
             return self::$iconResources;
         }
+
+        $cache_key = 'lakit_svg_resources_v1';
+
+        $cached = wp_cache_get($cache_key, 'lastudio-kit');
+
+        if ($cached !== false) {
+            self::$iconResources = $cached;
+            return self::$iconResources;
+        }
+
         $svg = [
             'dlicon' => [
-                'version' => '1.0.0',
-                'path' => lastudio_kit()->plugin_path('includes/extensions/elementor/assets/fonts/dlicon-svg.json')
+                'path' => lastudio_kit()->plugin_path(
+                    'includes/extensions/elementor/assets/fonts/dlicon-svg.json'
+                )
             ],
             'LaStudioIcons' => [
-                'version' => '1.0.1',
-                'path' => lastudio_kit()->plugin_path('includes/extensions/elementor/assets/fonts/LaStudioIcons-svg.json')
+                'path' => lastudio_kit()->plugin_path(
+                    'includes/extensions/elementor/assets/fonts/LaStudioIcons-svg.json'
+                )
             ]
         ];
 
         $saved_data = [];
-        foreach ($svg as $k => $item){
+
+        foreach ($svg as $k => $item) {
             $fileData = \Elementor\Utils::file_get_contents($item['path']);
-            $saved_data[$k] = [
-                'version' => $item['version'],
-                'data' => !empty($fileData) ? $fileData : ''
-            ];
+            $saved_data[$k] = !empty($fileData) ? json_decode($fileData, true) : [];
         }
+
+        wp_cache_set(
+            $cache_key,
+            $saved_data,
+            'lastudio-kit',
+            MONTH_IN_SECONDS
+        );
+
         self::$iconResources = $saved_data;
+
         return self::$iconResources;
     }
 
     public function maybeRenderSVGSpriteIcon( $icon = '', $type = '' ){
-        if(empty($icon) || empty($type)){
-            return '';
-        }
-        $tmp = explode(' ', $icon);
-        if(isset($tmp[1])){
-            $icon = $tmp[1];
-        }
-        $icon = str_replace('lastudioicon-', '', $icon);
+        $icon = $this->normalizeIconName($icon);
         $output = '';
-        $cacheSVG = $this->loadSVGJSON();
-        $svgData = [];
-        if(empty($cacheSVG)){
-            return '';
-        }
-        foreach ($cacheSVG as $k => $v){
-            $svgData[$k] = !empty($v['data']) ? json_decode($v['data'], true) : [];
+        $svgData = $this->loadSVGJSON();
+        if(!is_array($svgData)){
+            return $output;
         }
         if( isset( $svgData[$type][$icon] )){
             $_id = $type . '___' . str_replace('-', '_', $icon);
             $_w = $svgData[$type][$icon][0];
             $_h = $svgData[$type][$icon][1];
             $_d = $svgData[$type][$icon][4];
-
-            $show_source = false;
-            $is_shortcode = apply_filters( 'elementor/element/should_render_shortcode', false );
-            if( $is_shortcode || wp_doing_ajax() || lastudio_kit()->elementor()->editor->is_edit_mode() || \LaStudio_Kit_Helper::is_active_elementor_cache() ){
-                $show_source = true;
+            if ($this->shouldRenderSource === null) {
+//                $this->shouldRenderSource = apply_filters( 'elementor/element/should_render_shortcode', false ) || wp_doing_ajax() || lastudio_kit()->elementor()->editor->is_edit_mode();
+                $this->shouldRenderSource = true;
             }
-            if( $show_source ) {
+            if ($this->shouldRenderSource){
                 $output = sprintf('<svg xmlns="http://www.w3.org/2000/svg" width="%1$s" height="%2$s" viewBox="0 0 %1$s %2$s" class="lakit-font-icon-svg" data-icon-name="%5$s" data-icon-type="%4$s"><path d="%3$s" fill="currentColor"/></svg>', $_w, $_h, $_d, $type, $icon);
             }
             else{
@@ -454,24 +454,51 @@ class Module extends Module_Base {
     }
 
     public function getRenderSVGSprite() {
-        $cacheFonts = self::$cacheIconFonts;
-        $cacheSVG = $this->loadSVGJSON();
-        $svgData = [];
-        foreach ($cacheSVG as $k => $v){
-            $svgData[$k] = !empty($v['data']) ? json_decode($v['data'], true) : [];
+        if (empty(self::$cacheIconFonts)) {
+            return;
         }
+        $cache_key = 'lakit_svg_sprite_html_' . md5(serialize(self::$cacheIconFonts));
+        $cached_html = wp_cache_get( $cache_key, 'lastudio-kit');
+        if ($cached_html !== false) {
+            echo $cached_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            return;
+        }
+        $svgData = $this->loadSVGJSON();
         $output = [];
-        foreach ($cacheFonts as $type => $icons){
-            foreach ($icons as $icon){
-                if( isset( $svgData[$type][$icon] )){
-                    $_id = $type . '___' . str_replace('-', '_', $icon);
-                    $_path = $svgData[$type][$icon][4];
-                    $output[] = sprintf('<g id="%1$s"><path d="%2$s"/></g>', $_id, $_path);
+        foreach (self::$cacheIconFonts as $type => $icons) {
+            if ( empty($svgData[$type]) || empty($icons) ) {
+                continue;
+            }
+            foreach ($icons as $icon => $_) {
+                if (empty($svgData[$type][$icon])) {
+                    continue;
                 }
+                $_id = sprintf( '%s___%s', esc_attr($type), esc_attr(str_replace('-', '_', $icon)) );
+                $_path = $svgData[$type][$icon][4];
+                $output[] = '<g id="' . $_id . '"><path d="' . esc_attr($_path) . '"/></g>';
             }
         }
-        if(!empty($output)){
-            printf('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 0 0" width="0" height="0" focusable="false" role="none" style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;" class="hidden"><defs>%1$s</defs></svg>', join('', $output));// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        if (empty($output)) {
+            return;
         }
+        $html = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 0 0" width="0" height="0" focusable="false" role="none" style="visibility: hidden; position: absolute; left: -9999px; overflow: hidden;" class="hidden"><defs>' . implode('', $output) . '</defs></svg>';
+        wp_cache_set( $cache_key, $html, 'lastudio-kit', MONTH_IN_SECONDS );
+        echo $html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        return;
     }
+
+    private function normalizeIconName($icon) {
+        static $cache = [];
+        if (isset($cache[$icon])) {
+            return $cache[$icon];
+        }
+        $tmp = explode(' ', $icon);
+        if (isset($tmp[1])) {
+            $icon = $tmp[1];
+        }
+        $icon = str_replace('lastudioicon-', '', $icon);
+        $cache[$icon] = $icon;
+        return $icon;
+    }
+
 }

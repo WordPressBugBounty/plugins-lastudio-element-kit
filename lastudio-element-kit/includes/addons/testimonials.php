@@ -18,18 +18,13 @@ if (!defined('WPINC')) {
  */
 class LaStudioKit_Testimonials extends LaStudioKit_Base {
 
-    protected function enqueue_addon_resources(){
-	    if(!lastudio_kit_settings()->is_combine_js_css()) {
-		    $this->add_script_depends( 'lastudio-kit-base' );
-		    if(!lastudio_kit()->is_optimized_css_mode()) {
-                $depends = [ 'lastudio-kit-base', 'e-swiper' ];
-                if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
-                    $depends[] = 'lastudio-kit-swiper-dotv2';
-                }
-			    wp_register_style( $this->get_name(), lastudio_kit()->plugin_url( 'assets/css/addons/testimonials.min.css' ), $depends, lastudio_kit()->get_version() );
-			    $this->add_style_depends( $this->get_name() );
-		    }
-	    }
+    public function get_style_depends()
+    {
+        $depends = [ 'lakit-testimonials', 'e-swiper' ];
+        if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+            $depends[] = 'lastudio-kit-swiper-dotv2';
+        }
+        return $depends;
     }
 
     protected function get_html_wrapper_class(){
@@ -39,19 +34,6 @@ class LaStudioKit_Testimonials extends LaStudioKit_Base {
         }
         return $wrapper_class;
     }
-
-	public function get_widget_css_config($widget_name){
-		$file_url = lastudio_kit()->plugin_url(  'assets/css/addons/testimonials.min.css' );
-		$file_path = lastudio_kit()->plugin_path( 'assets/css/addons/testimonials.min.css' );
-		return [
-			'key' => $widget_name,
-			'version' => lastudio_kit()->get_version(true),
-			'file_path' => $file_path,
-			'data' => [
-				'file_url' => $file_url
-			]
-		];
-	}
     
     public function get_name() {
         return 'lakit-testimonials';

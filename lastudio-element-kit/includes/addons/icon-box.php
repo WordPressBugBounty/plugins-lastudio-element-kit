@@ -16,29 +16,10 @@ if (!defined('WPINC')) {
  */
 class LaStudioKit_Icon_Box extends LaStudioKit_Base {
 
-    protected function enqueue_addon_resources(){
-
-	    if(!lastudio_kit_settings()->is_combine_js_css()) {
-		    $this->add_script_depends( 'lastudio-kit-base' );
-		    if ( ! lastudio_kit()->is_optimized_css_mode() ) {
-			    wp_register_style( $this->get_name(), lastudio_kit()->plugin_url( 'assets/css/addons/iconbox.min.css' ), [ 'lastudio-kit-base' ], lastudio_kit()->get_version() );
-			    $this->add_style_depends( $this->get_name() );
-		    }
-	    }
+    public function get_style_depends()
+    {
+        return ['lakit-icon-box'];
     }
-
-	public function get_widget_css_config($widget_name){
-		$file_url = lastudio_kit()->plugin_url(  'assets/css/addons/iconbox.min.css' );
-		$file_path = lastudio_kit()->plugin_path( 'assets/css/addons/iconbox.min.css' );
-		return [
-			'key' => $widget_name,
-			'version' => lastudio_kit()->get_version(true),
-			'file_path' => $file_path,
-			'data' => [
-				'file_url' => $file_url
-			]
-		];
-	}
 
     public function get_name() {
         return 'lakit-icon-box';
@@ -53,7 +34,6 @@ class LaStudioKit_Icon_Box extends LaStudioKit_Base {
     }
 
     protected function register_controls() {
-
 
         $css_scheme = apply_filters(
             'lastudio-kit/iconbox/css-schema',
@@ -139,6 +119,7 @@ class LaStudioKit_Icon_Box extends LaStudioKit_Base {
                     ],
                 ],
                 'default'       => 'none',
+                'prefix_class' => 'lakit-icon-box--type-',
             ]
         );
 
@@ -179,7 +160,7 @@ class LaStudioKit_Icon_Box extends LaStudioKit_Base {
                 'dynamic' => [
                     'active' => true,
                 ],
-                'default' => esc_html__( 'Strategy and  Planning', 'lastudio-kit' ),
+                'default' => esc_html__( 'Strategy and Planning', 'lastudio-kit' ),
                 'placeholder' => esc_html__( 'Enter your title', 'lastudio-kit' ),
                 'label_block' => true,
                 'separator' => 'before',
@@ -309,7 +290,6 @@ class LaStudioKit_Icon_Box extends LaStudioKit_Base {
                 'label_on' => esc_html__( 'Yes', 'lastudio-kit' ),
                 'label_off' => esc_html__( 'No', 'lastudio-kit' ),
                 'return_value' => 'lakit--icon-floating-button',
-	            'prefix_class' => '',
                 'condition' => [
 	                'enable_btn' => 'yes',
                 ]
@@ -594,6 +574,29 @@ class LaStudioKit_Icon_Box extends LaStudioKit_Base {
                 ],
                 'default' => 'h3',
                 'separator' => 'before',
+            ]
+        );
+        $this->_add_control(
+            'enable_tooltip',
+            [
+                'label' => esc_html__( 'Enable Tooltip ?', 'lastudio-kit' ),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => esc_html__( 'Yes', 'lastudio-kit' ),
+                'label_off' => esc_html__( 'No', 'lastudio-kit' ),
+                'return_value' => 'yes',
+            ]
+        );
+        $this->_add_control(
+            'tooltip_show_title',
+            [
+                'label' => esc_html__( 'Enable Tooltip Title', 'lastudio-kit' ),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => esc_html__( 'Yes', 'lastudio-kit' ),
+                'label_off' => esc_html__( 'No', 'lastudio-kit' ),
+                'return_value' => 'yes',
+                'condition' => [
+                    'enable_tooltip' => 'yes',
+                ]
             ]
         );
         $this->_end_controls_section();
@@ -909,7 +912,7 @@ class LaStudioKit_Icon_Box extends LaStudioKit_Base {
 		    [
 			    'label' => esc_html__( 'Content Width', 'lastudio-kit' ),
 			    'type' => Controls_Manager::SLIDER,
-			    'size_units' => [ 'px', '%', 'em' ],
+			    'size_units' => [ 'px', '%', 'em', 'custom' ],
 			    'selectors' => [
 				    '{{WRAPPER}} ' . $css_scheme['box_body'] => 'width: {{SIZE}}{{UNIT}};max-width: {{SIZE}}{{UNIT}};',
 			    ],
@@ -2196,6 +2199,153 @@ class LaStudioKit_Icon_Box extends LaStudioKit_Base {
         );
 
         $this->_end_controls_section();
+
+        $this->_start_controls_section(
+            'section_tooltip',
+            [
+                'label' => esc_html__( 'Tooltip', 'lastudio-kit' ),
+                'tab' => controls_Manager::TAB_STYLE,
+                'condition' => [
+                    'enable_tooltip'    => 'yes'
+                ]
+            ]
+        );
+        $this->_add_control(
+            'tooltip_position',
+            [
+                'label'     => esc_html__( 'Position', 'lastudio-kit' ),
+                'type'      => Controls_Manager::SELECT,
+                'options'   => [
+                    'auto' => esc_html__( 'Auto', 'lastudio-kit' ),
+                    'top' => esc_html__( 'Top', 'lastudio-kit' ),
+                    'right' => esc_html__( 'Right', 'lastudio-kit' ),
+                    'bottom' => esc_html__( 'Bottom', 'lastudio-kit' ),
+                    'left' => esc_html__( 'Left', 'lastudio-kit' ),
+                ],
+                'default'   => 'auto',
+            ]
+        );
+        $this->_add_responsive_control(
+            'tooltip_width',
+            [
+                'label' => esc_html__( 'Tooltip Box Width', 'lastudio-kit' ),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ 'px', '%', 'em', 'custom' ],
+                'selectors' => [
+                    '.eid-{{ID}}' => '--tooltip-box-width: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+        $this->_add_control(
+            'tooltip_bg',
+            [
+                'label' => esc_html__( 'Background Color', 'lastudio-kit' ),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '.eid-{{ID}} .tooltip-inner' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+        $this->_add_responsive_control(
+            'tooltip_padding',
+            [
+                'label' => esc_html__( 'Padding', 'lastudio-kit' ),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', '%', 'em', 'custom' ],
+                'selectors' => [
+                    '.eid-{{ID}} .tooltip-inner' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+        $this->_add_responsive_control(
+            'tooltip_radius',
+            [
+                'label' => esc_html__( 'Border Radius', 'lastudio-kit' ),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', '%', 'em' ],
+                'selectors' => [
+                    '.eid-{{ID}} .tooltip-inner' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+        $this->_add_group_control(
+            Group_Control_Box_Shadow::get_type(),
+            [
+                'name' => 'tooltip_shadow',
+                'label' => esc_html__( 'Box Shadow', 'lastudio-kit' ),
+                'selector' => '.eid-{{ID}} .tooltip-inner'
+            ]
+        );
+
+        $this->add_control('tooltip_heading_0',
+            [
+                'label' => esc_html__( 'Image/Icon', 'lastudio-kit' ),
+                'type' => Controls_Manager::HEADING,
+                'separator' => 'before',
+            ]
+        );
+        $this->_add_responsive_control(
+            'tooltip_image_radius',
+            [
+                'label' => esc_html__( 'Border Radius', 'lastudio-kit' ),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', '%', 'em' ],
+                'selectors' => [
+                    '.eid-{{ID}}' => '--tooltip-image-border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->_add_responsive_control(
+            'tooltip_image_mb',
+            [
+                'label' => esc_html__( 'Margin bottom', 'lastudio-kit' ),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => [ 'px', '%', 'em'],
+                'selectors' => [
+                    '.eid-{{ID}}' => '--tooltip-image-mb: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_control('tooltip_heading_1',
+            [
+                'label' => esc_html__( 'Title', 'lastudio-kit' ),
+                'type' => Controls_Manager::HEADING,
+                'separator' => 'before',
+                'condition' => [
+                    'tooltip_show_title'    => 'yes'
+                ]
+            ]
+        );
+
+        $this->_add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name' => 'tooltip_title_typo',
+                'label' => esc_html__( 'Title Typography', 'lastudio-kit' ),
+                'selector' => '.eid-{{ID}} .lakit-tip__title',
+                'condition' => [
+                    'tooltip_show_title'    => 'yes'
+                ]
+            ]
+        );
+        $this->_add_control(
+            'tooltip_color',
+            [
+                'label' => esc_html__( 'Text Color', 'lastudio-kit' ),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '.eid-{{ID}} .tooltip-inner' => 'color: {{VALUE}};',
+                ],
+                'condition' => [
+                    'tooltip_show_title'    => 'yes'
+                ]
+            ]
+        );
+
+        $this->_end_controls_section();
+
 
     }
 

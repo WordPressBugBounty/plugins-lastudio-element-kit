@@ -57,10 +57,6 @@ abstract class Widget_Nested_Base extends LaStudioKit_Base {
         return '';
     }
 
-    protected function is_dynamic_content(): bool {
-        return false;
-    }
-
 	/**
 	 * @inheritDoc
 	 *

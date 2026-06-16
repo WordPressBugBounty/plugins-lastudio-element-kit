@@ -1,6 +1,8 @@
 <?php
 namespace LaStudioKitThemeBuilder\Modules\Woofilters;
 
+use WC_Query;
+
 if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly.
 }
@@ -86,7 +88,7 @@ class Module extends \Elementor\Core\Base\Module {
 
         // Back up current registered shortcodes and clear them all out.
         $orig_shortcode_tags = $shortcode_tags;
-        remove_all_shortcodes();
+        $shortcode_tags = [];
 
         add_shortcode( 'lakit_woofilter_item', [$this, 'add_shortcode'] );
 
@@ -106,25 +108,30 @@ class Module extends \Elementor\Core\Base\Module {
         return $content;
     }
 
+    private function setup_wc_query()
+    {
+        if(empty(WC()->query->get_main_query())){
+            $query = $GLOBALS['wp_query'];
+            WC()->query->product_query($query);
+        }
+    }
+
     public function repair_wc_query_in_edit_mode( $widget ){
-        if( $widget->get_name() == 'wp-widget-woocommerce_layered_nav' || $widget->get_name() == 'lakit-woofilters' ){
-            if(empty(WC()->query->get_main_query())){
-                $query = $GLOBALS['wp_query'];
-                WC()->query->product_query($query);
-            }
+        if( $widget->get_name() === 'wp-widget-woocommerce_layered_nav' || $widget->get_name() === 'lakit-woofilters' ){
+            $this->setup_wc_query();
         }
     }
 
     public function frontend_enqueue(){
-        if( !empty($_GET['elementor-preview']) || lastudio_kit()->elementor()->editor->is_edit_mode() ) {
+        if( lastudio_kit()->elementor()->preview->is_editor_or_preview() ) {
             wp_enqueue_script('wc-price-slider');
         }
     }
 
     public function __construct() {
         parent::__construct();
-//        add_filter('the_content', [ $this, 'display_shortcode' ], 1001 );
-        add_filter('elementor/frontend/the_content', [ $this, 'display_shortcode' ], 1001 );
+        add_shortcode( 'lakit_woofilter_item', [$this, 'add_shortcode'] );
+//        add_filter('elementor/frontend/the_content', [ $this, 'display_shortcode' ], 1001 );
         add_filter('elementor/widget/render_content', [ $this, 'display_shortcode_in_edit_mode' ], 1001 );
         add_action('elementor/widget/before_render_content', [ $this, 'repair_wc_query_in_edit_mode' ]);
         add_action('wp_enqueue_scripts', [$this, 'frontend_enqueue'], 99 );
@@ -347,8 +354,17 @@ class Module extends \Elementor\Core\Base\Module {
     }
 
     protected function render_price_range(){
+
+        $this->setup_wc_query();
+
+        $wc_query = WC()->query->get_main_query();
+
+        if( ! $wc_query instanceof \WP_Query ){
+            return '';
+        }
+
         // If there are not posts and we're not filtering, hide the widget.
-        if ( ! WC()->query->get_main_query()->post_count && ! isset( $_GET['min_price'] ) && ! isset( $_GET['max_price'] ) ) { // WPCS: input var ok, CSRF ok.
+        if ( ! $wc_query->post_count && ! isset( $_GET['min_price'] ) && ! isset( $_GET['max_price'] ) ) { // WPCS: input var ok, CSRF ok.
             return '';
         }
 

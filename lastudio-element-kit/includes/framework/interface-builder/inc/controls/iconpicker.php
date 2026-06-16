@@ -98,7 +98,7 @@ if ( ! class_exists( 'CX_Control_Iconpicker' ) ) {
 				$this->base_url . 'assets/lib/iconpicker/jquery-iconpicker.js',
 				array( 'jquery' ),
 				'1.0.0',
-				true
+                [ 'in_footer' => true]
 			);
 		}
 

@@ -18,29 +18,14 @@ if (!defined('ABSPATH')) {
 class LaStudioKit_Post_Navigation extends LaStudioKit_Base
 {
 
-    protected function enqueue_addon_resources()
+    protected function is_dynamic_content(): bool
     {
-        if (!lastudio_kit_settings()->is_combine_js_css()) {
-            if (!lastudio_kit()->is_optimized_css_mode()) {
-                wp_register_style($this->get_name(), lastudio_kit()->plugin_url('assets/css/addons/post-navigation.min.css'), [], lastudio_kit()->get_version());
-                $this->add_style_depends($this->get_name());
-            }
-        }
+        return true;
     }
 
-    public function get_widget_css_config($widget_name)
+    public function get_style_depends()
     {
-        $file_url = lastudio_kit()->plugin_url('assets/css/addons/post-navigation.min.css');
-        $file_path = lastudio_kit()->plugin_path('assets/css/addons/post-navigation.min.css');
-
-        return [
-            'key' => $widget_name,
-            'version' => lastudio_kit()->get_version(true),
-            'file_path' => $file_path,
-            'data' => [
-                'file_url' => $file_url
-            ]
-        ];
+        return ['lakit-post-navigation'];
     }
 
     public function get_name()

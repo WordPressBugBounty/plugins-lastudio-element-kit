@@ -13,6 +13,11 @@ if ( ! defined( 'WPINC' ) ) {
 
 class LaStudioKit_Hotspots extends Widget_Image {
 
+    protected function is_dynamic_content(): bool
+    {
+        return true;
+    }
+
 	public function has_widget_inner_wrapper(): bool {
 		return true;
 	}
@@ -28,39 +33,24 @@ class LaStudioKit_Hotspots extends Widget_Image {
 
     public function get_style_depends(): array
     {
-        return ['widget-image', 'lastudio-kit-w__hotspots'];
+        return ['widget-image', 'lakit-hotspots'];
     }
 
-  public function get_widget_css_config( $widget_name ) {
+    public function get_name() {
+        return 'lakit-hotspots';
+    }
 
-    $file_url  = lastudio_kit()->plugin_url( 'assets/css/addons/hotspots.min.css' );
-    $file_path = lastudio_kit()->plugin_path( 'assets/css/addons/hotspots.min.css' );
+    public function get_title() {
+        return 'LaStudioKit ' . __( 'Hotspots', 'lastudio-kit' );
+    }
 
-    return [
-      'key'       => $widget_name,
-      'version'   => lastudio_kit()->get_version( false ),
-      'file_path' => $file_path,
-      'data'      => [
-        'file_url' => $file_url
-      ]
-    ];
-  }
+    public function get_icon() {
+        return 'eicon-image-hotspot';
+    }
 
-  public function get_name() {
-    return 'lakit-hotspots';
-  }
-
-  public function get_title() {
-    return 'LaStudioKit ' . __( 'Hotspots', 'lastudio-kit' );
-  }
-
-  public function get_icon() {
-    return 'eicon-image-hotspot';
-  }
-
-  public function get_keywords() {
-    return [ 'image', 'tooltip', 'CTA', 'dot', 'hotspot' ];
-  }
+    public function get_keywords() {
+        return [ 'image', 'tooltip', 'CTA', 'dot', 'hotspot' ];
+    }
 
   protected function register_controls() {
     parent::register_controls();

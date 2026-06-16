@@ -17,11 +17,9 @@ if (!defined('WPINC')) {
  */
 class LaStudioKit_Woo_Single_Product_Title extends LaStudioKit_Post_Title {
 
-    protected function enqueue_addon_resources(){
-	    if(!lastudio_kit_settings()->is_combine_js_css()) {
-		    $this->add_style_depends( 'lastudio-kit-woocommerce' );
-		    $this->add_script_depends( 'lastudio-kit-base' );
-	    }
+    public function get_style_depends()
+    {
+        return ['lastudio-kit-woocommerce' ];
     }
 
     public function get_name() {

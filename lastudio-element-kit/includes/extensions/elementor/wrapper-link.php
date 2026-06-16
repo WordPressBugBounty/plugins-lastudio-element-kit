@@ -43,50 +43,7 @@ class Wrapper_Link {
     public function init_module( $controls_stack, $section_id ){
         $stack_name = $controls_stack->get_name();
 
-//        $ignore = [
-//            'lakit-contactform7',
-//            'lakit-addtocart',
-//            'lakit-woofilters',
-//            'lakit-menucart',
-//            'lakit-woopages',
-//            'lakit-wooproducts',
-//            'lakit-wooproduct-additional-information',
-//            'lakit-wooproduct-addtocart',
-//            'lakit-wooproduct-content',
-//            'lakit-wooproduct-datatabs',
-//            'lakit-wooproduct-images',
-//            'lakit-wooproduct-meta',
-//            'lakit-wooproduct-price',
-//            'lakit-wooproduct-rating',
-//            'lakit-wooproduct-shortdescription',
-//            'lakit-wooproduct-stock',
-//            'lakit-wooproduct-title',
-//            'lakit-advanced-carousel',
-//            'lakit-banner-list',
-//            'lakit-breadcrumbs',
-//            'lakit-hamburger-panel',
-//            'lakit-logo',
-//            'lakit-login-frm',
-//            'lakit-nav-menu',
-//            'column',
-//            'section',
-//            'container'
-//        ];
-
-//	    $includes = ['text-path', 'counter'];
-//		$common_pos = [
-//			'text-path' => '',
-//			'counter' => 'section_number',
-//		];
-
-//		if(in_array($stack_name, $includes)){
-//			la_log($section_id);
-//			la_log($controls_stack->get_stack());
-//		}
-
         if( (($stack_name === 'column' || $stack_name === 'section') && $section_id === 'section_advanced')
-//            || ($stack_name === 'common' && $section_id === '_section_style')
-//            || (in_array($stack_name, $includes) && $section_id === 'section_advanced')
             || ($stack_name === 'container' && in_array($section_id, ['section_layout_additional_options', 'section_layout_items']) )
         ){
 

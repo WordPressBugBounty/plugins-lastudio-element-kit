@@ -22,20 +22,16 @@ use LaStudioKitExtensions\Elementor\Controls\Group_Control_Related as Group_Cont
  */
 
 class LaStudioKit_Posts extends LaStudioKit_Base {
-    protected function enqueue_addon_resources() {
-        $this->add_script_depends( 'jquery-isotope' );
-        if ( ! lastudio_kit_settings()->is_combine_js_css() ) {
-            $this->add_script_depends( 'lastudio-kit-base' );
-            if ( ! lastudio_kit()->is_optimized_css_mode() ) {
-                $depends = [ 'lastudio-kit-base', 'e-swiper' ];
-                if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
-                    $depends[] = 'lastudio-kit-swiper-dotv2';
-                }
-                wp_register_style( $this->get_name(), lastudio_kit()->plugin_url( 'assets/css/addons/posts.min.css' ), $depends, lastudio_kit()->get_version() );
-                $this->add_style_depends( $this->get_name() );
-            }
-        }
+
+    private $_query = null;
+
+    public $item_counter = 0;
+
+    protected function is_dynamic_content(): bool
+    {
+        return true;
     }
+
     protected function get_html_wrapper_class(){
         $wrapper_class = 'lastudio-kit elementor-lakit-gposts elementor-' . $this->get_name();
         if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
@@ -44,23 +40,19 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
         return $wrapper_class;
     }
 
-    public function get_widget_css_config( $widget_name ) {
-        $file_url  = lastudio_kit()->plugin_url( 'assets/css/addons/posts.min.css' );
-        $file_path = lastudio_kit()->plugin_path( 'assets/css/addons/posts.min.css' );
-
-        return [
-            'key'       => $widget_name,
-            'version'   => lastudio_kit()->get_version( true ),
-            'file_path' => $file_path,
-            'data'      => [
-                'file_url' => $file_url
-            ]
-        ];
+    public function get_script_depends()
+    {
+        return ['jquery-isotope', 'lastudio-kit-base'];
     }
 
-    private $_query = null;
-
-    public $item_counter = 0;
+    public function get_style_depends()
+    {
+        $depends = ['e-swiper', 'lakit-posts'];
+        if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+            $depends[] = 'lastudio-kit-swiper-dotv2';
+        }
+        return $depends;
+    }
 
     public function get_name() {
         return 'lakit-posts';
@@ -121,7 +113,10 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
                 'label'   => esc_html__( 'Columns', 'lastudio-kit' ),
                 'type'    => Controls_Manager::SELECT,
                 'default' => 3,
-                'options' => lastudio_kit_helper()->get_select_range( 6 )
+                'options' => lastudio_kit_helper()->get_select_range( 6 ),
+                'selectors'  => array(
+                    '{{WRAPPER}}' => '--e-c-col:{{VALUE}}',
+                ),
             )
         );
 
@@ -444,24 +439,6 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
         $repeater = new Repeater();
 
         $repeater->add_control(
-            'item_label',
-            array(
-                'label' => esc_html__( 'Label', 'lastudio-kit' ),
-                'type'  => Controls_Manager::TEXT,
-            )
-        );
-        $repeater->add_control(
-            'item_icon',
-            [
-                'label'            => __( 'Icon', 'lastudio-kit' ),
-                'type'             => Controls_Manager::ICONS,
-                'fa4compatibility' => 'icon',
-                'skin'             => 'inline',
-                'label_block'      => false,
-            ]
-        );
-
-        $repeater->add_control(
             'item_type',
             [
                 'label'   => esc_html__( 'Type', 'lastudio-kit' ),
@@ -473,9 +450,45 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
                     'date'     => esc_html__( 'Posted Date', 'lastudio-kit' ),
                     'comment'  => esc_html__( 'Comment', 'lastudio-kit' ),
                     'view'     => esc_html__( 'View', 'lastudio-kit' ),
+                    'custom_field'  => esc_html__( 'Custom Field', 'lastudio-kit' ),
                     'empty'    => esc_html__( 'Empty', 'lastudio-kit' ),
                 ] )
             ]
+        );
+
+        $repeater->add_control(
+            'item_label',
+            array(
+                'label' => esc_html__( 'Label', 'lastudio-kit' ),
+                'type'  => Controls_Manager::TEXT,
+                'condition' => [
+                    'item_type!' => 'empty',
+                ]
+            )
+        );
+        $repeater->add_control(
+            'item_icon',
+            [
+                'label'            => __( 'Icon', 'lastudio-kit' ),
+                'type'             => Controls_Manager::ICONS,
+                'fa4compatibility' => 'icon',
+                'skin'             => 'inline',
+                'label_block'      => false,
+                'condition' => [
+                    'item_type!' => 'empty',
+                ]
+            ]
+        );
+
+        $repeater->add_control(
+            'custom_field_key',
+            array(
+                'label' => esc_html__( 'Field Key', 'lastudio-kit' ),
+                'type'  => Controls_Manager::TEXT,
+                'condition' => [
+                    'item_type' => 'custom_field',
+                ]
+            )
         );
 
         $this->_add_control(
@@ -1774,6 +1787,16 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
                 'show_label' => false,
             )
         );
+	    $this->_add_responsive_control(
+		    'button_width',
+		    array(
+			    'label'     => esc_html__( 'Button Width', 'lastudio-kit' ),
+			    'type'      => Controls_Manager::SLIDER,
+			    'selectors' => array(
+				    '{{WRAPPER}} ' . $css_scheme['button'] => 'width: {{SIZE}}{{UNIT}};',
+			    ),
+		    )
+	    );
         $this->_add_control(
             'show_btn_hover',
             [
@@ -2303,7 +2326,7 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
                     ),
                 ),
                 'selectors'  => array(
-                    '{{WRAPPER}} ' . $css_scheme['meta1-item'] . ':not(:first-child):before' => 'margin-left: {{SIZE}}{{UNIT}};margin-right: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}}' => '--lakit-meta1-item-gap: {{SIZE}}{{UNIT}}'
                 ),
             )
         );
@@ -2533,7 +2556,7 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
                     ),
                 ),
                 'selectors'  => array(
-                    '{{WRAPPER}} ' . $css_scheme['meta2-item'] . ':not(:first-child):before' => 'margin-left: {{SIZE}}{{UNIT}};margin-right: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}}' => '--lakit-meta2-item-gap: {{SIZE}}{{UNIT}}'
                 ),
             )
         );

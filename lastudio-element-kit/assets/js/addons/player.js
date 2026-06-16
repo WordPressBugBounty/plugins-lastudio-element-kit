@@ -56,7 +56,6 @@
         let _sources = {};
 
         $('.lakitplayer[data-album_id="'+albumID+'"]:not(.player--initialized)').find('.lakitplayer_btn__playpause').each(function (){
-            $(this).append('<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false" width="1024" height="1024" viewBox="0 0 1024 1024" class="lakit-font-icon-svg" data-icon-name="pause" data-icon-type="dlicon"><path d="M384 928c19.2 0 32-12.8 32-32V128c0-19.2-12.8-32-32-32H160c-19.2 0-32 12.8-32 32v768c0 19.2 12.8 32 32 32h224zM192 160h160v704H192V160zm672 768c19.2 0 32-12.8 32-32V128c0-19.2-12.8-32-32-32H640c-19.2 0-32 12.8-32 32v768c0 19.2 12.8 32 32 32h224zM672 160h160v704H672V160z" fill="currentColor"></path></svg>')
             $(this).closest('.lakitplayer').addClass('player--initialized');
             _sources = $(this).closest('.lakitplayer').data('config') || {}
         });

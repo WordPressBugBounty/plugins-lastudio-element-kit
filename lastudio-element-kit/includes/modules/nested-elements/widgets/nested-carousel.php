@@ -17,27 +17,9 @@ use LaStudioKitThemeBuilder\Modules\NestedElements\Controls\Control_Nested_Repea
 
 class Nested_Carousel extends Widget_Nested_Base {
 
-    protected function enqueue_addon_resources() {
-        if ( ! lastudio_kit_settings()->is_combine_js_css() ) {
-            $this->add_script_depends( 'lastudio-kit-w__ncarousel' );
-            if ( !lastudio_kit()->is_optimized_css_mode() ) {
-                $this->add_style_depends( 'lastudio-kit-swiper-dotv2' );
-            }
-        }
-    }
-
-    public function get_widget_css_config( $widget_name ) {
-        $file_url  = lastudio_kit()->plugin_url( 'assets/css/addons/n-carousel.min.css' );
-        $file_path = lastudio_kit()->plugin_path( 'assets/css/addons/n-carousel.min.css' );
-
-        return [
-            'key'       => 'lastudio-kit-swiper-dotv2',
-            'version'   => lastudio_kit()->get_version( true ),
-            'file_path' => $file_path,
-            'data'      => [
-                'file_url' => $file_url
-            ]
-        ];
+    public function get_script_depends()
+    {
+        return ['lastudio-kit-w__ncarousel'];
     }
 
     public function get_style_depends() {

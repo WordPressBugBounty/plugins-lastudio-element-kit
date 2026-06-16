@@ -11,12 +11,6 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class LaStudioKit_Logo extends LaStudioKit_Base {
 
-    protected function enqueue_addon_resources(){
-	    if(!lastudio_kit_settings()->is_combine_js_css()) {
-		    $this->add_style_depends( 'lastudio-kit-base' );
-	    }
-    }
-
 	public function get_name() {
 		return 'lakit-logo';
 	}

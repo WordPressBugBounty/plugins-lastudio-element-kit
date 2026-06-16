@@ -38,24 +38,25 @@ class LaStudioKit_Contact_Form7 extends LaStudioKit_Base {
             )
         );
 
-        $available_forms = $this->get_availbale_forms();
-
-        $active_form = '';
-
-        if ( ! empty( $available_forms ) ) {
-            $active_form = array_keys( $available_forms )[0];
-        }
-
         $input_selector = '.wpcf7 .wpcf7-form-control:not(.wpcf7-submit, .wpcf7-acceptance, .wpcf7-checkbox, .wpcf7-radio)';
         $input_selector_focus = '.wpcf7 .wpcf7-form-control:not(.wpcf7-submit, .wpcf7-acceptance, .wpcf7-checkbox, .wpcf7-radio):focus';
         $input_selector_invalid = '.wpcf7 .wpcf7-form-control:not(.wpcf7-submit, .wpcf7-acceptance, .wpcf7-checkbox, .wpcf7-radio).wpcf7-not-valid';
 
-        $this->add_control( 'form_shortcode', array(
-            'label'   => esc_html__( 'Select Form', 'lastudio-kit' ),
-            'type'    => Controls_Manager::SELECT,
-            'default' => $active_form,
-            'options' => $available_forms,
-        ) );
+        $this->add_control(
+            'form_shortcode',
+            [
+                'label' => esc_html__('Select Form', 'lastudio-kit'),
+                'type' => 'lastudiokit-query',
+                'options' => [],
+                'label_block' => true,
+                'autocomplete' => [
+                    'object' => 'post',
+                    'query' => [
+                        'post_type' => ['wpcf7_contact_form'],
+                    ],
+                ],
+            ]
+        );
 
         $this->end_controls_section();
 
@@ -1129,59 +1130,25 @@ class LaStudioKit_Contact_Form7 extends LaStudioKit_Base {
     }
 
     /**
-     * Retrieve available forms list.
-     * @return [type] [description]
-     */
-    protected function get_availbale_forms() {
-
-        if ( ! class_exists( 'WPCF7_ContactForm' ) ) {
-            return array();
-        }
-
-        $forms = \WPCF7_ContactForm::find( array(
-            'orderby' => 'title',
-            'order'   => 'ASC',
-        ) );
-
-        if ( empty( $forms ) ) {
-            return array();
-        }
-
-        $result = array();
-
-        foreach ( $forms as $item ) {
-            $key            = sprintf( '%1$s::%2$s', $item->id(), $item->title() );
-            $result[ $key ] = $item->title();
-        }
-
-        return $result;
-    }
-
-    /**
      * [render description]
      *
      * @return [type] [description]
      */
     protected function render() {
 
+        $form_id = $this->get_settings_for_display( 'form_shortcode' );
+        $form_id = absint( $form_id );
+        if(empty($form_id)){
+           return null;
+        }
+
         $this->_context = 'render';
 
         $this->_open_wrap();
 
-        $available_forms = $this->get_availbale_forms();
+        add_filter('wpcf7_autop_or_not', '__return_false');
 
-        $shortcode = $this->get_settings( 'form_shortcode' );
-
-        if ( ! array_key_exists( $shortcode, $available_forms ) ) {
-            $shortcode = array_keys( $available_forms )[0];
-        }
-
-        $data = explode( '::', $shortcode );
-
-        if ( ! empty( $data ) && 2 === count( $data ) ) {
-            \add_filter('wpcf7_autop_or_not', '__return_false');
-            echo do_shortcode( sprintf( '[contact-form-7 id="%1$d" title="%2$s"]', $data[0], $data[1] ) );
-        }
+        echo do_shortcode( sprintf( '[contact-form-7 id="%1$d"]', esc_attr($form_id)) );
 
         $this->_close_wrap();
 

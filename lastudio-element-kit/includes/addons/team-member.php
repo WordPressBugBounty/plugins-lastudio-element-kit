@@ -23,18 +23,13 @@ class LaStudioKit_Team_Member extends LaStudioKit_Base {
 
     public $item_counter = 0;
 
-    protected function enqueue_addon_resources(){
-	    if(!lastudio_kit_settings()->is_combine_js_css()) {
-		    $this->add_script_depends( 'lastudio-kit-base' );
-		    if(!lastudio_kit()->is_optimized_css_mode()) {
-                $depends = [ 'lastudio-kit-base', 'e-swiper' ];
-                if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
-                    $depends[] = 'lastudio-kit-swiper-dotv2';
-                }
-			    wp_register_style( $this->get_name(), lastudio_kit()->plugin_url( 'assets/css/addons/team-member.min.css' ), $depends, lastudio_kit()->get_version() );
-			    $this->add_style_depends( $this->get_name() );
-		    }
-	    }
+    public function get_style_depends()
+    {
+        $depends = [ 'e-swiper', 'lakit-team-member' ];
+        if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+            $depends[] = 'lastudio-kit-swiper-dotv2';
+        }
+        return $depends;
     }
 
     protected function get_html_wrapper_class(){
@@ -45,18 +40,6 @@ class LaStudioKit_Team_Member extends LaStudioKit_Base {
         return $wrapper_class;
     }
 
-	public function get_widget_css_config($widget_name){
-		$file_url = lastudio_kit()->plugin_url(  'assets/css/addons/team-member.min.css' );
-		$file_path = lastudio_kit()->plugin_path( 'assets/css/addons/team-member.min.css' );
-		return [
-			'key' => $widget_name,
-			'version' => lastudio_kit()->get_version(true),
-			'file_path' => $file_path,
-			'data' => [
-				'file_url' => $file_url
-			]
-		];
-	}
 
     public function get_name() {
         return 'lakit-team-member';
@@ -83,6 +66,7 @@ class LaStudioKit_Team_Member extends LaStudioKit_Base {
                 'image_instance'    => '.lakit-team-member__image-instance',
                 'title'             => '.lakit-team-member__name',
                 'desc'              => '.lakit-team-member__desc',
+                'subdesc'           => '.lakit-team-member__subdesc',
                 'position'          => '.lakit-team-member__position',
                 'socials'           => '.lakit-team-member__socials',
                 'slick_list'        => '.lakit-team-member .slick-list'
@@ -167,6 +151,15 @@ class LaStudioKit_Team_Member extends LaStudioKit_Base {
             'description',
             [
                 'label' => __( 'Description', 'lastudio-kit' ),
+                'type' => Controls_Manager::TEXTAREA,
+                'label_block' => true,
+                'dynamic' => array( 'active' => true ),
+            ]
+        );
+        $repeater->add_control(
+            'subdescription',
+            [
+                'label' => __( 'Sub Description', 'lastudio-kit' ),
                 'type' => Controls_Manager::TEXTAREA,
                 'label_block' => true,
                 'dynamic' => array( 'active' => true ),
@@ -433,7 +426,7 @@ class LaStudioKit_Team_Member extends LaStudioKit_Base {
         $this->add_control(
             'show_excerpt',
             array(
-                'label'        => esc_html__( 'Show Excerpt?', 'lastudio-kit' ),
+                'label'        => esc_html__( 'Show Description?', 'lastudio-kit' ),
                 'type'         => Controls_Manager::SWITCHER,
                 'label_on'     => esc_html__( 'Yes', 'lastudio-kit' ),
                 'label_off'    => esc_html__( 'No', 'lastudio-kit' ),
@@ -446,7 +439,7 @@ class LaStudioKit_Team_Member extends LaStudioKit_Base {
         $this->add_control(
             'excerpt_length',
             array(
-                'label'   => esc_html__( 'Custom Excerpt Length', 'lastudio-kit' ),
+                'label'   => esc_html__( 'Custom Description Length', 'lastudio-kit' ),
                 'type'    => Controls_Manager::NUMBER,
                 'default' => 20,
                 'min'     => 0,
@@ -455,6 +448,19 @@ class LaStudioKit_Team_Member extends LaStudioKit_Base {
                 'condition' => array(
                     'show_excerpt' => 'true'
                 )
+            )
+        );
+
+        $this->add_control(
+            'show_subdescription',
+            array(
+                'label'        => esc_html__( 'Show Sub-Description?', 'lastudio-kit' ),
+                'type'         => Controls_Manager::SWITCHER,
+                'label_on'     => esc_html__( 'Yes', 'lastudio-kit' ),
+                'label_off'    => esc_html__( 'No', 'lastudio-kit' ),
+                'return_value' => 'true',
+                'default'      => false,
+                'separator'    => 'before'
             )
         );
 
@@ -1349,7 +1355,7 @@ class LaStudioKit_Team_Member extends LaStudioKit_Base {
         $this->start_controls_section(
             'section_desc_style',
             array(
-                'label'      => esc_html__( 'Excerpt', 'lastudio-kit' ),
+                'label'      => esc_html__( 'Description', 'lastudio-kit' ),
                 'tab'        => Controls_Manager::TAB_STYLE,
                 'show_label' => false,
             )
@@ -1406,6 +1412,74 @@ class LaStudioKit_Team_Member extends LaStudioKit_Base {
                 'placeholder' => '1px',
                 'default'     => '1px',
                 'selector'    => '{{WRAPPER}} ' . $css_scheme['desc'],
+            )
+        );
+
+        $this->end_controls_section();
+
+        $this->start_controls_section(
+            'section_subdesc_style',
+            array(
+                'label'      => esc_html__( 'Sub Description', 'lastudio-kit' ),
+                'tab'        => Controls_Manager::TAB_STYLE,
+                'show_label' => false,
+                'condition' => [
+                    'show_subdescription' => 'true',
+                ],
+            )
+        );
+
+        $this->add_control(
+            'subdesc_color',
+            array(
+                'label'  => esc_html__( 'Color', 'lastudio-kit' ),
+                'type'   => Controls_Manager::COLOR,
+                'selectors' => array(
+                    '{{WRAPPER}} ' . $css_scheme['subdesc'] => 'color: {{VALUE}}',
+                ),
+            )
+        );
+
+        $this->add_group_control(
+            Group_Control_Typography::get_type(),
+            array(
+                'name'     => 'subdesc_typography',
+                'selector' => '{{WRAPPER}} ' . $css_scheme['subdesc'],
+            )
+        );
+
+        $this->add_responsive_control(
+            'subdesc_padding',
+            array(
+                'label'      => __( 'Padding', 'lastudio-kit' ),
+                'type'       => Controls_Manager::DIMENSIONS,
+                'size_units' => array( 'px', '%' ),
+                'selectors'  => array(
+                    '{{WRAPPER}} ' . $css_scheme['subdesc'] => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ),
+            )
+        );
+
+        $this->add_responsive_control(
+            'subdesc_margin',
+            array(
+                'label'      => __( 'Margin', 'lastudio-kit' ),
+                'type'       => Controls_Manager::DIMENSIONS,
+                'size_units' => array( 'px', '%', 'custom' ),
+                'selectors'  => array(
+                    '{{WRAPPER}} ' . $css_scheme['subdesc'] => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ),
+            )
+        );
+
+        $this->add_group_control(
+            Group_Control_Border::get_type(),
+            array(
+                'name'        => 'subdesc_border',
+                'label'       => esc_html__( 'Border', 'lastudio-kit' ),
+                'placeholder' => '1px',
+                'default'     => '1px',
+                'selector'    => '{{WRAPPER}} ' . $css_scheme['subdesc'],
             )
         );
 

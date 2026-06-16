@@ -81,7 +81,7 @@ if ( ! class_exists( 'CX_Customizer' ) ) {
 		 * @access protected
 		 * @var array.
 		 */
-		protected $fonts;
+		protected $fonts = [];
 
 		/**
 		 * Fonts manager instance
@@ -198,7 +198,6 @@ if ( ! class_exists( 'CX_Customizer' ) ) {
 		public function customize_preview_init(){
 			$theme_version = defined('WP_DEBUG') && WP_DEBUG ? time() : lastudio_kit()->get_version();
 			$dependency = array(
-				'jquery',
 				'customize-preview',
 			);
 			wp_enqueue_script( 'lakit-customize-preview', lastudio_kit()->plugin_url('assets/js/lastudio-customizer-preview.js') , $dependency, $theme_version, true );
@@ -302,7 +301,7 @@ if ( ! class_exists( 'CX_Customizer' ) ) {
 		public function render_font_value( $value ){
 			if(!empty($value)){
 				$tmp = explode(',', $value);
-				if(strpos($tmp[0], ' ') !== false){
+				if(str_contains($tmp[0], ' ')){
 					$tmp[0] = '"' . $tmp[0] . '"';
 					$value = join(',', $tmp);
 				}
@@ -605,13 +604,16 @@ if ( ! class_exists( 'CX_Customizer' ) ) {
 						$control_class = 'WP_Customize_Color_Control';
 					break;
 
-				case 'image':
-						$control_class = 'WP_Customize_Image_Control';
-						if(isset($args['button_labels'])){
-						    $control_args['button_labels'] = $args['button_labels'];
-                        }
-					break;
+                case 'alpha_color':
+                    $control_class = 'CX_Customizer_Alpha_Color_Control';
+                break;
 
+                case 'image':
+                    $control_class = 'WP_Customize_Image_Control';
+                    if(isset($args['button_labels'])){
+                        $control_args['button_labels'] = $args['button_labels'];
+                    }
+                    break;
 				case 'file':
 						$control_class = 'WP_Customize_Upload_Control';
                         if(isset($args['button_labels'])){
@@ -684,7 +686,7 @@ if ( ! class_exists( 'CX_Customizer' ) ) {
 			 */
 			$control_class = apply_filters( 'lastudio-kit/theme/customizer/control_class', $control_class, $id, $this );
 
-			if( in_array( $control_class, ['CX_Customizer_Checkbox_Multiple_control', 'CX_Customizer_Responsive_control']) && !class_exists($control_class)){
+			if( in_array( $control_class, ['CX_Customizer_Checkbox_Multiple_control', 'CX_Customizer_Responsive_control', 'CX_Customizer_Alpha_Color_Control']) && !class_exists($control_class)){
 				require_once lastudio_kit()->plugin_path( 'includes/framework/customizer/controls/responsive/responsive.php' );
 			}
 
@@ -768,7 +770,7 @@ if ( ! class_exists( 'CX_Customizer' ) ) {
 			if ( 'option' === $this->type ) {
 				$options = get_option( $this->prefix . '_options', array() );
 
-				return isset( $options[ $id ] ) ? $options[ $id ] : $default;
+				return $options[$id] ?? $default;
 			}
 
 			return $default;
@@ -782,7 +784,7 @@ if ( ! class_exists( 'CX_Customizer' ) ) {
 		 * @return mixed
 		 */
 		public function get_default( $id ) {
-			return isset( $this->options[ $id ]['default'] ) ? $this->options[ $id ]['default'] : null;
+			return $this->options[$id]['default'] ?? null;
 		}
 
 		/**
@@ -1025,10 +1027,10 @@ if ( ! class_exists( 'CX_Customizer' ) ) {
 			}
 
 			// Get minimum number in the range.
-			$min = ( isset( $atts['min'] ) ? $atts['min'] : $number );
+			$min = ($atts['min'] ?? $number);
 
 			// Get maximum number in the range.
-			$max = ( isset( $atts['max'] ) ? $atts['max'] : $number );
+			$max = ($atts['max'] ?? $number);
 
 			// If the number is within the valid range, return it; otherwise, return the default
 			return ( $min <= $number && $number <= $max && $checker ? $number : $setting->default );

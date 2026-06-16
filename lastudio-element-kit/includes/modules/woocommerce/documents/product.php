@@ -54,47 +54,6 @@ class Product extends Single_Base {
 		return $config;
 	}
 
-	public function enqueue_scripts() {
-
-        $conditions = false;
-        if(lastudio_kit()->elementor()->preview->is_preview_mode( $this->get_main_id() )){
-            $conditions = true;
-        }
-        else{
-            $doc_type = $this->get_template_type();
-            if($doc_type == 'product'){
-                $conditions = true;
-            }
-        }
-
-		// In preview mode it's not a real Product page - enqueue manually.
-		if ( $conditions ) {
-
-			global $product;
-
-			if ( is_singular( 'product' ) ) {
-				$product = wc_get_product();
-			}
-
-			if ( current_theme_supports( 'wc-product-gallery-zoom' ) ) {
-				wp_enqueue_script( 'zoom' );
-			}
-			if ( current_theme_supports( 'wc-product-gallery-slider' ) ) {
-				wp_enqueue_script( 'flexslider' );
-			}
-			if ( current_theme_supports( 'wc-product-gallery-lightbox' ) ) {
-				wp_enqueue_script( 'photoswipe-ui-default' );
-				wp_enqueue_style( 'photoswipe-default-skin' );
-				add_action( 'wp_footer', 'woocommerce_photoswipe' );
-			}
-			wp_enqueue_script( 'wc-single-product' );
-
-			wp_enqueue_style( 'photoswipe' );
-			wp_enqueue_style( 'photoswipe-default-skin' );
-			wp_enqueue_style( 'woocommerce_prettyPhoto_css' );
-		}
-	}
-
 	public function get_depended_widget() {
 		return lastudio_kit()->elementor()->widgets_manager->get_widget_types( 'lakit-wooproduct-datatabs' );
 	}
@@ -142,12 +101,6 @@ class Product extends Single_Base {
 
 		parent::print_content();
 	}
-
-    protected function init( $data ){
-        parent::init($data);
-
-        add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_scripts' ], 11 );
-    }
 
 	protected static function get_editor_panel_categories() {
 		$categories = [

@@ -4,7 +4,6 @@ if ( ! defined( 'WPINC' ) ) {
     die;
 }
 
-
 function lakit__override_elementor_control_args( $control_args ){
     if(isset($control_args['name'])){
         unset($control_args['name']);
@@ -298,16 +297,6 @@ add_action('elementor/element/icon-list/section_icon_list/before_section_end', f
 	]);
 });
 
-add_filter('lastudio-kit/integration/user-meta', function ( $value, $label){
-    if(class_exists('LaStudio_Kit_Helper')){
-        $k = substr_replace(LaStudio_Kit_Helper::lakit_active(), 'mini', 2, 0);
-        $value[ $label ] = [
-            $k => 1
-        ];
-    }
-    return $value;
-}, 10, 2);
-
 /**
  * Modify Counter - Visible control
  */
@@ -595,6 +584,25 @@ add_action(
 		);
 	}
 );
+
+/**
+ * Override _margin controls for specific widgets
+ */
+
+if(!function_exists('lakit__override_e_margin_for_specific_widgets')){
+    function lakit__override_e_margin_for_specific_widgets( $stack ){
+        $stack->update_responsive_control(
+            '_margin',
+            [
+                'selectors' => [
+                    '{{WRAPPER}}' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} calc(var(--kit-widget-spacing, 0px) + {{BOTTOM}}{{UNIT}}) {{LEFT}}{{UNIT}}; --e-w-ml: {{LEFT}}{{UNIT}}; --e-w-mr: {{RIGHT}}{{UNIT}};',
+                ],
+            ]
+        );
+    }
+    add_action('elementor/element/common/_section_style/before_section_end', 'lakit__override_e_margin_for_specific_widgets', 20);
+}
+
 
 /**
  * Allow override lakit_query

@@ -76,7 +76,7 @@ class Get_Menu_Items extends Base {
 			'data' => $menu_data,
 		);
 
-		set_transient( $transient_key, $items_data, 24 * HOUR_IN_SECONDS );
+		set_transient( $transient_key, $items_data, DAY_IN_SECONDS );
 
         Template_Helper::set_transient_key('menu', $menu_id, $transient_key);
 

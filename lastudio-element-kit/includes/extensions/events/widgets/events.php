@@ -20,44 +20,10 @@ class Events extends LaStudioKit_Posts{
 
 	public $cflag = false;
 
-	public $css_file_name = 'events.min.css';
-
-	protected function enqueue_addon_resources(){
-		$this->add_script_depends( 'jquery-isotope' );
-		if(!lastudio_kit_settings()->is_combine_js_css()) {
-			$this->add_script_depends( 'lastudio-kit-base' );
-			if(!lastudio_kit()->is_optimized_css_mode()) {
-				wp_register_style( 'lakit-posts', lastudio_kit()->plugin_url( 'assets/css/addons/posts.min.css' ), [ 'lastudio-kit-base' ], lastudio_kit()->get_version() );
-				wp_register_style( $this->get_name(), lastudio_kit()->plugin_url( 'assets/css/addons/' . $this->css_file_name ), [ 'lakit-posts' ], lastudio_kit()->get_version() );
-				$this->add_style_depends( $this->get_name() );
-			}
-		}
-	}
-
-	public function get_inline_css_depends() {
-		return [
-			[
-				'name' => 'lakit-posts'
-			]
-		];
-	}
-
-	public function get_widget_css_config($widget_name){
-
-        $css_file_name = $widget_name === 'lakit-posts' ? 'posts.min.css' : 'events.min.css';
-
-		$file_url = lastudio_kit()->plugin_url(  'assets/css/addons/' . $css_file_name );
-		$file_path = lastudio_kit()->plugin_path( 'assets/css/addons/' . $css_file_name );
-
-		return [
-			'key' => $widget_name,
-			'version' => lastudio_kit()->get_version(true),
-			'file_path' => $file_path,
-			'data' => [
-				'file_url' => $file_url
-			]
-		];
-	}
+    public function get_style_depends()
+    {
+        return ['lakit-posts', 'lakit-events'];
+    }
 
 	public function get_name() {
 		return 'lakit-events';
@@ -102,6 +68,27 @@ class Events extends LaStudioKit_Posts{
 		);
 
 		$this->_add_control(
+			'show_buy_btn',
+			[
+				'label'     => esc_html__( 'Show Buy Link', 'lastudio-kit' ),
+				'type'      => Controls_Manager::SWITCHER,
+				'label_on'  => esc_html__( 'Yes', 'lastudio-kit' ),
+				'label_off' => esc_html__( 'No', 'lastudio-kit' ),
+				'default'   => 'no'
+			]
+		);
+		$this->_add_control(
+			'buy_text',
+			[
+				'label' => esc_html__( 'Buy Text', 'lastudio-kit' ),
+				'type'  => Controls_Manager::TEXT,
+				'condition' => [
+					'show_buy_btn' => 'yes',
+				]
+			]
+		);
+
+		$this->_add_control(
 			'floating_date',
 			[
 				'label'     => esc_html__( 'Show Floating Date', 'lastudio-kit' ),
@@ -118,10 +105,11 @@ class Events extends LaStudioKit_Posts{
 				'label'     => esc_html__( 'Date Format', 'lastudio-kit' ),
 				'type'      => Controls_Manager::SELECT,
 				'options'   => [
-					'' => esc_html__( 'Default', 'lastudio-kit' ),
+					'' => esc_html__( 'M j, Y', 'lastudio-kit' ),
 					'type1' => esc_html__( 'Type 1', 'lastudio-kit' ),
 					'type2' => esc_html__( 'Type 2', 'lastudio-kit' ),
-					'type3' => esc_html__( 'Type 3', 'lastudio-kit' ),
+					'type3' => esc_html__( 'm/d/y', 'lastudio-kit' ),
+					'type4' => esc_html__( 'd/m/y', 'lastudio-kit' ),
 				],
 				'default'   => '',
 				'condition' => [
@@ -174,6 +162,8 @@ class Events extends LaStudioKit_Posts{
 					'location'      => esc_html__( 'Location', 'lastudio-kit' ),
 					'stage'         => esc_html__( 'Stage', 'lastudio-kit' ),
 					'organized_by'  => esc_html__( 'Organized By', 'lastudio-kit' ),
+					'time'          => esc_html__( 'Time', 'lastudio-kit' ),
+					'custom_field'  => esc_html__( 'Custom Field', 'lastudio-kit' ),
 					'empty'  => esc_html__( 'Empty', 'lastudio-kit' ),
 				] )
 			]
@@ -189,6 +179,18 @@ class Events extends LaStudioKit_Posts{
 				]
 			)
 		);
+
+        $repeater->add_control(
+			'custom_field_key',
+			array(
+				'label' => esc_html__( 'Field Key', 'lastudio-kit' ),
+				'type'  => Controls_Manager::TEXT,
+				'condition' => [
+					'item_type' => 'custom_field',
+				]
+			)
+		);
+
 		$repeater->add_control(
 			'item_icon',
 			[

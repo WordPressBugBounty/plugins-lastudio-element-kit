@@ -12,10 +12,10 @@
 }
 .lakit-team-member__image img {
 	transition: opacity .35s, transform .45s, filter .35s;
-	transform: translate3d(var(--lakit-team-img-offset-x, 0), var(--lakit-team-img-offset-y, 0), 0) scale(var(--lakit-team-img-scale, 1)) rotate((var(--lakit-team-img-rotate, 0deg)))
+	transform: translate3d(var(--lakit-team-img-offset-x, 0), var(--lakit-team-img-offset-y, 0), 0) scale(var(--lakit-team-img-scale, 1)) rotate(var(--lakit-team-img-rotate, 0deg))
 }
 .lakit-team-member__inner:hover .lakit-team-member__image img {
-	transform: translate3d(var(--lakit-team-img-hover-offset-x, 0), var(--lakit-team-img-hover-offset-y, 0), 0) scale(var(--lakit-team-img-scale-hover, 1)) rotate((var(--lakit-team-img-hover-rotate, 0deg)))
+	transform: translate3d(var(--lakit-team-img-hover-offset-x, 0), var(--lakit-team-img-hover-offset-y, 0), 0) scale(var(--lakit-team-img-scale-hover, 1)) rotate(var(--lakit-team-img-hover-rotate, 0deg))
 }
 .preset-type-3.lakit-team-member .lakit-team-member__inner, .preset-type-4.lakit-team-member .lakit-team-member__inner, .preset-type-5.lakit-team-member .lakit-team-member__inner {
 	overflow: hidden
@@ -323,4 +323,11 @@
 	position: absolute;
 	bottom: 0;
 	padding: 20px
+}
+.lakit-team-member__subdesc {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	color: #fff;
 }

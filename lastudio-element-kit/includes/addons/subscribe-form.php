@@ -17,29 +17,15 @@ if (!defined('WPINC')) {
  */
 class LaStudioKit_Subscribe_Form extends LaStudioKit_Base {
 
-	protected function enqueue_addon_resources() {
-		if ( ! lastudio_kit_settings()->is_combine_js_css() ) {
-			$this->add_script_depends( 'lakit-subscribe-form' );
-			if ( ! lastudio_kit()->is_optimized_css_mode() ) {
-				wp_register_style( $this->get_name(), lastudio_kit()->plugin_url( 'assets/css/addons/subscribe-form.min.css' ), [], lastudio_kit()->get_version() );
-				$this->add_style_depends( $this->get_name() );
-			}
-		}
-	}
+    public function get_style_depends()
+    {
+        return ['lakit-subscribe-form'];
+    }
 
-	public function get_widget_css_config( $widget_name ) {
-		$file_url  = lastudio_kit()->plugin_url( 'assets/css/addons/subscribe-form.min.css' );
-		$file_path = lastudio_kit()->plugin_path( 'assets/css/addons/subscribe-form.min.css' );
-
-		return [
-			'key'       => $widget_name,
-			'version'   => lastudio_kit()->get_version( true ),
-			'file_path' => $file_path,
-			'data'      => [
-				'file_url' => $file_url
-			]
-		];
-	}
+    public function get_script_depends()
+    {
+        return ['lakit-subscribe-form'];
+    }
 
     public function get_name() {
         return 'lakit-subscribe-form';
@@ -1332,7 +1318,7 @@ class LaStudioKit_Subscribe_Form extends LaStudioKit_Base {
                 'type'       => Controls_Manager::SLIDER,
                 'size_units' => ['px'],
                 'selectors'  => [
-                    '{{WRAPPER}}'=> '--lakit-newsletter-checkbox-gap: {{SIZE}};',
+                    '{{WRAPPER}}'=> '--lakit-newsletter-checkbox-gap: {{SIZE}}px;',
                 ]
             ]
         );
@@ -1364,6 +1350,16 @@ class LaStudioKit_Subscribe_Form extends LaStudioKit_Base {
             )
         );
         $this->add_control(
+            'agreement_border_color',
+            array(
+                'label' => esc_html__( 'Border Color', 'lastudio-kit' ),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => array(
+                    '{{WRAPPER}} .lakit-subscribe-form__agreements input' => 'border-color: {{VALUE}}',
+                ),
+            )
+        );
+        $this->add_control(
             'agreement_link_color_hover',
             array(
                 'label' => esc_html__( 'Link Hover Color', 'lastudio-kit' ),
@@ -1383,6 +1379,17 @@ class LaStudioKit_Subscribe_Form extends LaStudioKit_Base {
                     '{{WRAPPER}} .lakit-subscribe-form__agreements' => 'margin: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ),
             )
+        );
+        $this->add_control(
+            'agreement_checkbox_radius',
+            [
+                'label'      => esc_html__( 'Border Radius', 'lastudio-kit' ),
+                'type'       => Controls_Manager::SLIDER,
+                'size_units' => ['px'],
+                'selectors'  => [
+                    '{{WRAPPER}} .lakit-subscribe-form__agreements input'=> 'border-radius: {{SIZE}}px;',
+                ]
+            ]
         );
 
         $this->end_controls_section();

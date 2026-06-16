@@ -1,1 +1,721 @@
-!function(t){"use strict";function a(t,a){this.recalc_needed=!0,this.variation_attributes=t,this.variations_available=a,this.variations_current={},this.variations_selected={},this.reset_current=function(){for(var t in this.variation_attributes){this.variations_current[t]={};for(var a=0;a<this.variation_attributes[t].length;a++)this.variations_current[t.toString()][this.variation_attributes[t][a].toString()]=0}},this.update_current=function(){this.reset_current();for(var t=0;t<this.variations_available.length;t++)if(this.variations_available[t].variation_is_active){var a=this.variations_available[t].attributes;for(var e in a){var i=a[e],r=this.variations_selected[e];if(r&&r===i)this.variations_current[e][i]=1;else{var s=!0;for(var o in this.variations_selected)if(o!==e){var n=this.variations_selected[o],c=a[o];n&&c&&n!==c&&(s=!1)}if(s)if(""===i)for(var l in this.variations_current[e])this.variations_current[e][l]=1;else this.variations_current[e][i]=1}}}this.recalc_needed=!1},this.get_current=function(){return this.recalc_needed&&this.update_current(),this.variations_current},this.reset_selected=function(){this.recalc_needed=!0,this.variations_selected={}},this.set_selected=function(t,a){this.recalc_needed=!0,this.variations_selected[t]=a},this.get_selected=function(){return this.variations_selected}}function e(a,e){var i=a.closest(".product").find(".woocommerce-product-gallery.images").parent(),r="",s=!1,o=!1;if(a.closest(".product_item").length&&(s=a.closest(".product_item")),s){if(null!==e){var n=s.find(".p_img-first img");n.wc_set_variation_attr("src",e.image.src),n.wc_set_variation_attr("height",e.image.src_h),n.wc_set_variation_attr("width",e.image.src_w),n.wc_set_variation_attr("srcset",e.image.srcset),n.wc_set_variation_attr("sizes",e.image.sizes),n.wc_set_variation_attr("title",e.image.title),n.wc_set_variation_attr("data-caption",e.image.caption),n.wc_set_variation_attr("alt",e.image.alt),n.wc_set_variation_attr("data-src",e.image.full_src),n.wc_set_variation_attr("data-large_image",e.image.full_src),n.wc_set_variation_attr("data-large_image_width",e.image.full_src_w),n.wc_set_variation_attr("data-large_image_height",e.image.full_src_h)}}else{if(i.closest(".elementor-widget").length&&(o=!0),null!==e)r=function(a,e){let i="";return void 0!==a&&t.isArray(a.lakit_additional_images)&&t.each(a.lakit_additional_images,(function(t,a){let r=a.large[0],s=!1;if(i+="<div",a?.lakit_extra&&("video"===a?.lakit_extra?.type&&a?.lakit_extra?.videoUrl&&(i+=' data-media-attach-type="video"',i+=' data-media-attach-video="'+a?.lakit_extra?.videoUrl+'"',r=a?.lakit_extra?.videoUrl,s=!0),"threesixty"===a?.lakit_extra?.type&&a?.lakit_extra?.spriteSource)){let t={source:a?.lakit_extra?.spriteSource,totalframes:a?.lakit_extra?.totalFrames??0,framesperrow:a?.lakit_extra?.framesPerRow??0};i+=' data-media-attach-type="threesixty"',i+=` data-media-attach-threesixty='${JSON.stringify(t)}'`}i+=' data-thumb="'+a.thumb[0]+'" class="woocommerce-product-gallery__image">',e||(i+='<div class="zoomouter"><div class="zoominner">'),i+='<a href="'+r+'"',s&&(i+=' lapopup="yes"'),i+=' data-elementor-open-lightbox="no">',i+="<img ",i+='width="'+a.single[1]+'" ',i+='height="'+a.single[2]+'" ',i+='src="'+a.single[0]+'" ',i+='class="attachment-shop_single size-shop_single" ',i+='alt="'+a.alt+'" ',i+='title="'+a.title+'" ',i+='data-caption="'+a.caption+'" ',i+='data-src="'+a.large[0]+'" ',i+='data-large_image="'+a.large[0]+'" ',i+='data-large_image_width="'+a.large[1]+'" ',i+='data-large_image_height="'+a.large[2]+'" ',a.srcset&&(i+='srcset="'+a.srcset+'" ',i+='sizes="'+a.sizes+'" />'),i+="</a>",e||(i+="</div></div>"),i+="</div>"})),i}(e,o);else{var c=i.data("old_gallery")||!1;c?r=c:i.data("old_gallery",i.find(".woocommerce-product-gallery__wrapper").html())}if(t(document).trigger("lastudiokit/woocommerce/before_apply_swatches",i),""!==r&&!s){if(i.data("prev_gallery")){var l=t(i.data("prev_gallery")),d=t(r),_=!0;if(l.length===d.length)for(var h=0;h<l.length;h++)t(l[h]).attr("data-thumb")!==t(d[h]).attr("data-thumb")&&(_=!1);else _=!1;if(_)return}i.data("prev_gallery",r);var u='<div class="woocommerce-product-gallery--with-images woocommerce-product-gallery la-woo-product-gallery images" data-columns="'+i.find(".woocommerce-product-gallery.images").data("columns")+'">';i.data("gallery_action")&&(u+=i.data("gallery_action")),u+='<figure class="woocommerce-product-gallery__wrapper">'+r+'</figure><div class="la_woo_loading"><div class="la-loader spinner3"><div class="dot1"></div><div class="dot2"></div><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div></div></div>',i.removeAttr("data-element-loaded").css({"max-height":i.height(),"min-height":i.height()}).addClass("swatch-loading"),i.html(u);var f=i.find(".woocommerce-product-gallery.images");try{f.wc_product_gallery().addClass("swatch-loaded")}catch(t){}i.css({"max-height":"none","min-height":"200px"}),setTimeout((function(){i.removeClass("swatch-loading")}),150),t(document).trigger("lastudiokit/woocommerce/apply_swatches",i),"undefined"!=typeof LaStudioKits&&o&&LaStudioKits.wooGallery(i.closest(".elementor-widget"))}}}function i(t,a,e){var i=new RegExp("([?&])"+a+"=.*?(&|$)","i"),r=-1!==t.indexOf("?")?"&":"?";return t.match(i)?t.replace(i,"$1"+a+"="+e+"$2"):t+r+a+"="+e}t.fn.lakit_variation_form=function(){var i=this,r=parseInt(i.data("product_id"),10),s=null,o=!1,n=null,c=!1;if(i.closest(".product_item").length&&(c=!0),i.addClass("la-init-swatches"),i.find("th.label").each((function(){t(this).find("label").append('<span></span><span class="swatch-label"></span>')})),c){var l=parseInt(LaStudioKitSettings.i18n.swatches_max_item)||0;if(l>0){var d=i.closest(".product_item").find("a.woocommerce-loop-product__link").first().attr("href")||i.attr("action");i.find(".swatch-control").each((function(){t(".swatch-wrapper",t(this)).eq(l).before('<div class="swatch-wrapper-more"><a href="'+d+'"><i class="lastudioicon-i-add"></i><span>'+LaStudioKitSettings.i18n.swatches_more_text+"</span></a></div>")}))}}i.on("bind_calculator",(function(){var e=i.data("product_variations");(o=!1===e)&&i.block({message:null,overlayCSS:{background:"#fff",opacity:.6}});var c={};if(i.find(".select-option.selected").each((function(a,e){var i=t(this),r=i.closest("div.select").eq(0),s=r.closest("tr").find(".swatch-label").eq(0),o=r.find("select").first(),n=t("<div/>").html(i.data("value")).text();n=(n=n.replace(/'/g,"\\'")).replace(/"/g,'\\"'),s&&s.html(o.children("[value='"+n+"']").eq(0).text()),o.trigger("change")})),i.find(".variations select").each((function(a,e){var i=t(e),r=i.data("attribute_name")||i.attr("name");c[r]=[];var s;if((s=i.find("option:gt(0)").get()).length)for(var o=0;o<s.length;o++){var n=s[o];c[r].push(t(n).val())}})),o){n&&n.abort();var l={action:"lakit_ajax",_nonce:LaStudioKitSettings.ajaxNonce,actions:JSON.stringify({swatches_get_product_variations:{action:"swatches_get_product_variations",data:{product_id:r}}})};n=t.ajax({url:LaStudioKitSettings.ajaxUrl,type:"POST",data:l,success:function(t){s=new a(c,t.data.responses.swatches_get_product_variations.data,null,null),i.unblock()}})}else s=new a(c,e,null,null);i.trigger("woocommerce_variation_has_changed")})),i.on("change",".wc-default-select",(function(a){var e=t(this),i=e.closest("tr").find(".swatch-label").eq(0);""!==e.val()?i.html(e.find("option:selected").html()):i.html("")})),i.find(".wc-default-select").trigger("change"),i.on("click",".reset_variations",(function(){if(i.find(".swatch-label").html(""),i.find(".select-option").removeClass("selected"),i.find(".radio-option").prop("checked",!1),i.closest(".product_item").length){var t=i.closest(".product_item").find(".p_img-first img");t.wc_reset_variation_attr("src"),t.wc_reset_variation_attr("width"),t.wc_reset_variation_attr("height"),t.wc_reset_variation_attr("srcset"),t.wc_reset_variation_attr("sizes"),t.wc_reset_variation_attr("title"),t.wc_reset_variation_attr("data-caption"),t.wc_reset_variation_attr("alt"),t.wc_reset_variation_attr("data-src"),t.wc_reset_variation_attr("data-large_image"),t.wc_reset_variation_attr("data-large_image_width"),t.wc_reset_variation_attr("data-large_image_height")}return!1})).on("click",".select-option",(function(a){a.preventDefault();var e=t(this),i=e.closest("div.select").eq(0),r=i.closest("tr").find(".swatch-label").eq(0),s=i.find("select").first();if(e.hasClass("disabled"))return!1;if(e.hasClass("selected"))e.removeClass("selected"),s.children("option:eq(0)").prop("selected","selected").change(),r&&r.html("");else{i.find(".select-option").removeClass("selected"),e.addClass("selected");var o=t("<div/>").html(e.data("value")).text();o=(o=o.replace(/'/g,"\\'")).replace(/"/g,'\\"'),s.trigger("focusin").children("[value='"+o+"']").prop("selected","selected").change(),r&&r.html(s.children("[value='"+o+"']").eq(0).text())}})).on("change",".radio-option",(function(a){var e=t(this),i=e.closest("div.select").eq(0).find("select").first(),r=t("<div/>").html(e.val()).text();r=(r=r.replace(/'/g,"\\'")).replace(/"/g,'\\"'),i.trigger("focusin").children("[value='"+r+"']").prop("selected","selected").change()})).on("woocommerce_variation_has_changed",(function(){if(null!==s){i.find(".variations select").each((function(){var a=t(this).data("attribute_name")||t(this).attr("name");s.set_selected(a,t(this).val())}));var a=s.get_current();i.find("div.select").each((function(e,i){var r=t(i).find("select").first(),s=r.data("attribute_name")||r.attr("name"),o=a[s];t(i).find("div.select-option").each((function(a,e){o[t(e).data("value")]?t(e).removeClass("disabled"):t(e).addClass("disabled")})),t(i).find("input.radio-option").each((function(a,e){o[t(e).val()]?(t(e).removeAttr("disabled"),t(e).parent().removeClass("disabled")):(t(e).attr("disabled","disabled"),t(e).parent().addClass("disabled"))}))})),o&&i.find(".wc-default-select").each((function(e,i){var r=t(i),s=r.data("attribute_name")||r.attr("name"),o=a[s];r.find("option:gt(0)").removeClass("attached"),r.find("option:gt(0)").removeClass("enabled"),r.find("option:gt(0)").removeAttr("disabled"),r.find("option:gt(0)").each((function(a,e){o[t(e).val()]?(t(e).addClass("attached"),t(e).addClass("enabled")):t(e).addClass("disabled")})),r.find("option:gt(0):not(.enabled)").attr("disabled","disabled")}))}})).on("found_variation",(function(t,a){e(i,a)})).on("reset_image",(function(t){if(c){var a=i.closest(".lakit-product"),r=a.find(".button.la-addcart").first().data("oldtext")||!1;r&&(a.find(".button.la-addcart").removeClass("allow-ajax").attr("data-hint",r),a.find(".button.la-addcart .lakit-btn--text").text(r).attr("data-hint",r))}e(i,null)})),0===t(".swatch-control.select option[selected]").length&&t(".swatch-control .select-option:not(.disabled)",i).eq(0).click(),0===t(".swatch-control.radio-select input[checked]").length&&t(".swatch-control .radio-option:not(.disabled)",i).eq(0).click(),i.find(".single_variation").on("show_variation",(function(a,e,r){if(c){var s=i.closest(".lakit-product");""!=e.price_html&&t(".product_item--price",s).html(t(e.price_html).html());var o,n=s.find(".button.la-addcart").first();n.data("oldtext")||n.data("oldtext",n.data("hint")),n.data("tmptext")?o=n.data("tmptext"):(o=n.text(),n.data("tmptext",o)),r&&i.find(".single_add_to_cart_button").length&&(o=i.find(".single_add_to_cart_button").text(),n.data("oktext",o)),s.find(".button.la-addcart").addClass("allow-ajax").attr("data-hint",o),s.find(".button.la-addcart .lakit-btn--text").text(o).attr("data-hint",o)}else{var l=t('.single-price-wrapper[data-product_id="'+i.data("product_id")+'"]');""!=e.price_html&&(t(".price",l).remove(),l.append(e.price_html))}}))};let r=[];t(document).on("wc_variation_form","form.variations_form",(function(a){let e=t(a.target);r.push(e),e.data("lakit_has_swatches_form")||e.find(".swatch-control").length&&(e.data("lakit_has_swatches_form",!0),e.lakit_variation_form(),e.trigger("bind_calculator"),e.on("reload_product_variations",(function(){for(var t=0;t<r.length;t++)r[t].trigger("woocommerce_variation_has_changed"),r[t].trigger("bind_calculator"),r[t].trigger("woocommerce_variation_has_changed")})))})),t(document).on("mouseenter",".product_item .lakit-swatch-control .swatch-wrapper",(function(a){a.preventDefault();let e=t(this),r=e.closest(".product_item").find(".p_img-first img").first(),s=e.closest(".product_item").find(".la-addcart"),o=e.closest(".product_item").find(".woocommerce-loop-product__link, .product_item--title a");if(e.hasClass("selected"))return;e.addClass("selected").siblings().removeClass("selected"),r.hasClass("--has-changed")||r.attr("data-o-src",r.attr("src")).attr("data-o-sizes",r.attr("sizes")).attr("data-o-srcset",r.attr("srcset")).addClass("--has-changed");const n=e.attr("data-thumb")?e.attr("data-thumb"):r.attr("data-o-src");if(n!==r.attr("src")&&r.attr("src",n).removeAttr("sizes srcset"),s.length>0){let t=s.attr("href");t=i(t,"attribute_"+e.attr("data-attribute"),e.attr("data-value")),s.attr("href",t)}if(o.length>0){let t=o.eq(0).attr("href");t=i(t,"attribute_"+e.attr("data-attribute"),e.attr("data-value")),o.attr("href",t)}}));const s=a=>{let e=parseInt(LaStudioKitSettings.i18n.swatches_max_item)||0,i='<i class="lastudioicon-i-add"></i>';LaStudioKitSettings.i18n.swatches_more_text&&(i+=`<span>${LaStudioKitSettings.i18n.swatches_more_text}</span>`),e>0&&a.length>0&&a.each((function(){if(0===t(".swatch-wrapper-more",t(this)).length){let a=t(this).closest(".product_item").find("a.woocommerce-loop-product__link").first().attr("href");t(".swatch-wrapper",t(this)).eq(e).before(`<div class="swatch-wrapper-more"><a href="${a}">${i}</a></div>`)}}))};t(document).on("LaStudioTheme:AjaxShopFilter:success",(function(a,e){t("form.variations_form").trigger("wc_variation_form"),s(t(".lakit-swatch-control",e.parentContainer))})),t(document).on("lastudio-kit/ajax-loadmore/success lastudio-kit/ajax-pagination/success lastudio-kit/ajax-load-template/after lastudio-kit/carousel/init_success lastudio-kit/hamburger/after",(function(a,e){t("form.variations_form").trigger("wc_variation_form"),s(t(".lakit-swatch-control",e.parentContainer))})),t(window).on("elementor/frontend/init",(function(){window.elementorFrontend.hooks.addAction("frontend/element_ready/lakit-wooproducts.default",(function(t){s(t.find(".lakit-swatch-control"))}))}))}(jQuery);
+/*
+ Initialize LaStudio Swatches
+ */
+(function($) {
+    'use strict';
+
+    function variation_calculator(variation_attributes, product_variations) {
+
+        this.recalc_needed = true;
+        this.variation_attributes = variation_attributes;
+
+        //The actual variations that are configured in woocommerce.
+        this.variations_available = product_variations;
+
+        //Stores the calculation result for attribute + values that are available based on the selected attributes.
+        this.variations_current = {};
+
+        //Stores the selected attributes + values
+        this.variations_selected = {};
+
+        //Reset all the attributes + values to disabled.  They will be reenabled durring the calcution.
+        this.reset_current = function () {
+            for (var attribute in this.variation_attributes) {
+                this.variations_current[attribute] = {};
+                for (var av = 0; av < this.variation_attributes[attribute].length; av++) {
+                    this.variations_current[attribute.toString()][this.variation_attributes[attribute][av].toString()] = 0;
+                }
+            }
+        };
+
+        //Do the things to update the variations_current object with attributes + values which are enabled.
+        this.update_current = function () {
+            this.reset_current();
+            for (var i = 0; i < this.variations_available.length; i++) {
+                if (!this.variations_available[i].variation_is_active) {
+                    continue; //Variation is unavailable, probably out of stock.
+                }
+
+                //the variation attributes for the product this variation.
+                var variation_attributes = this.variations_available[i].attributes;
+
+                //loop though each variation attribute, turning on and off attributes which won't be available.
+                for (var attribute in variation_attributes) {
+
+                    var maybe_available_attribute_value = variation_attributes[attribute];
+                    var selected_value = this.variations_selected[attribute];
+
+                    if (selected_value && selected_value === maybe_available_attribute_value) {
+                        this.variations_current[attribute][maybe_available_attribute_value] = 1; //this is a currently selected attribute value
+                    } else {
+
+                        var result = true;
+
+                        /*
+
+                         Loop though any other item that is selected,
+                         checking to see if the attribute value does not match one of the attributes for this variation.
+                         If it does not match the attributes for this variation we do nothing.
+                         If none have matched at the end of these loops, the atttribute_option will remain off and unavailable.
+
+                         */
+                        for (var other_selected_attribute in this.variations_selected) {
+
+                            if (other_selected_attribute === attribute) {
+                                //We are looking to see if any attribute that is selected will cause this to fail.
+                                //Continue the loop since this is the attribute from above and we don't need to check against ourselves.
+                                continue;
+                            }
+
+                            //Grab the value that is selected for the other attribute.
+                            var other_selected_attribute_value = this.variations_selected[other_selected_attribute];
+
+                            //Grab the current product variations attribute value for the other selected attribute we are checking.
+                            var other_available_attribute_value = variation_attributes[other_selected_attribute];
+
+                            if (other_selected_attribute_value) {
+                                if (other_available_attribute_value) {
+                                    if (other_selected_attribute_value !== other_available_attribute_value) {
+                                        /*
+                                         The value this variation has for the "other_selected_attribute" does not match.
+                                         Since it does not match it does not allow us to turn on an available attribute value.
+
+                                         Set the result to false so we skip turning anything on.
+
+                                         Set the result to false so that we do not enable this attribute value.
+
+                                         If the value does match then we know that the current attribute we are looping through
+                                         might be available for us to set available attribute values.
+                                         */
+                                        result = false;
+                                        //Something on this variation didn't match the current selection, so we don't care about any of it's attributes.
+                                    }
+                                }
+                            }
+                        }
+
+                        /**
+                         After checking this attribute against this variation's attributes
+                         we either have an attribute which should be enabled or not.
+
+                         If the result is false we know that something on this variation did not match the currently selected attribute values.
+
+                         **/
+                        if (result) {
+                            if (maybe_available_attribute_value === "") {
+                                for (var av in this.variations_current[attribute]) {
+                                    this.variations_current[attribute][av] = 1;
+                                }
+
+                            } else {
+                                this.variations_current[attribute][maybe_available_attribute_value] = 1;
+                            }
+                        }
+
+                    }
+                }
+            }
+
+            this.recalc_needed = false;
+        };
+
+        this.get_current = function () {
+            if (this.recalc_needed) {
+                this.update_current();
+            }
+            return this.variations_current;
+        };
+
+        this.reset_selected = function () {
+            this.recalc_needed = true;
+            this.variations_selected = {};
+        }
+
+        this.set_selected = function (key, value) {
+            this.recalc_needed = true;
+            this.variations_selected[key] = value;
+        };
+
+        this.get_selected = function () {
+            return this.variations_selected;
+        }
+    }
+
+    function la_generator_gallery_html( variation, is_in_widget ){
+        let _html = '';
+        if( typeof variation !== "undefined" && $.isArray(variation.lakit_additional_images) ){
+            $.each(variation.lakit_additional_images, function(idx, val){
+
+                let _large_src = val.large[0];
+                let _has_video = false;
+
+                _html += '<div';
+                if(val?.lakit_extra){
+                    if(val?.lakit_extra?.type === 'video'){
+                        if( val?.lakit_extra?.videoUrl ){
+                            _html += ' data-media-attach-type="video"';
+                            _html += ' data-media-attach-video="'+val?.lakit_extra?.videoUrl+'"';
+                            _large_src = val?.lakit_extra?.videoUrl;
+                            _has_video = true;
+                        }
+                    }
+                    if(val?.lakit_extra?.type === 'threesixty'){
+                        if( val?.lakit_extra?.spriteSource ){
+                            let _threesixty = {
+                                'source': val?.lakit_extra?.spriteSource,
+                                'totalframes': val?.lakit_extra?.totalFrames ?? 0,
+                                'framesperrow': val?.lakit_extra?.framesPerRow ?? 0,
+                            }
+                            _html += ' data-media-attach-type="threesixty"';
+                            _html += ` data-media-attach-threesixty='${JSON.stringify(_threesixty)}'`;
+                        }
+                    }
+                }
+                _html += ' data-thumb="'+val.thumb[0]+'" class="woocommerce-product-gallery__image lakit-embla__slide">';
+                _html += '<a href="'+_large_src+'"';
+                if(_has_video){
+                    _html += ' lapopup="yes"';
+                }
+                _html += ' data-elementor-open-lightbox="no">';
+                _html += '<img ';
+                _html += 'width="'+val.single[1]+'" ';
+                _html += 'height="'+val.single[2]+'" ';
+                _html += 'src="'+val.single[0]+'" ';
+                _html += 'class="attachment-shop_single size-shop_single" ';
+                _html += 'alt="'+val.alt+'" ';
+                _html += 'title="'+val.title+'" ';
+                _html += 'data-caption="'+val.caption+'" ';
+                _html += 'data-src="'+val.large[0]+'" ';
+                _html += 'data-large_image="'+val.large[0]+'" ';
+                _html += 'data-large_image_width="'+val.large[1]+'" ';
+                _html += 'data-large_image_height="'+val.large[2]+'" ';
+                if(val.srcset){
+                    _html += 'srcset="'+val.srcset+'" ';
+                    _html += 'sizes="'+val.sizes+'" />';
+                }
+                _html += '</a>';
+                _html += '</div>';
+            });
+        }
+        return _html;
+    }
+
+    function la_update_swatches_gallery($form, variation ){
+        const $product_selector = $form.closest('.product');
+        const $galleryDiv = $product_selector.find('.woocommerce-product-gallery');
+        const $main_image_col = $galleryDiv.parent();
+        const $e_scope = $main_image_col.closest('.elementor-lakit-wooproduct-images');
+        var _html = '',
+            $product = false,
+            is_in_widget = false;
+
+        if($form.closest('.product_item').length){
+            $product = $form.closest('.product_item');
+        }
+
+        if($product){
+            if(variation !== null){
+                var $product_img = $product.find('.p_img-first img');
+                $product_img.wc_set_variation_attr( 'src', variation.image.src );
+                $product_img.wc_set_variation_attr( 'height', variation.image.src_h );
+                $product_img.wc_set_variation_attr( 'width', variation.image.src_w );
+                $product_img.wc_set_variation_attr( 'srcset', variation.image.srcset );
+                $product_img.wc_set_variation_attr( 'sizes', variation.image.sizes );
+                $product_img.wc_set_variation_attr( 'title', variation.image.title );
+                $product_img.wc_set_variation_attr( 'data-caption', variation.image.caption );
+                $product_img.wc_set_variation_attr( 'alt', variation.image.alt );
+                $product_img.wc_set_variation_attr( 'data-src', variation.image.full_src );
+                $product_img.wc_set_variation_attr( 'data-large_image', variation.image.full_src );
+                $product_img.wc_set_variation_attr( 'data-large_image_width', variation.image.full_src_w );
+                $product_img.wc_set_variation_attr( 'data-large_image_height', variation.image.full_src_h );
+            }
+            return;
+        }
+
+        if($e_scope.length){
+            is_in_widget = true;
+        }
+
+        if(variation !== null){
+            _html = la_generator_gallery_html(variation, is_in_widget);
+        }
+        else{
+            var _old_gallery = $main_image_col.data('old_gallery') || false;
+            if(_old_gallery){
+                _html = _old_gallery;
+            }
+            else{
+                $main_image_col.data('old_gallery', $main_image_col.find('.lakit-embla__container').html());
+            }
+        }
+
+        $(document).trigger('lastudiokit/woocommerce/before_apply_swatches', $main_image_col);
+
+        console.log({variation, _html, $product})
+
+        if (_html !== '' && !$product) {
+
+            if(!!$main_image_col.data('prev_gallery')){
+                var $_oldGalleryObject = $($main_image_col.data('prev_gallery')),
+                    $_newGalleryObject = $(_html);
+                var _donot_swap = true;
+                if($_oldGalleryObject.length === $_newGalleryObject.length){
+                    for (var idx = 0; idx < $_oldGalleryObject.length; idx++){
+                        if($($_oldGalleryObject[idx]).attr('data-thumb') !== $($_newGalleryObject[idx]).attr('data-thumb')){
+                            _donot_swap = false;
+                        }
+                    }
+                }
+                else{
+                    _donot_swap = false;
+                }
+                if(_donot_swap){
+                    return;
+                }
+            }
+            $main_image_col.data('prev_gallery', _html).find('.lakit-embla__container').html(_html)
+            $galleryDiv.removeClass('js--is_ready embla--inited')
+            $(document).trigger('lastudiokit/woocommerce/apply_swatches', $main_image_col);
+
+            if(is_in_widget){
+                try {
+                    elementorFrontend.hooks.doAction('frontend/element_ready/lakit-wooproduct-images.default', $e_scope, $)
+                }catch (_err) {
+                    console.log('err', _err)
+                }
+            }
+        }
+    }
+
+    $.fn.lakit_variation_form = function () {
+        var $form = this;
+        var $product_id = parseInt($form.data('product_id'), 10);
+        var calculator = null;
+        var $use_ajax = false;
+        var $swatches_xhr = null;
+        var is_in_list = false;
+
+        if($form.closest('.product_item').length){
+            is_in_list = true;
+        }
+        $form.addClass('la-init-swatches');
+
+        $form.find('th.label').each(function(){
+            var $label = $(this).find('label');
+            $label.append('<span></span><span class="swatch-label"></span>');
+        });
+
+        if(is_in_list){
+            var max_item = parseInt(LaStudioKitSettings.i18n.swatches_max_item) || 0;
+            if(max_item > 0){
+                var p_link = $form.closest('.product_item').find('a.woocommerce-loop-product__link').first().attr('href') || $form.attr('action');
+                $form.find('.swatch-control').each(function (){
+                    $('.swatch-wrapper', $(this)).eq(max_item).before('<div class="swatch-wrapper-more"><a href="'+p_link+'"><i class="lastudioicon-i-add"></i><span>'+LaStudioKitSettings.i18n.swatches_more_text+'</span></a></div>');
+                })
+            }
+        }
+
+        $form.on('bind_calculator', function () {
+
+            var $product_variations = $form.data('product_variations');
+            $use_ajax = $product_variations === false;
+
+            if ($use_ajax) {
+                $form.block({message: null, overlayCSS: {background: '#fff', opacity: 0.6}});
+            }
+
+            var attribute_keys = {};
+
+            //Set the default label.
+            $form.find('.select-option.selected').each(function (index, el) {
+                var $this = $(this);
+
+                //Get the wrapper select div
+                var $option_wrapper = $this.closest('div.select').eq(0);
+                var $label = $option_wrapper.closest('tr').find('.swatch-label').eq(0);
+                var $la_select_box = $option_wrapper.find('select').first();
+
+                // Decode entities
+                var attr_val = $('<div/>').html($this.data('value')).text();
+
+                // Add slashes
+                attr_val = attr_val.replace(/'/g, '\\\'');
+                attr_val = attr_val.replace(/"/g, '\\\"');
+
+                if ($label) {
+                    $label.html($la_select_box.children("[value='" + attr_val + "']").eq(0).text());
+                }
+                $la_select_box.trigger('change');
+            });
+
+            $form.find('.variations select').each(function (index, el) {
+                var $current_attr_select = $(el);
+                var current_attribute_name = $current_attr_select.data('attribute_name') || $current_attr_select.attr('name');
+
+                attribute_keys[current_attribute_name] = [];
+
+                //Build out a list of all available attributes and their values.
+                var current_options = '';
+                current_options = $current_attr_select.find('option:gt(0)').get();
+
+                if (current_options.length) {
+                    for (var i = 0; i < current_options.length; i++) {
+                        var option = current_options[i];
+                        attribute_keys[current_attribute_name].push($(option).val());
+                    }
+                }
+            });
+
+            if ($use_ajax) {
+                if ($swatches_xhr) {
+                    $swatches_xhr.abort();
+                }
+
+                var data = {
+                    'action' : 'lakit_ajax',
+                    '_nonce' : LaStudioKitSettings.ajaxNonce,
+                    'actions': JSON.stringify({
+                        'swatches_get_product_variations' : {
+                            'action': 'swatches_get_product_variations',
+                            'data': {
+                                'product_id': $product_id,
+                            }
+                        }
+                    }),
+                };
+
+                $swatches_xhr = $.ajax({
+                    url: LaStudioKitSettings.ajaxUrl,
+                    type: 'POST',
+                    data: data,
+                    success: function (response) {
+                        calculator = new variation_calculator(attribute_keys, response.data.responses.swatches_get_product_variations.data, null, null);
+                        $form.unblock();
+                    }
+                });
+            }
+            else {
+                calculator = new variation_calculator(attribute_keys, $product_variations, null, null);
+            }
+
+            $form.trigger('woocommerce_variation_has_changed');
+        });
+
+        $form
+            .on('change', '.wc-default-select', function(e){
+                var $__that = $(this);
+                var $label = $__that.closest('tr').find('.swatch-label').eq(0);
+                if($__that.val() !== ''){
+                    $label.html($__that.find('option:selected').html());
+                }else{
+                    $label.html('');
+                }
+            });
+
+        $form.find('.wc-default-select').trigger('change');
+
+        $form
+            // On clicking the reset variation button
+            .on('click', '.reset_variations', function () {
+                $form.find('.swatch-label').html('');
+                $form.find('.select-option').removeClass('selected');
+                $form.find('.radio-option').prop('checked', false);
+                // $('.price', $('.single-price-wrapper[data-product_id="'+$form.data('product_id')+'"]')).remove();
+
+                if($form.closest('.product_item').length){
+                    var $product = $form.closest('.product_item');
+                    var $product_img = $product.find('.p_img-first img');
+                    $product_img.wc_reset_variation_attr( 'src' );
+                    $product_img.wc_reset_variation_attr( 'width' );
+                    $product_img.wc_reset_variation_attr( 'height' );
+                    $product_img.wc_reset_variation_attr( 'srcset' );
+                    $product_img.wc_reset_variation_attr( 'sizes' );
+                    $product_img.wc_reset_variation_attr( 'title' );
+                    $product_img.wc_reset_variation_attr( 'data-caption' );
+                    $product_img.wc_reset_variation_attr( 'alt' );
+                    $product_img.wc_reset_variation_attr( 'data-src' );
+                    $product_img.wc_reset_variation_attr( 'data-large_image' );
+                    $product_img.wc_reset_variation_attr( 'data-large_image_width' );
+                    $product_img.wc_reset_variation_attr( 'data-large_image_height' );
+                }
+                return false;
+            })
+            .on('click', '.select-option', function (e) {
+                e.preventDefault();
+
+                var $this = $(this);
+
+                //Get the wrapper select div
+                var $option_wrapper = $this.closest('div.select').eq(0);
+                var $label = $option_wrapper.closest('tr').find('.swatch-label').eq(0);
+                var $la_select_box = $option_wrapper.find('select').first();
+                if ($this.hasClass('disabled')) {
+                    return false;
+                }
+                else if ($this.hasClass('selected')) {
+                    $this.removeClass('selected');
+                    $la_select_box.children('option:eq(0)').prop("selected", "selected").change();
+                    if ($label) {
+                        $label.html('');
+                    }
+                }
+                else {
+
+                    $option_wrapper.find('.select-option').removeClass('selected');
+                    //Set the option to selected.
+                    $this.addClass('selected');
+
+                    // Decode entities
+                    var attr_val = $('<div/>').html($this.data('value')).text();
+
+                    // Add slashes
+                    attr_val = attr_val.replace(/'/g, '\\\'');
+                    attr_val = attr_val.replace(/"/g, '\\\"');
+
+                    $la_select_box.trigger('focusin').children("[value='" + attr_val + "']").prop("selected", "selected").change();
+                    if ($label) {
+                        $label.html($la_select_box.children("[value='" + attr_val + "']").eq(0).text());
+                    }
+                }
+            })
+            .on('change', '.radio-option', function (e) {
+
+                var $this = $(this);
+
+                //Get the wrapper select div
+                var $option_wrapper = $this.closest('div.select').eq(0);
+
+                //Select the option.
+                var $la_select_box = $option_wrapper.find('select').first();
+
+                // Decode entities
+                var attr_val = $('<div/>').html($this.val()).text();
+
+                // Add slashes
+                attr_val = attr_val.replace(/'/g, '\\\'');
+                attr_val = attr_val.replace(/"/g, '\\\"');
+
+                $la_select_box.trigger('focusin').children("[value='" + attr_val + "']").prop("selected", "selected").change();
+
+
+            })
+            .on('woocommerce_variation_has_changed', function () {
+                if (calculator === null) {
+                    return;
+                }
+
+                $form.find('.variations select').each(function () {
+                    var attribute_name = $(this).data('attribute_name') || $(this).attr('name');
+                    calculator.set_selected(attribute_name, $(this).val());
+                });
+
+                var current_options = calculator.get_current();
+
+                //Grey out or show valid options.
+                $form.find('div.select').each(function (index, element) {
+                    var $la_select_box = $(element).find('select').first();
+
+                    var attribute_name = $la_select_box.data('attribute_name') || $la_select_box.attr('name');
+                    var avaiable_options = current_options[attribute_name];
+
+                    $(element).find('div.select-option').each(function (index, option) {
+                        if (!avaiable_options[$(option).data('value')]) {
+                            $(option).addClass('disabled');
+                        } else {
+                            $(option).removeClass('disabled');
+                        }
+                    });
+
+                    $(element).find('input.radio-option').each(function (index, option) {
+                        if (!avaiable_options[$(option).val()]) {
+                            $(option).attr('disabled', 'disabled');
+                            $(option).parent().addClass('disabled');
+                        } else {
+                            $(option).removeAttr('disabled');
+                            $(option).parent().removeClass('disabled');
+                        }
+                    });
+                });
+
+                if ($use_ajax) {
+                    //Manage a regular  default select list.
+                    // WooCommerce core does not do this if it's using AJAX for it's processing.
+                    $form.find('.wc-default-select').each(function (index, element) {
+                        var $la_select_box = $(element);
+
+                        var attribute_name = $la_select_box.data('attribute_name') || $la_select_box.attr('name');
+                        var avaiable_options = current_options[attribute_name];
+
+                        $la_select_box.find('option:gt(0)').removeClass('attached');
+                        $la_select_box.find('option:gt(0)').removeClass('enabled');
+                        $la_select_box.find('option:gt(0)').removeAttr('disabled');
+
+                        //Disable all options
+                        $la_select_box.find('option:gt(0)').each(function (optindex, option_element) {
+                            if (!avaiable_options[$(option_element).val()]) {
+                                $(option_element).addClass('disabled');
+                            } else {
+                                $(option_element).addClass('attached');
+                                $(option_element).addClass('enabled');
+                            }
+                        });
+
+                        $la_select_box.find('option:gt(0):not(.enabled)').attr('disabled', 'disabled');
+
+                    });
+                }
+            })
+            .on('found_variation', function( event, variation ){
+                la_update_swatches_gallery($form, variation);
+            })
+            .on('reset_image', function( event ){
+                if(is_in_list){
+                    var $p_item = $form.closest('.lakit-product'),
+                        $btn_add = $p_item.find('.button.la-addcart').first(),
+                        _old_text = $btn_add.data('oldtext') || false;
+                    if(_old_text){
+                        $p_item.find('.button.la-addcart').removeClass('allow-ajax').attr('data-hint', _old_text);
+                        $p_item.find('.button.la-addcart .lakit-btn--text').text(_old_text).attr('data-hint', _old_text);
+                    }
+                }
+                la_update_swatches_gallery($form, null);
+            });
+
+        if($('.swatch-control.select option[selected]').length === 0){
+            $('.swatch-control .select-option:not(.disabled)', $form).eq(0).click();
+        }
+        if($('.swatch-control.radio-select input[checked]').length === 0){
+            $('.swatch-control .radio-option:not(.disabled)', $form).eq(0).click();
+        }
+
+        $form.find('.single_variation').on('show_variation', function(e, variation, purchasable ){
+            if(is_in_list){
+                var $p_item = $form.closest('.lakit-product');
+                if(variation.price_html != ''){
+                    $('.product_item--price', $p_item).html($(variation.price_html).html());
+                }
+                var $btn_add = $p_item.find('.button.la-addcart').first(),
+                    _bk_text;
+
+                if(!$btn_add.data('oldtext')){
+                    $btn_add.data('oldtext', $btn_add.data('hint'));
+                }
+
+                if($btn_add.data('tmptext')){
+                    _bk_text = $btn_add.data('tmptext');
+                }
+                else{
+                    _bk_text = $btn_add.text();
+                    $btn_add.data('tmptext', _bk_text);
+                }
+                if(purchasable){
+                    if($form.find('.single_add_to_cart_button').length){
+                        _bk_text = $form.find('.single_add_to_cart_button').text();
+                        $btn_add.data('oktext', _bk_text);
+                    }
+                }
+                $p_item.find('.button.la-addcart').addClass('allow-ajax').attr('data-hint', _bk_text);
+                $p_item.find('.button.la-addcart .lakit-btn--text').text(_bk_text).attr('data-hint', _bk_text);
+            }
+            else{
+                var $priceWrapper = $('.single-price-wrapper[data-product_id="'+$form.data('product_id')+'"]');
+                if(variation.price_html != ''){
+                    $('.price', $priceWrapper).remove();
+                    $priceWrapper.append(variation.price_html);
+                }
+            }
+        })
+    };
+
+    function addQueryArg (url, key, value) {
+        var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+        var separator = url.indexOf('?') !== -1 ? "&" : "?";
+
+        if (url.match(re)) {
+            return url.replace(re, '$1' + key + "=" + value + '$2');
+        } else {
+            return url + separator + key + "=" + value;
+        }
+    }
+
+    let forms = [];
+
+    $(document).on('wc_variation_form', 'form.variations_form',  function (e) {
+        let $form = $(e.target);
+        forms.push($form);
+        if ( !$form.data('lakit_has_swatches_form') ) {
+            if ($form.find('.swatch-control').length) {
+                $form.data('lakit_has_swatches_form', true);
+                $form.lakit_variation_form();
+                $form.trigger('bind_calculator');
+                $form.on('reload_product_variations', function () {
+                    for (var i = 0; i < forms.length; i++) {
+                        forms[i].trigger('woocommerce_variation_has_changed');
+                        forms[i].trigger('bind_calculator');
+                        forms[i].trigger('woocommerce_variation_has_changed');
+                    }
+                })
+            }
+        }
+    });
+
+    $(document).on('mouseenter','.product_item .lakit-swatch-control .swatch-wrapper', function(e){
+        e.preventDefault();
+        let $swatch_control = $(this),
+            $image = $swatch_control.closest('.product_item').find('.p_img-first img').first(),
+            $btn_cart = $swatch_control.closest('.product_item').find('.la-addcart'),
+            $product_link = $swatch_control.closest('.product_item').find('.woocommerce-loop-product__link, .product_item--title a');
+
+        if($swatch_control.hasClass('selected')) return;
+        $swatch_control.addClass('selected').siblings().removeClass('selected');
+        if(!$image.hasClass('--has-changed')){
+            $image.attr('data-o-src', $image.attr('src')).attr('data-o-sizes', $image.attr('sizes')).attr('data-o-srcset', $image.attr('srcset')).addClass('--has-changed');
+        }
+        const newImgSrc = $swatch_control.attr('data-thumb') ? $swatch_control.attr('data-thumb') : $image.attr('data-o-src')
+        if(newImgSrc !== $image.attr('src')){
+            $image.attr('src', newImgSrc).removeAttr('sizes srcset');
+        }
+        if($btn_cart.length > 0){
+            let _href = $btn_cart.attr('href');
+            _href = addQueryArg(_href, 'attribute_' + $swatch_control.attr('data-attribute'), $swatch_control.attr('data-value'));
+            $btn_cart.attr('href', _href);
+        }
+        if($product_link.length > 0){
+            let _href = $product_link.eq(0).attr('href');
+            _href = addQueryArg(_href, 'attribute_' + $swatch_control.attr('data-attribute'), $swatch_control.attr('data-value'));
+            $product_link.attr('href', _href);
+        }
+    })
+
+    const renderMoreText = ( $parentSelector ) => {
+        let max_item = parseInt(LaStudioKitSettings.i18n.swatches_max_item) || 0;
+        let moreHTML = '<i class="lastudioicon-i-add"></i>'
+        if(LaStudioKitSettings.i18n.swatches_more_text){
+            moreHTML += `<span>${LaStudioKitSettings.i18n.swatches_more_text}</span>`
+        }
+        if(max_item > 0 && $parentSelector.length > 0){
+            $parentSelector.each(function (){
+                if( $('.swatch-wrapper-more', $(this)).length === 0 ){
+                    let p_link = $(this).closest('.product_item').find('a.woocommerce-loop-product__link').first().attr('href')
+                    $('.swatch-wrapper', $(this)).eq(max_item).before(`<div class="swatch-wrapper-more"><a href="${p_link}">${moreHTML}</a></div>`);
+                }
+            })
+        }
+    }
+
+    $(document).on('LaStudioTheme:AjaxShopFilter:success lastudio-kit/ajax-loadmore/success lastudio-kit/ajax-pagination/success lastudio-kit/ajax-load-template/after lastudio-kit/carousel/init_success lastudio-kit/hamburger/after', function (e, data){
+        $('form.variations_form').trigger('wc_variation_form');
+        renderMoreText($('.lakit-swatch-control', data.parentContainer))
+    });
+
+    $(window).on('elementor/frontend/init', function (){
+        window.elementorFrontend.hooks.addAction('frontend/element_ready/lakit-wooproducts.default', function ($scope) {
+            renderMoreText($scope.find('.lakit-swatch-control'))
+        });
+    });
+    if(typeof LaStudioKits !== "undefined" && LaStudioKits?.addedScripts?.hasOwnProperty('swatches')){
+        $('form.variations_form').trigger('wc_variation_form');
+        renderMoreText($('.lakit-swatch-control'))
+    }
+
+})(jQuery);

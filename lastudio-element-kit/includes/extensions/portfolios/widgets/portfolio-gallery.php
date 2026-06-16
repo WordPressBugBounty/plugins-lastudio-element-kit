@@ -16,26 +16,30 @@ use Elementor\Utils;
 
 
 class Portfolio_Gallery extends LaStudioKit_Base {
-    
+
     /**
      * [$item_counter description]
      * @var integer
      */
     public $item_counter = 0;
 
-    protected function enqueue_addon_resources(){
-        $this->add_script_depends( 'jquery-isotope' );
-        if(!lastudio_kit_settings()->is_combine_js_css()) {
-            $this->add_script_depends( 'lastudio-kit-base' );
-            if ( ! lastudio_kit()->is_optimized_css_mode() ) {
-                $depends = [ 'lastudio-kit-base', 'e-swiper' ];
-                if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
-                    $depends[] = 'lastudio-kit-swiper-dotv2';
-                }
-                wp_register_style( 'lakit-images-layout', lastudio_kit()->plugin_url( 'assets/css/addons/images-layout.min.css' ), $depends, lastudio_kit()->get_version() );
-                $this->add_style_depends( 'lakit-images-layout' );
-            }
+    protected function is_dynamic_content(): bool
+    {
+        return true;
+    }
+
+    public function get_script_depends()
+    {
+        return ['jquery-isotope', 'lastudio-kit-base'];
+    }
+
+    public function get_style_depends()
+    {
+        $depends = ['e-swiper', 'lakit-posts', 'lakit-images-layout'];
+        if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+            $depends[] = 'lastudio-kit-swiper-dotv2';
         }
+        return $depends;
     }
 
     protected function get_html_wrapper_class(){
@@ -44,30 +48,6 @@ class Portfolio_Gallery extends LaStudioKit_Base {
             $wrapper_class .= ' lakit-carousel-v2';
         }
         return $wrapper_class;
-    }
-
-    public function get_inline_css_depends() {
-        return [
-            [
-                'name' => 'lakit-images-layout'
-            ]
-        ];
-    }
-
-    public function get_widget_css_config($widget_name){
-        if( $widget_name === 'lakit-portfolio-gallery' ){
-            return parent::get_widget_css_config($widget_name);
-        }
-        $file_url = lastudio_kit()->plugin_url(  'assets/css/addons/images-layout.min.css' );
-        $file_path = lastudio_kit()->plugin_path( 'assets/css/addons/images-layout.min.css' );
-        return [
-            'key' => $widget_name,
-            'version' => lastudio_kit()->get_version(true),
-            'file_path' => $file_path,
-            'data' => [
-                'file_url' => $file_url
-            ]
-        ];
     }
 
     public function get_name() {

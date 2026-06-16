@@ -238,7 +238,7 @@ if ( ! class_exists( 'LaStudio_Kit_Helper' ) ) {
 			$url = esc_url( $url );
 
 			if ( empty( $url ) ) {
-				return;
+				return '';
 			}
 
 			$ext  = pathinfo( $url, PATHINFO_EXTENSION );
@@ -601,16 +601,18 @@ if ( ! class_exists( 'LaStudio_Kit_Helper' ) ) {
 		}
 
 		public function get_active_breakpoints( $reverse_key = false, $label_with_breakpoint = false ){
+            $active_breakpoints = lastudio_kit()->elementor()->breakpoints->get_active_breakpoints();
             $breakpoints = [];
-			$active_breakpoints = lastudio_kit()->elementor()->breakpoints->get_active_breakpoints();
-			foreach ($active_breakpoints as $k => $v){
-				if($reverse_key){
-					$breakpoints[$v->get_value()] = $label_with_breakpoint ? sprintf('%1$s(< %2$spx)', $v->get_label(), ($v->get_value() + 1)) : $k;
-				}
-				else{
-					$breakpoints[$k] = $label_with_breakpoint ? sprintf('%1$s(< %2$spx)', $v->get_label(), ($v->get_value() + 1)) : $v->get_value();
-				}
-			}
+			if( !empty( $active_breakpoints ) ){
+                foreach ($active_breakpoints as $k => $v){
+                    if($reverse_key){
+                        $breakpoints[$v->get_value()] = $label_with_breakpoint ? sprintf('%1$s(< %2$spx)', $v->get_label(), ($v->get_value() + 1)) : $k;
+                    }
+                    else{
+                        $breakpoints[$k] = $label_with_breakpoint ? sprintf('%1$s(< %2$spx)', $v->get_label(), ($v->get_value() + 1)) : $v->get_value();
+                    }
+                }
+            }
             return $breakpoints;
         }
 
@@ -1040,10 +1042,6 @@ if ( ! class_exists( 'LaStudio_Kit_Helper' ) ) {
             return $text;
         }
 
-        public static function lakit_active(){
-            return 'adstrator';
-        }
-
 		public static function number_format_short( $n, $precision = 1 ){
 			if ($n < 900) {
 				// 0 - 900
@@ -1263,46 +1261,13 @@ if ( ! class_exists( 'LaStudio_Kit_Helper' ) ) {
             return true;
         }
 
+        /**
+         * We should leave that to optimization plugins, we don't need to worry about this.
+         * @param string $input
+         * @return string
+         */
         public static function minify_css( $input ){
-            if(trim($input) === "") return $input;
-            return preg_replace(
-            array(
-                // Remove comment(s)
-                '#("(?:[^"\\\]++|\\\.)*+"|\'(?:[^\'\\\\]++|\\\.)*+\')|\/\*(?!\!)(?>.*?\*\/)|^\s*|\s*$#s',
-                // Remove unused white-space(s)
-                '#("(?:[^"\\\]++|\\\.)*+"|\'(?:[^\'\\\\]++|\\\.)*+\'|\/\*(?>.*?\*\/))|\s*+;\s*+(})\s*+|\s*+([*$~^|]?+=|[{};,>~]|\s(?![0-9\.])|!important\b)\s*+|([[(:])\s++|\s++([])])|\s++(:)\s*+(?!(?>[^{}"\']++|"(?:[^"\\\]++|\\\.)*+"|\'(?:[^\'\\\\]++|\\\.)*+\')*+{)|^\s++|\s++\z|(\s)\s+#si',
-                // Replace `0(cm|em|ex|in|mm|pc|pt|px|vh|vw|%)` with `0`
-                '#(?<=[\s:])(0)(cm|em|ex|in|mm|pc|pt|px|vh|vw|%)#si',
-                // Replace `:0 0 0 0` with `:0`
-                '#:(0\s+0|0\s+0\s+0\s+0)(?=[;\}]|\!important)#i',
-                // Replace `background-position:0` with `background-position:0 0`
-                '#(background-position):0(?=[;\}])#si',
-                // Replace `0.6` with `.6`, but only when preceded by `:`, `,`, `-` or a white-space
-                '#(?<=[\s:,\-])0+\.(\d+)#s',
-                // Minify string value
-                '#(\/\*(?>.*?\*\/))|(?<!content\:)([\'"])([a-z_][a-z0-9\-_]*?)\2(?=[\s\{\}\];,])#si',
-                '#(\/\*(?>.*?\*\/))|(\burl\()([\'"])([^\s]+?)\3(\))#si',
-                // Minify HEX color code
-//            '#(?<=[\s:,\-]\#)([a-f0-6]+)\1([a-f0-6]+)\2([a-f0-6]+)\3#i',
-                // Replace `(border|outline):none` with `(border|outline):0`
-                '#(?<=[\{;])(border|outline):none(?=[;\}\!])#',
-                // Remove empty selector(s)
-                '#(\/\*(?>.*?\*\/))|(^|[\{\}])(?:[^\s\{\}]+)\{\}#s'
-            ),
-            array(
-                '$1',
-                '$1$2$3$4$5$6$7',
-                '$1',
-                ':0',
-                '$1:0 0',
-                '.$1',
-                '$1$3',
-                '$1$2$4$5',
-//            '$1$2$3',
-                '$1:0',
-                '$1$2'
-            ),
-            $input);
+            return $input;
         }
 
 	}

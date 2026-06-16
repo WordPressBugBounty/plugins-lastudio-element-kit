@@ -13,41 +13,10 @@ if ( ! defined( 'ABSPATH' ) ) exit; // Exit if accessed directly
 
 class LaStudioKit_Banner extends LaStudioKit_Base {
 
-    protected function enqueue_addon_resources(){
-	    if(!lastudio_kit_settings()->is_combine_js_css()) {
-		    if(!lastudio_kit()->is_optimized_css_mode()) {
-			    wp_register_style( $this->get_name(), lastudio_kit()->plugin_url( 'assets/css/addons/banner.min.css' ), [ 'lastudio-kit-base' ], lastudio_kit()->get_version() );
-			    $this->add_style_depends( $this->get_name() );
-		    }
-	    }
+    public function get_style_depends()
+    {
+        return ['lakit-banner'];
     }
-
-	public function get_inline_css_depends() {
-		return [
-			'lakit-banner2',
-		];
-	}
-
-	public function get_widget_css_config($widget_name){
-		switch ($widget_name){
-			case 'lakit-banner2':
-				$file_url = lastudio_kit()->plugin_url(  'assets/css/addons/banner2.min.css' );
-				$file_path = lastudio_kit()->plugin_path( 'assets/css/addons/banner2.min.css' );
-				break;
-			default:
-				$file_url = lastudio_kit()->plugin_url(  'assets/css/addons/banner1.min.css' );
-				$file_path = lastudio_kit()->plugin_path( 'assets/css/addons/banner1.min.css' );
-				break;
-		}
-		return [
-			'key' => $widget_name,
-			'version' => lastudio_kit()->get_version(true),
-			'file_path' => $file_path,
-			'data' => [
-				'file_url' => $file_url
-			]
-		];
-	}
 
 	public function get_name() {
 		return 'lakit-banner';

@@ -17,16 +17,13 @@ if (!defined('WPINC')) {
  * Post Featured Image Widget
  */
 class LaStudioKit_Post_Featured_Image extends LaStudioKit_Base {
-
+    protected function is_dynamic_content(): bool
+    {
+        return true;
+    }
 	public function has_widget_inner_wrapper(): bool {
 		return true;
 	}
-
-    protected function enqueue_addon_resources(){
-	    if(!lastudio_kit_settings()->is_combine_js_css()) {
-		    $this->add_style_depends( 'lastudio-kit-base' );
-	    }
-    }
 
     public function get_name() {
         return 'lakit-post-featured-image';

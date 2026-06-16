@@ -284,6 +284,7 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
         remove_action('woocommerce_after_shop_loop_item', 'woocommerce_template_loop_add_to_cart', 10);
         remove_action('woocommerce_shop_loop_item_title', 'woocommerce_template_loop_product_title', 10);
         remove_action('woocommerce_before_shop_loop_item_title', 'woocommerce_template_loop_product_thumbnail', 10);
+        remove_action('woocommerce_before_shop_loop_item_title', 'woocommerce_show_product_loop_sale_flash', 10);
         remove_action('woocommerce_after_shop_loop_item_title', 'woocommerce_template_loop_price');
         remove_action('woocommerce_after_shop_loop_item_title', 'woocommerce_template_loop_rating', 5);
 
@@ -305,6 +306,18 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
 
         remove_action('woocommerce_after_shop_loop', 'woocommerce_pagination', 10);
         add_action('woocommerce_after_shop_loop', [$this, 'override_wc_pagination'], 10);
+
+        remove_action('woocommerce_before_subcategory', 'woocommerce_template_loop_category_link_open', 10);
+        remove_action('woocommerce_after_subcategory', 'woocommerce_template_loop_category_link_close', 10);
+        remove_action('woocommerce_shop_loop_subcategory_title', 'woocommerce_template_loop_category_title', 10);
+
+        add_action('woocommerce_before_subcategory', [$this, 'loop_item_open'], -1001);
+        add_action('woocommerce_after_subcategory', [$this, 'loop_item_close'], 1001);
+        add_action('woocommerce_before_subcategory_title', [$this, 'loop_item_thumbnail_open'], -1001);
+        add_action('woocommerce_before_subcategory_title', [$this, 'loop_item_category_image_link'], -20);
+        add_action('woocommerce_before_subcategory_title', 'woocommerce_template_loop_category_link_close', 20);
+        add_action('woocommerce_before_subcategory_title', [$this, 'loop_item_category_thumbnail_close'], 1001);
+        add_action('woocommerce_shop_loop_subcategory_title', [$this, 'loop_item_category_title'], 20);
     }
 
     private function override_loop_hook(){
@@ -324,22 +337,51 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
     public function loop_item_close(){
         echo '</div>';
     }
+
+    public function loop_item_category_thumbnail_close()
+    {
+        echo '</div>';
+        echo '</div>';
+    }
+
+    public function loop_item_category_image_link( $category )
+    {
+        $category_term = get_term( $category, 'product_cat' );
+        $category_name = ( ! $category_term || is_wp_error( $category_term ) ) ? '' : $category_term->name;
+        /* translators: %s: Category name */
+        echo '<a class="woocommerce-loop-product__link" aria-label="' . sprintf( esc_attr__( 'Visit product category %1$s', 'woocommerce' ), esc_attr( $category_name ) ) . '" href="' . esc_url( get_term_link( $category, 'product_cat' ) ) . '">';
+    }
+
+    public function loop_item_category_title( $category )
+    {
+        $count = '';
+        if ( $category->count > 0 ) {
+            $count = apply_filters( 'woocommerce_subcategory_count_html', ' <mark class="count">(' . esc_html( $category->count ) . ')</mark>', $category );
+        }
+        echo sprintf(
+            '<div class="product_item--info"><div class="product_item--info-inner"><div class="lakitp-zone lakitp-zone-d"><h2 class="lakitp-zone-item product_item--title woocommerce-loop-category__title"><a href="%1$s">%2$s%3$s</a></h2></div></div></div>',
+            esc_url( get_term_link( $category, 'product_cat' ) ),
+            esc_html( $category->name ),
+            wp_kses($count, array('mark' => array('class' => array()))),
+        );
+    }
+
     public function loop_item_thumbnail_open(){
         echo '<div class="product_item--thumbnail">';
-            echo '<div class="product_item--thumbnail-holder">';
+        echo '<div class="product_item--thumbnail-holder">';
     }
     public function loop_item_thumbnail_close(){
+        echo '</div>';
+        if( !lastudio_kit()->get_theme_support('elementor::product-grid-v2') ) {
+            echo '<div class="product_item_thumbnail_action product_item--action">';
+            echo '<div class="wrap-addto">';
+            do_action('lastudio-kit/products/action/shop_loop_item_action_top');
             echo '</div>';
-            if( !lastudio_kit()->get_theme_support('elementor::product-grid-v2') ) {
-                echo '<div class="product_item_thumbnail_action product_item--action">';
-                    echo '<div class="wrap-addto">';
-                    do_action('lastudio-kit/products/action/shop_loop_item_action_top');
-                    echo '</div>';
-                echo '</div>';
-            }
-            else{
-                $this->add_zone_image();
-            }
+            echo '</div>';
+        }
+        else{
+            $this->add_zone_image();
+        }
         echo '</div>';
     }
 
@@ -496,6 +538,7 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
     public function add_zone_image(){
 
         $unique_id = wc_get_loop_prop('lakit_unique_id');
+        $w_id = wc_get_loop_prop('lakit_widget_id');
 
         $zone_1 = $this->get_setting_zone_content('product_image_zone_1');
         $zone_2 = $this->get_setting_zone_content('product_image_zone_2');
@@ -505,19 +548,20 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
         $zone_2_hide_on = !empty($this->get_setting_zone_content('zone_2_hide_on')) ? ' elementor-hidden-' . join(' elementor-hidden-', $this->get_setting_zone_content('zone_2_hide_on')) : '';
         $zone_3_hide_on = !empty($this->get_setting_zone_content('zone_3_hide_on')) ? ' elementor-hidden-' . join(' elementor-hidden-', $this->get_setting_zone_content('zone_3_hide_on')) : '';
 
-        echo $this->render_button_actions($zone_1, 'lakitp-zone lakitp-zone-a'. $zone_1_hide_on, 'lakit-tooltip-zone-a--id-' . $unique_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-        echo $this->render_button_actions($zone_2, 'lakitp-zone lakitp-zone-b'. $zone_2_hide_on, 'lakit-tooltip-zone-b--id-' . $unique_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-        echo $this->render_zone_content($zone_3, 'lakitp-zone lakitp-zone-c'. $zone_3_hide_on, 'lakit-tooltip-zone-c--id-' . $unique_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo $this->render_button_actions($zone_1, 'lakitp-zone lakitp-zone-a'. $zone_1_hide_on, 'lakit-tooltip-zone-a--id-' . $unique_id, 'lakit-tooltip-zone-a--id-' . $w_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo $this->render_button_actions($zone_2, 'lakitp-zone lakitp-zone-b'. $zone_2_hide_on, 'lakit-tooltip-zone-b--id-' . $unique_id, 'lakit-tooltip-zone-b--id-' . $w_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo $this->render_zone_content($zone_3, 'lakitp-zone lakitp-zone-c'. $zone_3_hide_on, 'lakit-tooltip-zone-c--id-' . $unique_id, 'lakit-tooltip-zone-c--id-' . $w_id ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
 
     public function add_zone_content(){
         $unique_id = wc_get_loop_prop('lakit_unique_id');
+	    $w_id = wc_get_loop_prop('lakit_widget_id');
         $zone_content = $this->get_setting_zone_content('product_content_zone');
         $zone_4_hide_on = !empty($this->get_setting_zone_content('zone_4_hide_on')) ? ' elementor-hidden-' . join(' elementor-hidden-', $this->get_setting_zone_content('zone_4_hide_on')) : '';
-        echo $this->render_zone_content($zone_content, 'lakitp-zone lakitp-zone-d'. $zone_4_hide_on, 'lakit-tooltip-zone-d--id-' . $unique_id); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+        echo $this->render_zone_content($zone_content, 'lakitp-zone lakitp-zone-d'. $zone_4_hide_on, 'lakit-tooltip-zone-d--id-' . $unique_id, 'lakit-tooltip-zone-d--id-' . $w_id); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
     }
 
-    private function render_button_actions( $zoneSettings, $wrapperClass, $zoneID = '' ){
+    private function render_button_actions( $zoneSettings, $wrapperClass, $zoneID = '', $tipID = '' ){
         $html = '';
 
         $zoneSettings = apply_filters('lastudio-kit/products/zoneSettings', $zoneSettings);
@@ -529,7 +573,7 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
                 'text2' => !empty($setting['item_label2']) ? $setting['item_label2'] : '',
                 'icon' => $this->_get_icon_setting($setting['item_icon']),
                 'el_class' => $el_class,
-                'tip_class' => $zoneID,
+                'tip_class' => $tipID,
             ];
             switch ($setting['item_type']){
                 case 'addcart':
@@ -561,7 +605,7 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
         return $html;
     }
 
-    private function render_zone_content( $zoneSettings, $wrapperClass, $zoneID = '' ){
+    private function render_zone_content( $zoneSettings, $wrapperClass, $zoneID = '', $tipID = '' ){
 
         $zoneSettings = apply_filters('lastudio-kit/products/zoneSettings', $zoneSettings);
 
@@ -639,7 +683,7 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
                 case 'product_action':
                     $zone_5_hide_on = !empty($this->get_setting_zone_content('zone_5_hide_on')) ? ' elementor-hidden-' . join(' elementor-hidden-', $this->get_setting_zone_content('zone_5_hide_on')) : '';
                     $el_class .= $zone_5_hide_on;
-                    $item_html = $this->v2_loop_actions( $el_class, $zoneID );
+                    $item_html = $this->v2_loop_actions( $el_class, $zoneID, $tipID );
                     $html .= apply_filters('lastudio-kit/products/zone_item_html', $item_html, $el_class, $setting);
                     break;
 
@@ -1047,9 +1091,9 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
         return '';
     }
 
-    private function v2_loop_actions( $elClass = '', $zoneID = '' ){
+    private function v2_loop_actions( $elClass = '', $zoneID = '', $tipID = '' ){
         $zone_action = $this->get_setting_zone_content('product_content_buttons');
-        return $this->render_button_actions($zone_action, 'lakitp-zone-item product_item--buttons ' . $elClass, $zoneID);
+        return $this->render_button_actions($zone_action, 'lakitp-zone-item product_item--buttons ' . $elClass, $zoneID, $tipID);
     }
 
     private function v2_loop_author( $elClass = '', $icon = '' ){

@@ -46,7 +46,7 @@ class General_Extensions {
             if(empty($stack->get_data('isInner'))){
                 $classes[] = 'e-parent';
                 try {
-                    $current_document =   lastudio_kit()->elementor()->documents->get_current();
+                    $current_document = lastudio_kit()->elementor()->documents->get_current();
                     if('header' === $current_document->get_template_type()){
                         $classes[] = 'e-loc-h';
                     }

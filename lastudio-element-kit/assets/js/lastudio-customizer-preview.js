@@ -1,55 +1,52 @@
-(function($, api) {
+(function(api) {
     "use strict";
-
-    var cssRules = {};
-
+    const cssRules = {};
     function liveUpdateCSS(id, css){
-        var _tmp_id = id.replace('[', '_').replace(']', '_').replace(/_*$/, '');
+        let _tmp_id = id.replace('[', '_').replace(']', '_').replace(/_*$/, '');
         _tmp_id = 'lakit_cs__' + _tmp_id;
-
-        var styleSelector = document.getElementById( _tmp_id );
+        const styleSelector = document.getElementById( _tmp_id );
         if(styleSelector){
             styleSelector.innerHTML = css;
         }
         else{
-            var tmpDiv = document.createElement("div");
+            const tmpDiv = document.createElement("div");
             tmpDiv.innerHTML = "<style id='"+_tmp_id+"'>" + css + "</style>";
             document.getElementsByTagName("head")[0].appendChild(tmpDiv.childNodes[0])
         }
     }
 
     function renderCssRules(){
-        var css = '';
-        $.each(cssRules, function ( key, value ){
-            if(value !== ''){
-                css += value;
+        let css = '';
+        for (const cssKey in cssRules) {
+            if(cssRules[cssKey] !== ''){
+                css += cssRules[cssKey];
             }
-        });
+        }
         liveUpdateCSS('cs_style', css);
     }
 
     function setCssRule( key, rules, value ){
-        if(value == ''){
+        if(value === ''){
             cssRules[key] = '';
         }
         else{
             if(rules.length){
-                var _css = '';
+                let _css = '';
                 rules.forEach( function ( rule ){
                     _css += rule.selector + '{' + rule.property + ':' + value + '}';
-                } );
+                });
                 cssRules[key] = _css;
             }
         }
         renderCssRules();
     }
 
-    $.each(lakitCustomizeConfigs, function ( key, css_rule ){
-        api(key, function (value){
-            value.bind(function ( newval ){
-                setCssRule( key, css_rule, newval );
+    for (const control_name in lakitCustomizeConfigs) {
+        api(control_name, function ( controlSetting ){
+            controlSetting.bind(function ( value ){
+                setCssRule( control_name, lakitCustomizeConfigs[control_name], value );
             });
         });
-    });
+    }
 
-})(jQuery, wp.customize);
+})(wp.customize);

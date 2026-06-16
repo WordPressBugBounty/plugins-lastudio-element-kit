@@ -22,7 +22,7 @@ if(empty($item_meta)){
 ?>
 <div <?php $this->print_render_attribute_string( 'timeline_bar_' . $item_settings['_id'] ) ?>>
 	<?php
-        echo '<div>'.esc_html($item_meta).'</div>';
+        echo '<div class="lakit-htimeline-item__meta">'.esc_html($item_meta).'</div>';
         if($show_arrow){
             echo '<div class="lakit-htimeline-item__card-arrow"></div>';
         }

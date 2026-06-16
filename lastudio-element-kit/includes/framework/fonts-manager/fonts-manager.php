@@ -108,7 +108,7 @@ if ( ! class_exists( 'CX_Fonts_Manager' ) ) {
 		 */
 		public function get_fonts_url() {
 
-			$font_url = get_transient( $this->transient_key() );
+            $font_url = wp_cache_get( $this->transient_key(), 'lastudio-kit' );
 
 			if ( ! $font_url ) {
 
@@ -122,14 +122,11 @@ if ( ! class_exists( 'CX_Fonts_Manager' ) ) {
 
 				$font_url = $this->build_fonts_url();
 
-				if ( false == $font_url ) {
-					return;
+				if (!$font_url) {
+					return false;
 				}
 
-				global $wp_customize;
-				if ( ! isset( $wp_customize ) ) {
-					set_transient( $this->transient_key(), $font_url, WEEK_IN_SECONDS );
-				}
+                wp_cache_set( $this->transient_key(), $font_url, 'lastudio-kit' );
 			}
 
 			return $font_url;
@@ -156,13 +153,11 @@ if ( ! class_exists( 'CX_Fonts_Manager' ) ) {
 			$type = $this->args['type'];
 
 			if ( 'theme_mod' == $type ) {
-				$setting = get_theme_mod( $name );
-				return $setting;
+				return get_theme_mod( $name );
 			}
 
-			if ( true != $this->args['single'] ) {
-				$setting = get_option( $name );
-				return $setting;
+			if (!$this->args['single']) {
+				return get_option( $name );
 			}
 
 			$settings = get_option( $this->args['prefix'] );

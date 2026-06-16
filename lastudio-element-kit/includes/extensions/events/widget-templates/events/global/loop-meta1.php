@@ -77,6 +77,17 @@ if (filter_var($show_metadata, FILTER_VALIDATE_BOOLEAN) && !empty($metadata)) {
 		        $meta_value = $_val;
 		        $item_type_class = 'post__organized_by';
 		        break;
+			case 'time':
+		        $_val = get_post_meta( get_the_ID(), 'event_time', true );
+		        $meta_value = $_val;
+		        $item_type_class = 'post__time';
+		        break;
+            case 'custom_field':
+                if(!empty($meta['custom_field_key'])){
+                    $meta_value = get_post_meta(get_the_ID(), $meta['custom_field_key'], true);
+                    $item_type_class = 'post__custom_field';
+                }
+                break;
         }
 
         $meta_value = apply_filters('lastudio-kit/lakit-events/metadata/output', $meta_value, $item_type, get_the_ID());

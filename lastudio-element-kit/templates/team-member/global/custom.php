@@ -72,6 +72,7 @@ if( $enable_carousel ){
             $show_role          = filter_var( $this->get_settings_for_display('show_role'), FILTER_VALIDATE_BOOLEAN );
             $show_social        = filter_var( $this->get_settings_for_display('show_social'), FILTER_VALIDATE_BOOLEAN );
             $show_excerpt       = filter_var( $this->get_settings_for_display('show_excerpt'), FILTER_VALIDATE_BOOLEAN );
+            $show_subdesc       = filter_var( $this->get_settings_for_display('show_subdescription'), FILTER_VALIDATE_BOOLEAN );
             $excerpt_length     = absint( $this->get_settings_for_display('excerpt_length') );
 
             if($items){
@@ -82,6 +83,7 @@ if( $enable_carousel ){
                     $member_image       = !empty($item['image']) ? $item['image'] : [];
                     $member_role        = !empty($item['role']) ? $item['role'] : '';
                     $member_description = !empty($item['description']) ? $item['description'] : '';
+                    $member_subdescription = !empty($item['subdescription']) ? $item['subdescription'] : '';
 
                     $link_key = 'member_link_' . $index;
 
@@ -104,11 +106,17 @@ if( $enable_carousel ){
                                     if ( ! empty( $member_link['url'] ) ) {
                                         $tag_link = 'a';
                                         $this->add_link_attributes( $link_key, $member_link );
-                                        $this->add_render_attribute( $link_key, 'title', esc_attr($member_name) );
+                                        $this->add_render_attribute( $link_key, 'title', esc_attr(wp_strip_all_tags( $member_name ) ) );
                                     }
                                     echo sprintf('<%1$s %2$s>%3$s</%1$s>', $tag_link, $this->get_render_attribute_string( $link_key ), $this->_get_member_image( $member_image )); // phpcs:ignore
                                     if(in_array($preset, array('type-1', 'type-2', 'type-3')) && $show_social && !empty($social_html)){
                                         echo '<div class="lakit-team-member__cover"><div class="lakit-team-member__socials">' . $social_html . '</div></div>'; // phpcs:ignore
+                                    }
+                                    if($show_subdesc && !empty($member_subdescription)){
+                                        echo sprintf(
+                                            '<div class="lakit-team-member__subdesc">%1$s</div>',
+                                            wp_kses(balanceTags($member_subdescription, true), \LaStudio_Kit_Helper::kses_allowed_tags())
+                                        );
                                     }
                                     ?>
                                 </div>
@@ -120,7 +128,7 @@ if( $enable_carousel ){
                                             '<%1$s class="lakit-team-member__name"><%4$s %2$s>%3$s</%4$s></%1$s>',
                                             esc_attr($title_tag),
                                             $this->get_render_attribute_string( $link_key ), // phpcs:ignore
-                                            esc_html($member_name),
+	                                        wp_kses($member_name, \LaStudio_Kit_Helper::kses_allowed_tags()),
 	                                        $tag_link // phpcs:ignore
                                         );
     

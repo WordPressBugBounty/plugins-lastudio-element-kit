@@ -1,123 +1,131 @@
 <?php
-// If this file is called directly, abort.
-
+// Prevent direct access.
 if ( ! defined( 'WPINC' ) ) {
-    die;
+    exit;
 }
 
-add_filter('elementor/editor/localize_settings', function ($configs){
-    $key = ['elementor_site', 'docs_elementor_site', 'help_the_content_url', 'help_right_click_url', 'help_flexbox_bc_url', 'elementPromotionURL', 'dynamicPromotionURL'];
-    $key2 = ['help_preview_error_url', 'help_preview_http_error_url', 'help_preview_http_error_500_url', 'goProURL'];
-    $tmp = [];
-    if(is_array($configs)){
-        foreach ($configs as $k => $v){
-            if(in_array($k, $key)){
-                $old_val = $configs[$k];
-                $tmp[] = $old_val;
-	            $configs[$k] = 'https://la-studioweb.com/go/elementor/docs';
-            }
-            if( ($k == 'preview' || $k == 'icons') && is_array($v) ){
-                foreach ($v as $k1 => $v1){
-                    if(in_array($k1, $key2)){
-                        $old_val2 = $v[$k1];
-                        $tmp[] = $old_val2;
-	                    $v[$k1] = 'https://la-studioweb.com/go/elementor/docs';
-                    }
-                }
-                $configs[$k] = $v;
-            }
-        }
-    }
-    if(!empty($configs['initial_document']['widgets'])){
-        foreach ($configs['initial_document']['widgets'] as $widget => &$setting ) {
-            if(isset($setting['help_url'])){
-	            $setting['help_url'] = 'https://la-studioweb.com/go/elementor/docs';
-            }
-        }
-    }
-    if(!empty($configs['elements'])){
-        foreach ($configs['elements'] as $widget_name => &$setting ) {
-            if(isset($setting['help_url'])){
-	            $setting['help_url'] = 'https://la-studioweb.com/go/elementor/docs';
-            }
-        }
-    }
+final class LaStudioKit_Elementor_Link_Replacer {
 
-    if( !empty($configs['promotion']['elements']['action_button']['url']) ){
-        $configs['promotion']['elements']['action_button']['url'] = str_replace('https://go.elementor.com', 'https://la-studioweb.com/go/elementor', $configs['promotion']['elements']['action_button']['url']);
-    }
+    private const TARGET_URL = 'https://la-studioweb.com/go/elementor-pro';
 
-    return $configs;
-});
+    private const CONFIG_VARS = [
+        'elementorCommonConfig',
+        'elementorAppConfig',
+        'elementorPromotionsData',
+        'editorOneSidebarConfig',
+    ];
 
-add_action('elementor/app/init', function (){
-	/**
-	 * Remove the deprecated `print_emoji_styles` handler.
-	 * It avoids breaking style generation with a deprecation message.
-	 */
-	$has_emoji_styles = has_action( 'wp_print_styles', 'print_emoji_styles' );
-	if ( $has_emoji_styles ) {
-		remove_action( 'wp_print_styles', 'print_emoji_styles' );
-	}
-    add_action('wp_print_footer_scripts', function (){
-        ?>
-        <script type="text/javascript">
-            function LaStudioKit_ReplaceLinks2(){
-                document.querySelectorAll('a[href*="go.elementor.com"]').forEach( elm => {
-                    elm.setAttribute('href', 'https://la-studioweb.com/go/elementor-pro')
-                } )
-                document.querySelectorAll('a[href*="elementor.com/popup-builder"]').forEach( elm => {
-                    elm.setAttribute('href', 'https://la-studioweb.com/go/elementor/popup-builder')
-                } )
-            }
-            document.addEventListener('DOMContentLoaded', LaStudioKit_ReplaceLinks2);
-            window.addEventListener('load', LaStudioKit_ReplaceLinks2);
-        </script>
-        <?php
-    }, 999);
-});
+    private const TEMPLATE_SELECTORS = [
+        '#tmpl-elementor-panel-revisions-no-revisions',
+        '#tmpl-elementor-panel-categories',
+        '#tmpl-elementor-panel-global',
+        '#tmpl-elementor-template-library-save-template',
+        '#tmpl-elementor-template-library-save-template-variant-b',
+        '#tmpl-elementor-template-library-import',
+        '#tmpl-elementor-template-library-templates-empty',
+        '#tmpl-elementor-navigator',
+        '#tmpl-elementor-template-library-get-pro-button',
+        '#elementor-preview-responsive-wrapper #elementor-notice-bar',
+    ];
 
-add_action('admin_footer', function (){
-    ?>
-    <script type="text/javascript">
-        function LaStudioKit_ReplaceLinks2(){
-            document.querySelectorAll('a[href*="go.elementor.com"]').forEach( elm => {
-                elm.setAttribute('href', 'https://la-studioweb.com/go/elementor-pro')
-            } )
-            document.querySelectorAll('a[href*="elementor.com/popup-builder"]').forEach( elm => {
-                elm.setAttribute('href', 'https://la-studioweb.com/go/elementor/popup-builder')
-            } )
-        }
-        document.addEventListener('DOMContentLoaded', LaStudioKit_ReplaceLinks2);
-        window.addEventListener('load', LaStudioKit_ReplaceLinks2);
-    </script>
-    <?php
-}, 999);
+    public static function init() {
+        add_filter( 'elementor/editor/localize_settings', [ __CLASS__, 'replace_links_recursive' ], 100 );
+        add_filter( 'elementor/common/localize_settings', [ __CLASS__, 'replace_links_recursive' ], 100 );
+        add_filter( 'wp_redirect', [ __CLASS__, 'replace_redirect_url' ], 20 );
 
-add_filter('wp_redirect', function ( $location ){
-    if( strpos($location, 'https://elementor.com/pro') !== false || strpos($location, '//go.elementor.com') !== false ){
-        $location = 'https://la-studioweb.com/go/elementor-pro';
-    }
-    return $location;
-}, 20);
-
-add_action('elementor/editor/footer', function (){
-    ?>
-    <script type="text/javascript">
-        const LaStudioKit_ScriptTemplateIds = ['#tmpl-elementor-panel-categories', '#tmpl-elementor-panel-global', '#tmpl-elementor-template-library-get-pro-button', '#elementor-preview-responsive-wrapper #elementor-notice-bar'];
-        LaStudioKit_ScriptTemplateIds.forEach(function (id){
-            const temp = document.querySelector(id);
-            if(temp){
-                temp.innerHTML = temp.innerHTML.replace(/href="(.*?)"/gi, 'href="https://la-studioweb.com/go/elementor-pro"');
+        // Remove deprecated emoji style.
+        add_action( 'elementor/app/init', static function () {
+            if ( has_action( 'wp_print_styles', 'print_emoji_styles' ) ) {
+                remove_action( 'wp_print_styles', 'print_emoji_styles' );
             }
         });
-        function LaStudioKit_ReplaceLinks(){
-            document.querySelectorAll('a[href*="go.elementor.com"]').forEach( elm => {
-                elm.setAttribute('href', 'https://la-studioweb.com/go/elementor/docs')
-            } )
+        add_action( 'admin_footer', [ __CLASS__, 'print_script' ], 999 );
+        add_action( 'elementor/editor/footer', [ __CLASS__, 'print_script' ], 999 );
+    }
+    public static function replace_links_recursive( $data ) {
+        if ( is_array( $data ) ) {
+            foreach ( $data as $key => $value ) {
+                $data[ $key ] = self::replace_links_recursive( $value );
+            }
+            return $data;
         }
-        document.addEventListener('DOMContentLoaded', LaStudioKit_ReplaceLinks);
-        window.addEventListener('load', LaStudioKit_ReplaceLinks);
-    </script>
-    <?php
-}, 100);
+        if ( is_object( $data ) ) {
+            foreach ( $data as $key => $value ) {
+                $data->$key = self::replace_links_recursive( $value );
+            }
+            return $data;
+        }
+        if ( is_string( $data ) ) {
+            $data = preg_replace( '#https?://(?:go\.)?elementor\.com/[^\s"\']+#i', self::TARGET_URL, $data );
+        }
+        return $data;
+    }
+    public static function replace_redirect_url( $location ) {
+        if ( ! is_string( $location ) ) {
+            return $location;
+        }
+        if ( str_contains( $location, 'elementor.com/pro' ) || str_contains( $location, 'go.elementor.com' ) ) {
+            return self::TARGET_URL;
+        }
+        return $location;
+    }
+
+    public static function print_script() {
+        static $printed = false;
+        if ( $printed ) {
+            return;
+        }
+        $printed = true;
+        $config_vars = wp_json_encode( self::CONFIG_VARS );
+        ?>
+        <script type="text/javascript">
+            (() => {
+                const TARGET_URL = <?php echo wp_json_encode( self::TARGET_URL ); ?>;
+                const TEMPLATE_SELECTORS = <?php echo wp_json_encode( self::TEMPLATE_SELECTORS ); ?>;
+                const CONFIG_VARS = <?php echo $config_vars; ?>;
+                function replaceData(data) {
+                    if (Array.isArray(data)) {
+                        return data.map(replaceData);
+                    }
+                    if (data && typeof data === 'object') {
+                        Object.keys(data).forEach((key) => {
+                            data[key] = replaceData(data[key]);
+                        });
+                        return data;
+                    }
+                    if (typeof data === 'string') {
+                        return data.replace( /https?:\/\/(?:go\.)?elementor\.com\/[^\s"']*/gi, TARGET_URL );
+                    }
+                    return data;
+                }
+                function replaceTemplates() {
+                    TEMPLATE_SELECTORS.forEach((selector) => {
+                        const element = document.querySelector(selector);
+                        if (!element) {
+                            return;
+                        }
+                        element.innerHTML = element.innerHTML.replace(/https?:\/\/(?:go\.)?elementor\.com/gi,TARGET_URL);
+                    });
+                }
+                function replaceLinks() {
+                    replaceTemplates();
+                    document.querySelectorAll('a[href*="go.elementor.com"]')?.forEach((element) => { element.href = TARGET_URL });
+                    CONFIG_VARS.forEach((configVar) => {
+                        if (typeof window[configVar] !== 'undefined') {
+                            window[configVar] = replaceData(window[configVar]);
+                        }
+                    });
+                }
+                if (document.readyState === 'loading') {
+                    document.addEventListener('DOMContentLoaded', replaceLinks);
+                }
+                else {
+                    replaceLinks();
+                }
+                window.addEventListener('load', replaceLinks);
+            })();
+        </script>
+        <?php
+    }
+}
+LaStudioKit_Elementor_Link_Replacer::init();

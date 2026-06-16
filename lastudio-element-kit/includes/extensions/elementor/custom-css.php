@@ -86,7 +86,7 @@ class Custom_CSS {
             $css = str_replace( 'selector', $post_css->get_element_unique_selector( $element ), $css );
             // Add a css comment
             $css = sprintf( '/* Start custom CSS for %s, class: %s */', $element->get_name(), $element->get_unique_selector() ) . $css . '/* End custom CSS */';
-            $css = \LaStudio_Kit_Helper::minify_css($css);
+//            $css = \LaStudio_Kit_Helper::minify_css($css);
             $post_css->get_stylesheet()->add_raw_css( $css );
         }
 	}
@@ -114,7 +114,7 @@ class Custom_CSS {
 		// Add a css comment
 		$custom_css = '/* Start custom CSS */' . $custom_css . '/* End custom CSS */';
 
-        $custom_css = \LaStudio_Kit_Helper::minify_css($custom_css);
+//        $custom_css = \LaStudio_Kit_Helper::minify_css($custom_css);
 
 		$post_css->get_stylesheet()->add_raw_css( $custom_css );
 	}

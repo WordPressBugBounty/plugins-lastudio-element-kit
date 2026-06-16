@@ -3,7 +3,7 @@
  * Login messages
  */
 
-$message = wp_cache_get( 'lakit-login-messages' );
+$message = wp_cache_get( 'lakit-login-messages', 'lastudio-kit' );
 
 if ( ! $message ) {
 	return;

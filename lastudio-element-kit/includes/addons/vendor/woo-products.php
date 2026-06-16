@@ -20,16 +20,9 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
     public static $__called_index = 0;
     public static $__called_item = false;
 
-    protected function enqueue_addon_resources(){
-	    if(!lastudio_kit_settings()->is_combine_js_css()) {
-		    $this->add_style_depends( 'lastudio-kit-woocommerce' );
-		    $this->add_style_depends( 'e-swiper' );
-            if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
-                $this->add_style_depends( 'lastudio-kit-swiper-dotv2' );
-            }
-		    $this->add_script_depends( 'lastudio-kit-base' );
-
-	    }
+    protected function is_dynamic_content(): bool
+    {
+        return true;
     }
 
     protected function get_html_wrapper_class(){
@@ -38,6 +31,15 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
             $wrapper_class .= ' lakit-carousel-v2';
         }
         return $wrapper_class;
+    }
+
+    public function get_style_depends()
+    {
+        $depends = ['lastudio-kit-woocommerce', 'e-swiper'];
+        if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+            $depends[] = 'lastudio-kit-swiper-dotv2';
+        }
+        return $depends;
     }
 
     public function get_name() {

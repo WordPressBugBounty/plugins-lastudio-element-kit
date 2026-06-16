@@ -11,6 +11,10 @@
 	align-items: center;
 	transform: translate3d(0,0,0);
 }
+.lakit-gmap-message__text{
+  font-size: .857em;
+  text-align: center;
+}
 [data-widget_type="lakit-google-maps.default"] .lakit-gmap-message .lakit-gmap-message__text {
 	z-index: 2
 }

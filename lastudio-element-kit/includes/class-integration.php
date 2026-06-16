@@ -54,7 +54,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
             }
 
             // Polylang compatibility
-            if ( class_exists( 'Polylang' ) ) {
+            if ( class_exists( 'Polylang', false ) ) {
                 add_filter( 'lastudio-kit/themecore/get_location_templates/template_id', array( $this, 'set_pll_translated_location_id' ) );
             }
 
@@ -63,23 +63,13 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
             add_action( 'init', array( $this, 'register_handler' ) );
             add_action( 'init', array( $this, 'login_handler' ) );
 
-            add_action( 'wp_enqueue_scripts', array( $this, 'frontend_enqueue_css' ), 10 );
-            add_action( 'elementor/frontend/after_enqueue_scripts', array( $this, 'frontend_enqueue_js' ), 10 );
+
+            add_action( 'elementor/frontend/after_register_styles', [ $this, 'elementor_after_register_styles' ] );
+
+            add_action( 'elementor/frontend/after_enqueue_scripts', array( $this, 'frontend_enqueue_js' ), 20 );
             add_action( 'wp_enqueue_scripts', array( $this, 'frontend_enqueue_later' ), 1000 );
 
             add_action( 'elementor/frontend/after_register_scripts', array( $this, 'frontend_override_js' ), 20 );
-
-
-            $this->sys_messages = apply_filters( 'lastudio-kit/popups_sys_messages', array(
-                'invalid_mail'                => esc_html__( 'Please, provide valid mail', 'lastudio-kit' ),
-                'mailchimp'                   => esc_html__( 'Please, set up MailChimp API key and List ID', 'lastudio-kit' ),
-                'internal'                    => esc_html__( 'Internal error. Please, try again later', 'lastudio-kit' ),
-                'server_error'                => esc_html__( 'Server error. Please, try again later', 'lastudio-kit' ),
-                'invalid_nonce'               => esc_html__( 'Invalid nonce. Please, try again later', 'lastudio-kit' ),
-                'subscribe_success'           => esc_html__( 'Success', 'lastudio-kit' ),
-	            'invalid_captcha'             => esc_html__( 'reCAPTCHA response token is invalid.', 'lastudio-kit' ),
-	            'require_field'               => esc_html__( 'Please fill out this field.', 'lastudio-kit' ),
-            ) );
 
             // Set default single post template
             add_filter( 'get_post_metadata', array( $this, 'override_single_post_template' ), 10, 4 );
@@ -95,23 +85,42 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
                 add_action('template_redirect', [ $this, 'set_post_views_count' ], 100);
             }
 
-            add_filter('woocommerce_get_asset_url', function ( $path ){
-                if( false !== strpos($path, 'assets/js/flexslider/jquery.flexslider') ){
-                    $path = lastudio_kit()->plugin_url( 'assets/js/lib/jquery.flexslider.min.js' );
-                }
-                return $path;
-            }, 20);
-
             add_filter('elementor/widgets/black_list', [ $this, 'e_widget_blacklist' ], 20);
             add_filter('elementor/editor/localize_settings', [ $this, 'e_pro_widgets' ], 20);
 
             add_filter('elementor/shapes/additional_shapes', [ $this, 'e_shapes' ], 20);
 
-//            add_filter( 'style_loader_src', [ $this, 'override_e_animation_src' ], 20, 2 );
-
             add_action( 'elementor/frontend/before_enqueue_scripts', [ $this, 'enqueue_frontend_scripts' ] );
 
             add_filter( 'woocommerce_add_to_cart_redirect', [ $this, 'woocommerce_add_to_cart_redirect' ], 100, 1 );
+
+            add_action( 'init', [ $this, 'on_init' ] );
+
+            add_filter( 'body_class', [ $this, 'add_body_class' ], 100 );
+
+            add_action('after_switch_theme', [ $this, 'after_switch_theme' ]);
+        }
+
+        public function after_switch_theme()
+        {
+            $cache_key = sprintf(
+                'lakit_gmap_styles_%s',
+                md5( get_template_directory() . get_stylesheet_directory() . lastudio_kit()->get_version(true) )
+            );
+            delete_transient( $cache_key );
+        }
+
+        public function on_init() {
+            $this->sys_messages = apply_filters( 'lastudio-kit/popups_sys_messages', array(
+                'invalid_mail'                => esc_html__( 'Please, provide valid mail', 'lastudio-kit' ),
+                'mailchimp'                   => esc_html__( 'Please, set up MailChimp API key and List ID', 'lastudio-kit' ),
+                'internal'                    => esc_html__( 'Internal error. Please, try again later', 'lastudio-kit' ),
+                'server_error'                => esc_html__( 'Server error. Please, try again later', 'lastudio-kit' ),
+                'invalid_nonce'               => esc_html__( 'Invalid nonce. Please, try again later', 'lastudio-kit' ),
+                'subscribe_success'           => esc_html__( 'Success', 'lastudio-kit' ),
+                'invalid_captcha'             => esc_html__( 'reCAPTCHA response token is invalid.', 'lastudio-kit' ),
+                'require_field'               => esc_html__( 'Please fill out this field.', 'lastudio-kit' ),
+            ) );
         }
 
 		/**
@@ -152,18 +161,17 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 		 * @return void
 		 */
 		public function register_addons( $widgets_manager ) {
-
-			$available_widgets = lastudio_kit_settings()->get_option( 'avaliable_widgets' );
-
-			foreach ( glob( lastudio_kit()->plugin_path( 'includes/addons/' ) . '*.php' ) as $file ) {
-				$slug = basename( $file, '.php' );
-
-				$enabled = isset( $available_widgets[ $slug ] ) ? $available_widgets[ $slug ] : false;
-
-				if ( filter_var( $enabled, FILTER_VALIDATE_BOOLEAN ) || ! $available_widgets ) {
-					$this->register_addon( $file, $widgets_manager );
-				}
-			}
+            $available_widgets = lastudio_kit_settings()->get_option( 'avaliable_widgets', [] );
+            $registry = require lastudio_kit()->plugin_path( 'includes/addons/widget-registry.php' );
+            foreach ( $registry as $slug => $widget ) {
+                $enabled = $available_widgets[ $slug ] ?? false;
+                if ( filter_var( $enabled, FILTER_VALIDATE_BOOLEAN ) || empty( $available_widgets ) ) {
+                    $file = lastudio_kit()->plugin_path( 'includes/addons/' . $widget['file'] );
+                    if ( is_readable( $file ) ) {
+                        $this->register_addon( $file, $widgets_manager );
+                    }
+                }
+            }
 		}
 
 		/**
@@ -292,7 +300,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 
             foreach ( $allowed_vendors as $vendor ) {
                 if ( is_callable( $vendor['conditional']['cb'] )
-                    && true === call_user_func( $vendor['conditional']['cb'], $vendor['conditional']['arg'] ) ) {
+                    && true === call_user_func( $vendor['conditional']['cb'], $vendor['conditional']['arg'], false ) ) {
                     $this->register_addon( $vendor['file'], $widgets_manager );
                 }
             }
@@ -387,52 +395,75 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
          * @return void
          */
         public function editor_styles() {
-
             wp_enqueue_style(
                 'lastudio-kit-editor',
                 lastudio_kit()->plugin_url( 'assets/css/lastudio-kit-editor.css' ),
-                array(),
+                [],
                 lastudio_kit()->get_version()
             );
-
         }
 
-        public function frontend_enqueue_css(){
+        public function elementor_after_register_styles()
+        {
+            wp_register_style( 'lastudio-kit-base', lastudio_kit()->plugin_url('assets/css/lastudio-kit-base.min.css'), ['elementor-frontend'], lastudio_kit()->get_version());
 
-            wp_register_style( 'lastudio-kit-base', lastudio_kit()->plugin_url('assets/css/lastudio-kit-base.min.css'), [], lastudio_kit()->get_version());
-            wp_register_style( 'lastudio-kit-player', lastudio_kit()->plugin_url('assets/css/addons/player.min.css'), [], lastudio_kit()->get_version());
-
-	        if( lastudio_kit_settings()->is_combine_js_css() ){
-		        wp_register_style( 'lastudio-kit-all-addons', lastudio_kit()->plugin_url('assets/css/addon.css'), [], lastudio_kit()->get_version());
-	        }
-
-            wp_register_style( 'lastudio-kit-woocommerce', lastudio_kit()->plugin_url('assets/css/lastudio-kit-woocommerce.min.css'), [], lastudio_kit()->get_version());
+            $css_widget_lists = [
+                'lastudio-kit-player' => 'assets/css/addons/player.min.css',
+                'lastudio-kit-swiper-dotv2' => 'assets/css/addons/n-carousel.min.css',
+                'lakit-advanced-carousel' => 'assets/css/addons/advanced-carousel.min.css',
+                'lakit-banner' => 'assets/css/addons/banner.min.css',
+                'lakit-animated-box' => 'assets/css/addons/animated-box.min.css',
+                'lakit-animated-text' => 'assets/css/addons/animated-text.min.css',
+                'lakit-author-box' => 'assets/css/addons/author-box.min.css',
+                'lakit-banner-list' => 'assets/css/addons/banner-list.min.css',
+                'lakit-breadcrumbs' => 'assets/css/addons/breadcrumbs.min.css',
+                'lakit-counter' => 'assets/css/addons/counter.min.css',
+                'lakit-curlang-switcher' => 'assets/css/addons/language-switcher.min.css',
+                'lakit-google-maps' => 'assets/css/addons/google-map.min.css',
+                'lakit-hamburger-panel' => 'assets/css/addons/hamburger-panel.min.css',
+                'lakit-hotspots' => 'assets/css/addons/hotspots.min.css',
+                'lakit-icon-box' => 'assets/css/addons/iconbox.min.css',
+                'lakit-image-box' => 'assets/css/addons/imagebox.min.css',
+                'lakit-image-compare' => 'assets/css/addons/image-compare.min.css',
+                'lakit-images-layout' => 'assets/css/addons/images-layout.min.css',
+                'lakit-instagram-feed' => 'assets/css/addons/instagram-feed.min.css',
+                'lakit-login-frm' => 'assets/css/addons/login.min.css',
+                'lastudio-kit-dlmenu' => 'assets/css/lastudio-dlmenu.min.css',
+                'lakit-post-navigation' => 'assets/css/addons/post-navigation.min.css',
+                'lakit-posts' => 'assets/css/addons/posts.min.css',
+                'lakit-price-list' => 'assets/css/addons/price-list.min.css',
+                'lakit-pricing-table' => 'assets/css/addons/pricing-table.min.css',
+                'lakit-progress-bar' => 'assets/css/addons/progress-bar.min.css',
+                'lakit-register-frm' => 'assets/css/addons/register.min.css',
+                'lakit-search' => 'assets/css/addons/search.min.css',
+                'lakit-slides' => 'assets/css/addons/slides.min.css',
+                'lakit-social-share' => 'assets/css/addons/social-share.min.css',
+                'lakit-subscribe-form' => 'assets/css/addons/subscribe-form.min.css',
+                'lakit-table-of-contents' => 'assets/css/addons/tablet-contents.min.css',
+                'lakit-tabs' => 'assets/css/addons/tabs.min.css',
+                'lakit-team-member' => 'assets/css/addons/team-member.min.css',
+                'lakit-testimonials' => 'assets/css/addons/testimonials.min.css',
+                'lakit-timeline-horizontal' => 'assets/css/addons/timeline-horizontal.min.css',
+                'lakit-timeline-vertical' => 'assets/css/addons/timeline-vertical.min.css',
+                'lakit-twitter' => 'assets/css/addons/twitter.min.css',
+                'lakit-album-lists' => 'assets/css/addons/album-lists.min.css',
+                'lakit-events' => 'assets/css/addons/events.min.css',
+                'lakit-givewp' => 'assets/css/addons/givewp.min.css',
+                'lakit-portfolio' => 'assets/css/addons/portfolio.min.css',
+                'lakit-nested-tabs' => 'assets/css/addons/n-tabs.min.css'
+            ];
+            if ( class_exists( 'WooCommerce', false ) ) {
+                $css_widget_lists['lastudio-kit-woocommerce'] = 'assets/css/lastudio-kit-woocommerce.min.css';
+            }
+            foreach ( $css_widget_lists as $handle_name => $css_url ) {
+                wp_register_style( $handle_name, lastudio_kit()->plugin_url($css_url), ['lastudio-kit-base'], lastudio_kit()->get_version());
+            }
 
             if( apply_filters( 'lastudio-kit/allow_override_elementor_device', true ) ){
                 wp_add_inline_style('elementor-frontend', $this->set_device_name_for_custom_bkp_by_css());
             }
-
-            if (version_compare(ELEMENTOR_VERSION, '3.24', '<')) {
-                wp_add_inline_style('elementor-frontend', $this->add_new_animation_css());
-            }
-
-            wp_register_style( 'lastudio-kit-w__hotspots', lastudio_kit()->plugin_url('assets/css/addons/hotspots.min.css'), ['lastudio-kit-base'], lastudio_kit()->get_version());
-            wp_register_style( 'lastudio-kit-swiper-dotv2', lastudio_kit()->plugin_url( 'assets/css/addons/n-carousel.min.css' ), [ 'lastudio-kit-base' ], lastudio_kit()->get_version() );
-
-            if(lastudio_kit_settings()->is_combine_js_css()){
-            	wp_enqueue_style('lastudio-kit-base');
-            	wp_enqueue_style('lastudio-kit-all-addons');
-	            if ( class_exists( 'WooCommerce' ) ) {
-		            wp_enqueue_style('lastudio-kit-woocommerce');
-	            }
-            }
-			else{
-				wp_enqueue_style('lastudio-kit-base');
-				if ( class_exists( 'WooCommerce', false ) ) {
-					wp_enqueue_style('lastudio-kit-woocommerce');
-				}
-			}
         }
+
         public function frontend_enqueue_js(){
 
 	        $polyfill_data = apply_filters('lastudio-kit/filter/js_polyfill_data', [
@@ -444,43 +475,51 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 	        ]);
 	        $polyfill_inline = lastudio_kit_helper()->get_polyfill_inline( $polyfill_data );
 
-	        wp_register_script( 'lastudio-kit-anime-js', lastudio_kit()->plugin_url( 'assets/js/lib/anime.min.js' ), [], lastudio_kit()->get_version(), true );
-	        wp_register_script(  'jquery-isotope' , lastudio_kit()->plugin_url('assets/js/lib/isotope.pkgd.min.js') , [],  lastudio_kit()->get_version() , true );
-	        wp_register_script(  'embla-carousel' , lastudio_kit()->plugin_url('assets/js/lib/embla-carousel.umd.js') , [],  lastudio_kit()->get_version() , true );
-	        wp_register_script(  'odometer' , lastudio_kit()->plugin_url('assets/js/lib/odometer.min.js') , [],  lastudio_kit()->get_version() , true );
-	        wp_register_script( 'lastudio-kit-dlmenu', lastudio_kit()->plugin_url( 'assets/js/lib/lakitdlmenu.min.js' ), [], lastudio_kit()->get_version(), true );
-	        wp_register_script(  'lastudio-kit-player' , lastudio_kit()->plugin_url('assets/js/addons/player.min.js') , ['jquery'],  lastudio_kit()->get_version() , true );
+            $disable_gmap_api_js    = lastudio_kit_settings()->get_option('disable_gmap_api_js');
+            $google_api_key         = lastudio_kit_settings()->get_option('gmap_api_key', lastudio_kit_settings()->get_option('gmap_backend_api_key'));
+            if (!filter_var($disable_gmap_api_js, FILTER_VALIDATE_BOOLEAN) && !empty($google_api_key)) {
+                $google_api_url = add_query_arg(
+                    array(
+                        'key' => $google_api_key,
+                        'libraries' => 'marker'
+                    ),
+                    'https://maps.googleapis.com/maps/api/js'
+                );
+                wp_register_script('lastudio-kit-gmap_api', $google_api_url, false, lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ]);
+            }
 
-	        wp_register_script( 'lastudio-kit-floating-effects', lastudio_kit()->plugin_url('assets/js/addons/floating-effects.min.js'), ['lastudio-kit-anime-js', 'elementor-frontend'], lastudio_kit()->get_version(), true);
-	        wp_register_script(  'lastudio-kit-sticky-js' , lastudio_kit()->plugin_url('assets/js/lib/jquery.sticky.min.js') , ['jquery'],  lastudio_kit()->get_version() , true );
-	        wp_register_script(  'lastudio-kit-motion-fx' , lastudio_kit()->plugin_url('assets/js/addons/motion-fx.min.js') , ['lastudio-kit-sticky-js'],  lastudio_kit()->get_version() , true );
-	        wp_register_script( 'lastudio-kit-wrapper-links', lastudio_kit()->plugin_url('assets/js/addons/wrapper-links.min.js'), [], lastudio_kit()->get_version(), true);
+	        wp_register_script( 'lastudio-kit-anime-js', lastudio_kit()->plugin_url( 'assets/js/lib/anime.min.js' ), [], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ] );
+	        wp_register_script(  'jquery-isotope' , lastudio_kit()->plugin_url('assets/js/lib/isotope.pkgd.min.js') , [],  lastudio_kit()->get_version() , [ 'in_footer' => true, 'strategy' => 'defer' ] );
+	        wp_register_script(  'embla-carousel' , lastudio_kit()->plugin_url('assets/js/lib/embla-carousel.min.js') , [],  lastudio_kit()->get_version() , [ 'in_footer' => true, 'strategy' => 'defer' ] );
+	        wp_register_script(  'odometer' , lastudio_kit()->plugin_url('assets/js/lib/odometer.min.js') , [],  lastudio_kit()->get_version() , [ 'in_footer' => true, 'strategy' => 'defer' ] );
+	        wp_register_script( 'lastudio-kit-dlmenu', lastudio_kit()->plugin_url( 'assets/js/lib/lakitdlmenu.min.js' ), [], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ] );
+	        wp_register_script(  'lastudio-kit-player' , lastudio_kit()->plugin_url('assets/js/addons/player.min.js') , ['jquery'],  lastudio_kit()->get_version() , [ 'in_footer' => true, 'strategy' => 'defer' ] );
 
-	        if( lastudio_kit_settings()->is_combine_js_css() ){
-		        wp_register_script(  'lastudio-kit-base' , lastudio_kit()->plugin_url('assets/js/frondend.js') , [ 'elementor-frontend' ],  lastudio_kit()->get_version() , true );
-		        wp_add_inline_script('lastudio-kit-base', $polyfill_inline, 'before');
-	        }
-	        else{
-		        wp_register_script(  'lastudio-kit-base' , lastudio_kit()->plugin_url('assets/js/lastudio-kit-base.min.js') , [ ],  lastudio_kit()->get_version() , true );
-		        wp_register_script(  'lastudio-kit-header-vertical' , lastudio_kit()->plugin_url('assets/js/addons/header-sidebar.min.js') , [ 'lastudio-kit-base' ],  lastudio_kit()->get_version() , true );
-		        wp_add_inline_script('lastudio-kit-header-vertical', $polyfill_inline, 'before');
-	        }
+	        wp_register_script( 'lastudio-kit-floating-effects', lastudio_kit()->plugin_url('assets/js/addons/floating-effects.min.js'), ['lastudio-kit-anime-js', 'elementor-frontend'], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ]);
+	        wp_register_script(  'lastudio-kit-sticky-js' , lastudio_kit()->plugin_url('assets/js/lib/jquery.sticky.min.js') , ['jquery'],  lastudio_kit()->get_version() , [ 'in_footer' => true, 'strategy' => 'defer' ] );
+	        wp_register_script(  'lastudio-kit-motion-fx' , lastudio_kit()->plugin_url('assets/js/addons/motion-fx.min.js') , ['lastudio-kit-sticky-js'],  lastudio_kit()->get_version() , [ 'in_footer' => true, 'strategy' => 'defer' ] );
+	        wp_register_script( 'lastudio-kit-wrapper-links', lastudio_kit()->plugin_url('assets/js/addons/wrapper-links.min.js'), [], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ]);
 
-            wp_register_script( 'lastudio-kit-w__tabs', lastudio_kit()->plugin_url( 'assets/js/addons/tabs.js' ), [ ], lastudio_kit()->get_version(), true );
-            wp_register_script( 'lastudio-kit-w__ntabs', lastudio_kit()->plugin_url( 'assets/js/addons/n-tabs.min.js' ), [ ], lastudio_kit()->get_version(), true );
-            wp_register_script( 'lastudio-kit-w__hotspots', lastudio_kit()->plugin_url( 'assets/js/addons/hotspots.min.js' ), [ ], lastudio_kit()->get_version(), true );
-            wp_register_script( 'lastudio-kit-w__social-share', lastudio_kit()->plugin_url( 'assets/js/addons/social-share.js' ), [ 'share-link' ], lastudio_kit()->get_version(), true );
-            wp_register_script( 'lastudio-kit-w__tableofcontent', lastudio_kit()->plugin_url( 'assets/js/addons/tablet-contents.min.js' ), [], lastudio_kit()->get_version(), true );
-            wp_register_script( 'lastudio-kit-w__htimeline', lastudio_kit()->plugin_url( 'assets/js/addons/timeline-horizontal.min.js' ), [], lastudio_kit()->get_version(), true );
-            wp_register_script( 'lastudio-kit-w__vtimeline', lastudio_kit()->plugin_url( 'assets/js/addons/timeline-vertical.min.js' ), [], lastudio_kit()->get_version(), true );
-            wp_register_script( 'lastudio-kit-w__twitter', lastudio_kit()->plugin_url( 'assets/js/addons/twitter.min.js' ), [], lastudio_kit()->get_version(), true );
-            wp_register_script( 'lastudio-kit-w__animated-text', lastudio_kit()->plugin_url( 'assets/js/addons/animated-text.min.js' ), ['lastudio-kit-anime-js'], lastudio_kit()->get_version(), true );
-            wp_register_script( 'lastudio-kit-w__progress-bar', lastudio_kit()->plugin_url( 'assets/js/addons/progress-bar.js' ), ['lastudio-kit-anime-js'], lastudio_kit()->get_version(), true );
-            wp_register_script( 'lastudio-kit-w__counter', lastudio_kit()->plugin_url( 'assets/js/addons/counter.min.js' ), ['odometer'], lastudio_kit()->get_version(), true );
-            wp_register_script( 'lastudio-kit-w__image-compare', lastudio_kit()->plugin_url( 'assets/js/addons/image-compare.min.js' ), [], lastudio_kit()->get_version(), true );
-            wp_register_script( 'lakit-subscribe-form', lastudio_kit()->plugin_url( 'assets/js/addons/subscribe-form.min.js' ), [], lastudio_kit()->get_version(), true );
-	        wp_register_script( 'lastudio-kit-w__gmap', lastudio_kit()->plugin_url( 'assets/js/addons/google-map.min.js' ), [], lastudio_kit()->get_version(), true );
-            wp_register_script( 'lastudio-kit-w__ncarousel', lastudio_kit()->plugin_url( 'assets/js/addons/n-carousel.min.js' ), ['lastudio-kit-base'], lastudio_kit()->get_version(), true );
+            wp_register_script(  'lastudio-kit-base' , lastudio_kit()->plugin_url('assets/js/lastudio-kit-base.min.js') , [ 'elementor-frontend' ],  lastudio_kit()->get_version() , [ 'in_footer' => true, 'strategy' => 'defer' ] );
+            wp_register_script(  'lastudio-kit-header-vertical' , lastudio_kit()->plugin_url('assets/js/addons/header-sidebar.min.js') , [ 'lastudio-kit-base' ],  lastudio_kit()->get_version() , [ 'in_footer' => true, 'strategy' => 'defer' ] );
+            wp_add_inline_script('lastudio-kit-header-vertical', $polyfill_inline, 'before');
+
+            wp_register_script( 'lastudio-kit-w__tabs', lastudio_kit()->plugin_url( 'assets/js/addons/tabs.js' ), ['lastudio-kit-base'], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ] );
+            wp_register_script( 'lastudio-kit-w__ntabs', lastudio_kit()->plugin_url( 'assets/js/addons/n-tabs.min.js' ), ['lastudio-kit-base'], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ] );
+            wp_register_script( 'lastudio-kit-w__hotspots', lastudio_kit()->plugin_url( 'assets/js/addons/hotspots.min.js' ), ['lastudio-kit-base'], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ] );
+            wp_register_script( 'lastudio-kit-w__social-share', lastudio_kit()->plugin_url( 'assets/js/addons/social-share.js' ), [ 'share-link' ], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ] );
+            wp_register_script( 'lastudio-kit-w__tableofcontent', lastudio_kit()->plugin_url( 'assets/js/addons/tablet-contents.min.js' ), ['lastudio-kit-base'], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ] );
+            wp_register_script( 'lastudio-kit-w__htimeline', lastudio_kit()->plugin_url( 'assets/js/addons/timeline-horizontal.min.js' ), ['lastudio-kit-base'], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ] );
+            wp_register_script( 'lastudio-kit-w__vtimeline', lastudio_kit()->plugin_url( 'assets/js/addons/timeline-vertical.min.js' ), ['lastudio-kit-base'], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ] );
+            wp_register_script( 'lastudio-kit-w__twitter', lastudio_kit()->plugin_url( 'assets/js/addons/twitter.min.js' ), ['lastudio-kit-base'], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ] );
+            wp_register_script( 'lastudio-kit-w__animated-text', lastudio_kit()->plugin_url( 'assets/js/addons/animated-text.min.js' ), ['lastudio-kit-base', 'lastudio-kit-anime-js'], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ] );
+            wp_register_script( 'lastudio-kit-w__progress-bar', lastudio_kit()->plugin_url( 'assets/js/addons/progress-bar.js' ), ['lastudio-kit-base', 'lastudio-kit-anime-js'], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ] );
+            wp_register_script( 'lastudio-kit-w__counter', lastudio_kit()->plugin_url( 'assets/js/addons/counter.min.js' ), ['lastudio-kit-base', 'odometer'], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ] );
+            wp_register_script( 'lastudio-kit-w__image-compare', lastudio_kit()->plugin_url( 'assets/js/addons/image-compare.min.js' ), ['lastudio-kit-base'], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ] );
+            wp_register_script( 'lakit-subscribe-form', lastudio_kit()->plugin_url( 'assets/js/addons/subscribe-form.min.js' ), ['lastudio-kit-base'], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ] );
+	        wp_register_script( 'lastudio-kit-w__gmap', lastudio_kit()->plugin_url( 'assets/js/addons/google-map.min.js' ), ['lastudio-kit-base'], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ] );
+            wp_register_script( 'lastudio-kit-w__ncarousel', lastudio_kit()->plugin_url( 'assets/js/addons/n-carousel.min.js' ), ['lastudio-kit-base'], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ] );
+            wp_register_script(  'lastudio-kit-w__buynow' , lastudio_kit()->plugin_url('assets/js/addons/buynow.min.js') , ['jquery', 'lastudio-kit-base'],  lastudio_kit()->get_version() , [ 'in_footer' => true, 'strategy' => 'defer' ] );
 
             $rest_api_url = apply_filters( 'lastudio-kit/rest/frontend/url', get_rest_url() );
 
@@ -493,8 +532,14 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 			if(class_exists( 'Give', false )){
 				$delayResources['js']['lakit-givewp'] = lastudio_kit()->plugin_url('assets/js/delay/givewp.min.js');
 			}
+            if(class_exists( 'WooCommerce', false )){
+                if(lastudio_kit()->get_theme_support('lakit-swatches') && 'yes' !== lastudio_kit_settings()->get('swatches__is_disable', '')){
+                    $delayResources['js']['swatches'] = lastudio_kit()->plugin_url('includes/extensions/swatches/assets/js/swatches.min.js');
+                }
+            }
 
             $LaStudioKitSettings = [
+                'version'        => lastudio_kit()->get_version(),
 	            'templateApiUrl' => $rest_api_url . 'lastudio-kit-api/v1/elementor-template',
 	            'widgetApiUrl'   => $rest_api_url . 'lastudio-kit-api/v1/elementor-widget',
 	            'homeURL'        => esc_url(home_url('/')),
@@ -517,7 +562,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
                 'resources'      => [
                     'imagesloaded'      => lastudio_kit()->plugin_url('assets/js/lib/imagesloaded.min.js'),
                     'jquery-isotope'    => lastudio_kit()->plugin_url('assets/js/lib/isotope.pkgd.min.js'),
-                    'embla-carousel'    => lastudio_kit()->plugin_url('assets/js/lib/embla-carousel.umd.js'),
+                    'embla-carousel'    => lastudio_kit()->plugin_url('assets/js/lib/embla-carousel.min.js'),
                     'bootstrap-tooltip' => lastudio_kit()->plugin_url('assets/js/lib/bootstrap-tooltip.min.js'),
                     'spritespin'        => lastudio_kit()->plugin_url('assets/js/lib/spritespin.min.js'),
 	                'popupjs'           => lastudio_kit()->plugin_url('includes/modules/popup/assets/js/popup.min.js'),
@@ -525,11 +570,15 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
                     'odometerjs'        => lastudio_kit()->plugin_url('assets/js/lib/odometer.min.js'),
                     'swiperjs'          => lastudio_kit()->plugin_url('assets/js/lib/swiper.min.js'),
                     'simpleparallax'    => lastudio_kit()->plugin_url('assets/js/lib/simple-parallax.min.js'),
+                    'subscribeForm'     => lastudio_kit()->plugin_url('assets/js/addons/subscribe-form.min.js'),
                 ],
-	            'delayResources'        => $delayResources,
-	            'recaptchav3'       => $this->is_active_recaptchav3() ? $this->get_recaptchav3_site_key() : '',
-	            'giveRouter'        => esc_url(add_query_arg(['givewp-route'=>'donation-form-view', 'form-id' => 'lakit_rp_lakit'], home_url('/'))),
+	            'delayResources' => $delayResources,
+	            'recaptchav3'    => $this->is_active_recaptchav3() ? $this->get_recaptchav3_site_key() : '',
             ];
+
+            if(class_exists( 'Give', false )){
+                $LaStudioKitSettings['giveRouter'] = esc_url(add_query_arg(['givewp-route'=>'donation-form-view', 'form-id' => 'lakit_rp_lakit'], home_url('/')));
+            }
 
             wp_localize_script('lastudio-kit-base', 'LaStudioKitSettings', $LaStudioKitSettings );
 
@@ -548,12 +597,6 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 
         public function frontend_enqueue_later(){
 
-            if(lastudio_kit_settings()->is_combine_js_css()){
-                wp_enqueue_script('lastudio-kit-base');
-            }
-
-			wp_add_inline_script('wc-single-product', $this->product_image_flexslider_vars(), 'before');
-
             $disable_gutenberg_block_css = lastudio_kit_settings()->get_option('disable-gutenberg-block', '');
 
 			if($disable_gutenberg_block_css === 'enabled'){
@@ -567,16 +610,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
                 wp_deregister_script('thickbox');
                 wp_dequeue_style('thickbox');
 			}
-//			if( ! $this->in_elementor() ){
-//				wp_dequeue_style( 'elementor-icons' );
-//				wp_deregister_style( 'elementor-icons' );
-//                wp_dequeue_style( 'elementor-common' );
-//				wp_deregister_style( 'elementor-common' );
-//			}
-
-            $css = '
-                @media screen and ( max-width: 782px ) { html { margin-top: 0 !important; } }
-            ';
+            $css = '@media screen and ( max-width: 782px ) { html { margin-top: 0 !important; } }';
             wp_add_inline_style( 'admin-bar', $css );
         }
 
@@ -697,7 +731,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
                 exit;
 
             } catch ( Exception $e ) {
-                wp_cache_set( 'lakit-login-messages', $e->getMessage() );
+                wp_cache_set( 'lakit-login-messages', $e->getMessage(), 'lastudio-kit', 5 * MINUTE_IN_SECONDS );
             }
 
         }
@@ -750,7 +784,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
                 exit;
 
             } catch ( Exception $e ) {
-                wp_cache_set( 'lakit-register-messages', $e->getMessage() );
+                wp_cache_set( 'lakit-register-messages', $e->getMessage(), 'lastudio-kit', 5 * MINUTE_IN_SECONDS );
             }
 
         }
@@ -764,6 +798,13 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
          * @return [type]           [description]
          */
         public function create_user( $username, $email, $password ) {
+
+	        if('yes' !== get_option( 'woocommerce_enable_myaccount_registration' ) && 'yes' !== get_option( 'users_can_register' )){
+		        return new WP_Error(
+			        'registration-error-disable',
+			        __( 'This feature is not available.', 'lastudio-kit' )
+		        );
+	        }
 
             // Check username
             if ( empty( $username ) || ! validate_username( $username ) ) {
@@ -909,7 +950,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 		 * Returns the instance.
 		 *
 		 * @since  1.0.0
-		 * @return object
+		 * @return LaStudio_Kit_Integration
 		 */
 		public static function get_instance() {
 
@@ -923,7 +964,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 		public function set_device_name_for_custom_bkp_by_css(){
 		    $breakpoints = lastudio_kit_helper()->get_active_breakpoints();
 			asort($breakpoints);
-		    $css = '';
+		    $css = '.e-con .lastudio-kit.elementor-widget.elementor-element{--eew: min(calc(var(--e-w-ml, 0px) + var(--e-w-mr, 0px)), 0px);max-width:calc(100% - var(--eew, 0px))}';
 
 		    $grid_mapping = [
 		        'laptop'        => 'desk',
@@ -989,10 +1030,6 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 		    return lastudio_kit_helper()->minify_css($css);
         }
 
-        public function product_image_flexslider_vars(){
-            return 'try{wc_single_product_params.flexslider.directionNav=!0,wc_single_product_params.flexslider.start=function(o){jQuery(document).trigger("lastudiokit/woocommerce/single/product-gallery-start-hook",[o]),jQuery(document).trigger("lastudio-kit/woocommerce/single/product-gallery-start-hook",[o])},wc_single_product_params.flexslider.before=function(o){jQuery(".woocommerce-product-gallery").css("opacity",1),jQuery(document).trigger("lastudiokit/woocommerce/single/init_product_slider",[o]),jQuery(document).trigger("lastudio-kit/woocommerce/single/init_product_slider",[o])},wc_single_product_params.flexslider.init=function(o){jQuery(document).trigger("lastudiokit/woocommerce/single/product-gallery-init-hook",[o]),jQuery(document).trigger("lastudio-kit/woocommerce/single/product-gallery-init-hook",[o])}}catch(o){}';
-        }
-
         public function register_custom_animation( $animations ){
             $new_animation = [
                 'lakitShortFadeInDown' => 'Short Fade In Down',
@@ -1009,18 +1046,6 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
             ];
             $animations['LaStudio Kit'] = $new_animation;
 		    return $animations;
-        }
-
-        public function add_new_animation_css(){
-            return '@keyframes lakitShortFadeInDown{from{opacity:0;transform:translate3d(0,-50px,0)}to{opacity:1;transform:none}}.lakitShortFadeInDown{animation-name:lakitShortFadeInDown}@keyframes lakitShortFadeInUp{from{opacity:0;transform:translate3d(0,50px,0)}to{opacity:1;transform:none}}.lakitShortFadeInUp{animation-name:lakitShortFadeInUp}@keyframes lakitShortFadeInLeft{from{opacity:0;transform:translate3d(-50px,0,0)}to{opacity:1;transform:none}}.lakitShortFadeInLeft{animation-name:lakitShortFadeInLeft}@keyframes lakitShortFadeInRight{from{opacity:0;transform:translate3d(50px,0,0)}to{opacity:1;transform:none}}.lakitShortFadeInRight{animation-name:lakitShortFadeInRight}.lakitRevealCircle{animation-name:lakitRevealCircle}@keyframes lakitRevealCircle{0%{-webkit-clip-path:circle(0% at 50% 50%);clip-path:circle(0% at 50% 50%)}100%{-webkit-clip-path:circle(100% at 50% 50%);clip-path:circle(100% at 50% 50%)}}.lakitRevealTop{animation-name:lakitRevealTop}@keyframes lakitRevealTop{0%{-webkit-clip-path:polygon(0 0,100% 0,100% 0,0 0);clip-path:polygon(0 0,100% 0,100% 0,0 0)}100%{-webkit-clip-path:polygon(0 0,100% 0,100% 100%,0 100%);clip-path:polygon(0 0,100% 0,100% 100%,0 100%)}}.lakitRevealBottom{animation-name:lakitRevealBottom}@keyframes lakitRevealBottom{0%{-webkit-clip-path:polygon(0 100%,100% 100%,100% 100%,0% 100%);clip-path:polygon(0 100%,100% 100%,100% 100%,0% 100%)}100%{-webkit-clip-path:polygon(0 0,100% 0,100% 100%,0% 100%);clip-path:polygon(0 0,100% 0,100% 100%,0% 100%)}}.lakitRevealLeft{animation-name:lakitRevealLeft}@keyframes lakitRevealLeft{0%{-webkit-clip-path:polygon(0 0,0 0,0 100%,0% 100%);clip-path:polygon(0 0,0 0,0 100%,0% 100%)}100%{-webkit-clip-path:polygon(0 0,100% 0,100% 100%,0% 100%);clip-path:polygon(0 0,100% 0,100% 100%,0% 100%)}}.lakitRevealRight{animation-name:lakitRevealRight}@keyframes lakitRevealRight{0%{-webkit-clip-path:polygon(100% 0,100% 0%,100% 100%,100% 100%);clip-path:polygon(100% 0,100% 0%,100% 100%,100% 100%)}100%{-webkit-clip-path:polygon(0 0,100% 0,100% 100%,0% 100%);clip-path:polygon(0 0,100% 0,100% 100%,0% 100%)}}.lakitRevealCenter{animation-name:lakitRevealCenter}@keyframes lakitRevealCenter{0%{-webkit-clip-path:polygon(20% 20%,80% 20%,80% 80%,20% 80%);clip-path:polygon(20% 20%,80% 20%,80% 80%,20% 80%)}100%{-webkit-clip-path:polygon(0 0,100% 0,100% 100%,0% 100%);clip-path:polygon(0 0,100% 0,100% 100%,0% 100%)}}';
-        }
-
-        public function override_e_animation_src($src, $handle){
-            if( str_starts_with($handle, 'e-animation-lakit') ){
-                $filename = str_replace('e-animation-', '', $handle);
-                $src = lastudio_kit()->plugin_url('assets/css/animations/'.$filename.'.min.css');
-            }
-            return $src;
         }
 
         /**
@@ -1063,7 +1088,6 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
             if ( '_wp_page_template' !== $meta_key || is_admin() || !is_singular() ) {
                 return $value;
             }
-
             if( !empty($GLOBALS['post']) ){
                 $_post = $GLOBALS['post'];
                 if( $_post->ID && $_post->ID === $post_id ){
@@ -1468,6 +1492,13 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 			$username   = wp_slash($username);
 			$email      = wp_slash($email);
 
+			if('yes' !== get_option( 'woocommerce_enable_myaccount_registration' ) && 'yes' !== get_option( 'users_can_register' )){
+				return [
+					'type'      => 'error',
+					'message'   => __( '<strong>Error:</strong> This feature is not available.', 'lastudio-kit' ),
+				];
+			}
+
 			if(!$is_human){
 				return [
 					'type'      => 'error',
@@ -1641,6 +1672,14 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
                 $url = wc_get_checkout_url();
             }
             return $url;
+        }
+
+        public function add_body_class( $classes )
+        {
+            if( Elementor\Plugin::instance()->preview->is_preview_mode() ){
+                $classes[] = 'lakit-is-elementor-editor-mode';
+            }
+            return $classes;
         }
 	}
 

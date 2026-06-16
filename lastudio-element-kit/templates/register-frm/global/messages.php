@@ -3,7 +3,7 @@
  * Registration messages
  */
 
-$message = wp_cache_get( 'lakit-register-messages' );
+$message = wp_cache_get( 'lakit-register-messages', 'lastudio-kit' );
 
 if ( ! $message ) {
 	return;

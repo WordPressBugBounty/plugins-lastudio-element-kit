@@ -60,11 +60,11 @@ class Module extends Module_Base {
         $this->path = lastudio_kit()->plugin_path('includes/extensions/mega-menu/');
         $this->url  = lastudio_kit()->plugin_url('includes/extensions/mega-menu/');
 
-        add_action( 'elementor/init',                   [$this, 'add_support']  );
-        add_action( 'elementor/document/after_save',    [$this, 'save_posts']   );
-        add_filter( 'pre_get_posts',                     [$this, 'pre_get_posts'], 10 );
-        add_filter( 'elementor/document/urls/wp_preview',[$this, 'add_preview'], 10, 2 );
-        add_filter( 'wp_insert_post_data',               [$this, 'revision_autosave'], 10 );
+        add_action( 'elementor/init', [$this, 'add_support']  );
+        add_action( 'elementor/document/after_save', [$this, 'save_posts']   );
+        add_filter( 'pre_get_posts', [$this, 'pre_get_posts'], 10 );
+        add_filter( 'elementor/document/urls/wp_preview', [$this, 'add_preview'], 10, 2 );
+        add_filter( 'wp_insert_post_data', [$this, 'revision_autosave'], 10 );
 
         add_action( 'admin_enqueue_scripts', [ $this, 'admin_scripts' ], 99 );
         add_action( 'admin_footer', array( $this, 'print_menu_settings_vue_template' ), 10 );
@@ -72,7 +72,7 @@ class Module extends Module_Base {
         add_action( 'wp_ajax_lakit_get_nav_item_settings', array( $this, 'get_nav_item_settings' ) );
         add_action( 'wp_ajax_lakit_save_nav_item_settings', array( $this, 'save_nav_item_settings' ) );
 
-        add_action( 'init', array( $this, 'edit_redirect' ), 0 );
+        add_action( 'admin_init', array( $this, 'edit_redirect' ), 0 );
 
         add_action( 'template_include', array( $this, 'set_post_type_template' ), 9999 );
     }
@@ -205,6 +205,10 @@ class Module extends Module_Base {
                     array(
                         'label' => esc_html__( 'Relative item', 'lastudio-kit' ),
                         'value' => 'relative-item',
+                    ),
+                    array(
+                        'label' => esc_html__( 'Center window', 'lastudio-kit' ),
+                        'value' => 'center-window',
                     )
                 ),
             ),

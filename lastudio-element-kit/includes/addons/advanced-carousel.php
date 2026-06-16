@@ -21,21 +21,9 @@ use LaStudioKitExtensions\Elementor\Controls\Control_Query as QueryControlModule
  */
 class LaStudioKit_Advanced_Carousel extends LaStudioKit_Base {
 
-    protected function enqueue_addon_resources(){
-	    if(!lastudio_kit_settings()->is_combine_js_css()){
-		    $this->add_script_depends( 'lastudio-kit-base' );
-		    if(!lastudio_kit()->is_optimized_css_mode()) {
-
-                $depends = [ 'lakit-banner', 'e-swiper' ];
-                if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
-                    $depends[] = 'lastudio-kit-swiper-dotv2';
-                }
-
-			    wp_register_style( 'lakit-banner', lastudio_kit()->plugin_url('assets/css/addons/banner.min.css'), ['lastudio-kit-base'], lastudio_kit()->get_version());
-			    wp_register_style( $this->get_name(), lastudio_kit()->plugin_url('assets/css/addons/advanced-carousel.min.css'), $depends, lastudio_kit()->get_version());
-			    $this->add_style_depends( $this->get_name() );
-		    }
-	    }
+    protected function is_dynamic_content(): bool
+    {
+        return true;
     }
 
     protected function get_html_wrapper_class(){
@@ -46,40 +34,14 @@ class LaStudioKit_Advanced_Carousel extends LaStudioKit_Base {
         return $wrapper_class;
     }
 
-	public function get_inline_css_depends() {
-        if('true' === $this->get_settings_for_display('disable_default_css')){
-            return [];
+    public function get_style_depends()
+    {
+        $depends = [ 'lakit-banner', 'e-swiper', 'lakit-advanced-carousel' ];
+        if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
+            $depends[] = 'lastudio-kit-swiper-dotv2';
         }
-		return [
-			'lakit-banner1',
-			'lakit-banner2',
-		];
-	}
-
-	public function get_widget_css_config($widget_name){
-		switch ($widget_name){
-			case 'lakit-banner1':
-				$file_url = lastudio_kit()->plugin_url(  'assets/css/addons/banner1.min.css' );
-				$file_path = lastudio_kit()->plugin_path( 'assets/css/addons/banner1.min.css' );
-				break;
-			case 'lakit-banner2':
-				$file_url = lastudio_kit()->plugin_url(  'assets/css/addons/banner2.min.css' );
-				$file_path = lastudio_kit()->plugin_path( 'assets/css/addons/banner2.min.css' );
-				break;
-			default:
-				$file_url = lastudio_kit()->plugin_url(  'assets/css/addons/advanced-carousel.min.css' );
-				$file_path = lastudio_kit()->plugin_path( 'assets/css/addons/advanced-carousel.min.css' );
-				break;
-		}
-		return [
-			'key' => $widget_name,
-			'version' => lastudio_kit()->get_version(true),
-			'file_path' => $file_path,
-			'data' => [
-				'file_url' => $file_url
-			]
-		];
-	}
+        return $depends;
+    }
 
     public function get_name() {
         return 'lakit-advanced-carousel';

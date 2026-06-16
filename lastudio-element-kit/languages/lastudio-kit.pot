@@ -12006,7 +12006,7 @@ msgid "Sticky-posts ordering is visible on frontend only"
 msgstr ""
 
 #: includes/addons/icon-box.php:180
-msgid "Strategy and  Planning"
+msgid "Strategy and Planning"
 msgstr ""
 
 #: includes/addons/google-maps.php:170

@@ -55,6 +55,10 @@ if ( ! class_exists( 'LaStudio_Kit_Post_Meta' ) ) {
          */
         public function init_post_meta() {
 
+            if(empty($this->options)){
+                return;
+            }
+
             foreach ( $this->options as $options ) {
 
                 if ( ! isset( $options['builder_cb'] ) ) {

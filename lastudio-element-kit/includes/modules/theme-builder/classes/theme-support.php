@@ -17,11 +17,9 @@ class Theme_Support {
 	public function init() {
 		$theme = wp_get_theme();
 
-		switch ( $theme->get_template() ) {
-			case 'elementor-safe':
-				new Safe_Mode_Theme_Support();
-				break;
-		}
+        if ($theme->get_template() == 'elementor-safe') {
+            new Safe_Mode_Theme_Support();
+        }
 
 		add_action( 'elementor/theme/register_locations', [ $this, 'after_register_locations' ], 99 );
 	}

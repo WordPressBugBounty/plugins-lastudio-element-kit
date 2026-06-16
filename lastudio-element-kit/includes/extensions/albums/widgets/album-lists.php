@@ -24,30 +24,20 @@ class Album_Lists extends LaStudioKit_Posts{
 
 	public $cflag = false;
 
-	public $css_file_name = 'album-lists.min.css';
-
 	public $popup_id = 0;
 
 	public static $popup_instance = [];
 
-	protected function enqueue_addon_resources(){
-		$this->add_script_depends( 'jquery-isotope' );
-		if(!lastudio_kit_settings()->is_combine_js_css()) {
-			$this->add_script_depends( 'lastudio-kit-base' );
-			if(!lastudio_kit()->is_optimized_css_mode()) {
 
-                $depends = [ 'lastudio-kit-base', 'e-swiper' ];
-                if( lastudio_kit()->get_theme_support('elementor::swiper-dotv2') ){
-                    $depends[] = 'lastudio-kit-swiper-dotv2';
-                }
-				wp_register_style( 'lakit-posts', lastudio_kit()->plugin_url( 'assets/css/addons/posts.min.css' ), $depends, lastudio_kit()->get_version() );
-				wp_register_style( $this->get_name(), lastudio_kit()->plugin_url( 'assets/css/addons/' . $this->css_file_name ), [ 'lakit-posts' ], lastudio_kit()->get_version() );
-				$this->add_style_depends( $this->get_name() );
-			}
-		}
-		$this->add_script_depends('lastudio-kit-player');
-		$this->add_style_depends('lastudio-kit-player');
-	}
+    public function get_script_depends()
+    {
+        return ['jquery-isotope', 'lastudio-kit-base', 'lastudio-kit-player'];
+    }
+
+    public function get_style_depends()
+    {
+        return ['lastudio-kit-player', 'lakit-posts', 'lakit-album-lists'];
+    }
 
     protected function get_html_wrapper_class(){
         $wrapper_class = parent::get_html_wrapper_class();
@@ -56,31 +46,6 @@ class Album_Lists extends LaStudioKit_Posts{
         }
         return $wrapper_class;
     }
-
-	public function get_inline_css_depends() {
-		return [
-			[
-				'name' => 'lakit-posts'
-			]
-		];
-	}
-
-	public function get_widget_css_config($widget_name){
-
-        $css_file_name = $widget_name === 'lakit-posts' ? 'posts.min.css' : 'album-lists.min.css';
-
-        $file_url = lastudio_kit()->plugin_url(  'assets/css/addons/' . $css_file_name );
-        $file_path = lastudio_kit()->plugin_path( 'assets/css/addons/' . $css_file_name );
-
-		return [
-			'key' => $widget_name,
-			'version' => lastudio_kit()->get_version(true),
-			'file_path' => $file_path,
-			'data' => [
-				'file_url' => $file_url
-			]
-		];
-	}
 
 	public function get_name() {
 		return 'lakit-album-lists';

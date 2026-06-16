@@ -55,6 +55,10 @@ if ( ! class_exists( 'LaStudio_Kit_Term_Meta' ) ) {
          */
         public function init_term_meta() {
 
+            if(empty($this->options)){
+                return;
+            }
+
             foreach ( $this->options as $options ) {
 
                 if ( ! isset( $options['builder_cb'] ) ) {

@@ -10,11 +10,11 @@ if ( ! defined( 'WPINC' ) ) {
     die;
 }
 
-if ( ! class_exists( 'WP_Customize_Control' ) ) {
+if ( ! class_exists( 'WP_Customize_Control', false ) ) {
     require_once ABSPATH . WPINC . '/class-wp-customize-control.php';
 }
 
-if ( ! class_exists( 'CX_Customizer_Responsive_control' ) ) {
+if ( ! class_exists( 'CX_Customizer_Responsive_control', false ) ) {
 
     class CX_Customizer_Responsive_control extends WP_Customize_Control {
 
@@ -404,7 +404,7 @@ if ( ! class_exists( 'CX_Customizer_Responsive_control' ) ) {
 }
 
 
-if(!class_exists('CX_Customizer_Checkbox_Multiple_control')){
+if(!class_exists('CX_Customizer_Checkbox_Multiple_control', false)){
 
     class CX_Customizer_Checkbox_Multiple_control extends WP_Customize_Control{
 	    /**
@@ -414,7 +414,7 @@ if(!class_exists('CX_Customizer_Checkbox_Multiple_control')){
 	     * @access public
 	     * @var    string
 	     */
-	    public $type = 'checkbox-multiple';
+	    public $type = 'lakit_checkbox_multiple';
 
 	    /**
 	     * Enqueue scripts/styles.
@@ -425,13 +425,12 @@ if(!class_exists('CX_Customizer_Checkbox_Multiple_control')){
 	     */
 	    public function enqueue() {
 		    $version = '1.0.0';
-
 		    $dependency = array(
 			    'jquery',
 			    'customize-base',
 			    'customize-controls',
 		    );
-		    wp_enqueue_script( 'lakit-customizer-checkbox-multiple-control', plugin_dir_url(__FILE__ ) . 'checkbox-multiple.js', $dependency, $version, true );
+		    wp_enqueue_script( 'lakit-customizer-lakit_checkbox_multiple-control', plugin_dir_url(__FILE__ ) . 'checkbox-multiple.js', $dependency, $version, true );
 	    }
 
 	    /**
@@ -473,4 +472,46 @@ if(!class_exists('CX_Customizer_Checkbox_Multiple_control')){
 	    <?php }
     }
 
+}
+
+if( !class_exists('CX_Customizer_Alpha_Color_Control', false) ){
+    class CX_Customizer_Alpha_Color_Control extends WP_Customize_Control{
+        /**
+         * Official control name.
+         *
+         * @var string
+         */
+        public $type = 'lakit_alpha_color';
+
+        public function enqueue() {
+            wp_enqueue_script(
+                'cx-colorpicker-alpha',
+                lastudio_kit()->plugin_url('includes/framework/interface-builder/assets/lib/colorpicker/wp-color-picker-alpha.min.js'),
+                array( 'wp-color-picker' ),
+                '3.0.0',
+                true
+            );
+            wp_enqueue_script( 'lakit-customizer-lakit_alpha_color-control', plugin_dir_url(__FILE__ ) . 'alpha-color.js', ['jquery', 'customize-base', 'customize-controls' ], '1.0.0', true );
+            wp_enqueue_style( 'wp-color-picker' );
+        }
+        /**
+         * Render the control.
+         */
+
+        public function render_content() {
+            $input_id         = '_customize-input-' . $this->id;
+            if ( isset( $this->label ) && '' !== $this->label ) {
+                echo '<span class="customize-control-title">' . esc_html( $this->label ) . '</span>';
+            }
+            if ( isset( $this->description ) && '' !== $this->description ) {
+                echo '<span class="description customize-control-description">' . esc_html( $this->description ) . '</span>';
+            }
+            ?>
+            <div class="customize-control-content">
+                <label for="<?php echo esc_attr( $input_id ); ?>"><span class="screen-reader-text"><?php echo esc_html( $this->label ); ?></span></label>
+                <input id="<?php echo esc_attr( $input_id ); ?>" class="color-picker-hex lakit-customize-alpha-color-control" type="text" data-alpha-enabled="true" <?php $this->link(); ?> value="<?php echo esc_attr($this->value()); ?>" />
+            </div>
+            <?php
+        }
+    }
 }

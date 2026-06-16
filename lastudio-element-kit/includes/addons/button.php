@@ -17,12 +17,6 @@ if (!defined('WPINC')) {
  */
 class LaStudioKit_Button extends LaStudioKit_Base {
 
-    protected function enqueue_addon_resources(){
-	    if(!lastudio_kit_settings()->is_combine_js_css()) {
-		    $this->add_style_depends( 'lastudio-kit-base' );
-	    }
-    }
-
     public function get_name() {
         return 'lakit-button';
     }
@@ -461,7 +455,7 @@ class LaStudioKit_Button extends LaStudioKit_Base {
         if ( ! empty( $settings['link']['url'] ) ) {
 
             $tmp_url = $settings['link']['url'];
-            if(false !== strpos($tmp_url, '{meta:')){
+            if(str_contains($tmp_url, '{meta:')){
 	            $tmp_url = str_replace(['{meta:', '}'], '', $tmp_url);
 	            if(!empty($tmp_url)){
 	                global $post;

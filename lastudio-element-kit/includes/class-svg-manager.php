@@ -23,7 +23,7 @@ if ( ! class_exists( 'LaStudio_Kit_SVG_Manager' ) ) {
 		 * A reference to an instance of this class.
 		 *
 		 * @since 1.0.0
-		 * @var   object
+		 * @var   LaStudio_Kit_SVG_Manager
 		 */
 		private static $instance = null;
 
@@ -61,6 +61,7 @@ if ( ! class_exists( 'LaStudio_Kit_SVG_Manager' ) ) {
 		 */
 		public function allow_svg( $mimes ) {
 			$mimes['svg'] = 'image/svg+xml';
+			$mimes['svgz'] = 'image/svg+xml';
 			return $mimes;
 		}
 
@@ -295,7 +296,7 @@ if ( ! class_exists( 'LaStudio_Kit_SVG_Manager' ) ) {
                 foreach ($need_enqueues as $font_family => $font_url){
                     if(!empty($font_url) && ( empty($passed) || ( !empty($passed) && !in_array($font_url, $passed) ) ) ){
                         wp_enqueue_style( 'lakit-custom-font-' . sanitize_key($font_family), esc_url_raw($font_url) , array(), lastudio_kit()->get_version() );
-	                    array_push($passed, $font_url);
+	                    $passed[] = $font_url;
                     }
                 }
             }
@@ -305,7 +306,7 @@ if ( ! class_exists( 'LaStudio_Kit_SVG_Manager' ) ) {
 		 * Returns the instance.
 		 *
 		 * @since  1.0.0
-		 * @return object
+		 * @return LaStudio_Kit_SVG_Manager
 		 */
 		public static function get_instance() {
 

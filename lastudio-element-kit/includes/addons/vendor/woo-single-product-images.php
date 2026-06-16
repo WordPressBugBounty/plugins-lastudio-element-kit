@@ -17,18 +17,14 @@ if (!defined('WPINC')) {
  */
 class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
 
-    protected function enqueue_addon_resources(){
-	    if(!lastudio_kit_settings()->is_combine_js_css()) {
-		    $this->add_style_depends( 'lastudio-kit-woocommerce' );
-		    $this->add_script_depends( 'lastudio-kit-base' );
-	    }
-      $this->add_script_depends('wc-single-product');
-      $this->add_script_depends('zoom');
-      $this->add_script_depends('flexslider');
-      $this->add_script_depends('photoswipe-ui-default');
-      $this->add_style_depends('photoswipe');
-      $this->add_style_depends('photoswipe-default-skin');
-      $this->add_style_depends('woocommerce_prettyPhoto_css');
+    protected function is_dynamic_content(): bool
+    {
+        return true;
+    }
+
+    public function get_style_depends()
+    {
+        return ['lastudio-kit-woocommerce' ];
     }
 
     public function get_name() {
@@ -51,168 +47,41 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
         return 'eicon-product-images';
     }
 
-    protected function register_controls() {
+    protected function register_controls()
+    {
 
-      $this->start_controls_section(
-        'section_product',
-        [
-          'label' => esc_html__( 'Product', 'lastudio-kit' ),
-        ]
-      );
-      $this->add_control(
-        'wc_product_warning',
-        [
-          'type' => Controls_Manager::RAW_HTML,
-          'raw' => esc_html__( 'Leave a blank to get the data for current product.', 'lastudio-kit' ),
-          'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
-        ]
-      );
-      $this->add_control(
-        'product_id',
-        [
-          'label' =>  esc_html__( 'Product', 'lastudio-kit' ),
-          'type' => 'lastudiokit-query',
-          'options' => [],
-          'label_block' => true,
-          'autocomplete' => [
-            'object' => 'post',
-            'query' => [
-              'post_type' => [ 'product' ],
-            ],
-          ],
-        ]
-      );
-      $this->end_controls_section();
-
-        if( lastudio_kit()->get_theme_support('lastudio-kit') ){
-            $this->register_lastudio_theme_controls();
-        }
-        else{
-            $this->start_controls_section(
-                'section_product_gallery_style',
-                [
-                    'label' => esc_html__( 'Style', 'lastudio-kit' ),
-                    'tab' => Controls_Manager::TAB_STYLE,
-                ]
-            );
-
-            $this->add_control(
-                'wc_style_warning',
-                [
-                    'type' => Controls_Manager::RAW_HTML,
-                    'raw' => esc_html__( 'The style of this widget is often affected by your theme and plugins. If you experience any such issue, try to switch to a basic theme and deactivate related plugins.', 'lastudio-kit' ),
-                    'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
-                ]
-            );
-
-            $this->add_control(
-                'layout_type',
-                [
-                    'label' => esc_html__( 'Gallery Layout', 'lastudio-kit' ),
-                    'type' => Controls_Manager::SELECT,
-                    'options' => [
-                        'wc' => esc_html__('Default', 'lastudio-kit')
+        $this->start_controls_section(
+            'section_product',
+            [
+                'label' => esc_html__('Product', 'lastudio-kit'),
+            ]
+        );
+        $this->add_control(
+            'wc_product_warning',
+            [
+                'type' => Controls_Manager::RAW_HTML,
+                'raw' => esc_html__('Leave a blank to get the data for current product.', 'lastudio-kit'),
+                'content_classes' => 'elementor-panel-alert elementor-panel-alert-info',
+            ]
+        );
+        $this->add_control(
+            'product_id',
+            [
+                'label' => esc_html__('Product', 'lastudio-kit'),
+                'type' => 'lastudiokit-query',
+                'options' => [],
+                'label_block' => true,
+                'autocomplete' => [
+                    'object' => 'post',
+                    'query' => [
+                        'post_type' => ['product'],
                     ],
-                    'default' => 'wc',
-                ]
-            );
+                ],
+            ]
+        );
+        $this->end_controls_section();
 
-            $this->add_control(
-                'sale_flash',
-                [
-                    'label' => esc_html__( 'Sale Flash', 'lastudio-kit' ),
-                    'type' => Controls_Manager::SWITCHER,
-                    'label_on' => esc_html__( 'Show', 'lastudio-kit' ),
-                    'label_off' => esc_html__( 'Hide', 'lastudio-kit' ),
-                    'render_type' => 'template',
-                    'return_value' => 'yes',
-                    'default' => 'yes',
-                    'prefix_class' => '',
-                ]
-            );
-
-            $this->add_group_control(
-                Group_Control_Border::get_type(),
-                [
-                    'name' => 'image_border',
-                    'selector' => '.woocommerce {{WRAPPER}} .woocommerce-product-gallery__trigger + .woocommerce-product-gallery__wrapper,
-				.woocommerce {{WRAPPER}} .flex-viewport, .woocommerce {{WRAPPER}} .flex-control-thumbs img',
-                    'separator' => 'before',
-                ]
-            );
-
-            $this->add_responsive_control(
-                'image_border_radius',
-                [
-                    'label' => esc_html__( 'Border Radius', 'lastudio-kit' ),
-                    'type' => Controls_Manager::DIMENSIONS,
-                    'size_units' => [ 'px', '%' ],
-                    'selectors' => [
-                        '.woocommerce {{WRAPPER}} .woocommerce-product-gallery__trigger + .woocommerce-product-gallery__wrapper,
-					.woocommerce {{WRAPPER}} .flex-viewport' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}',
-                    ],
-                ]
-            );
-
-            $this->add_control(
-                'spacing',
-                [
-                    'label' => esc_html__( 'Spacing', 'lastudio-kit' ),
-                    'type' => Controls_Manager::SLIDER,
-                    'size_units' => [ 'px', 'em' ],
-                    'selectors' => [
-                        '.woocommerce {{WRAPPER}} .flex-viewport:not(:last-child)' => 'margin-bottom: {{SIZE}}{{UNIT}}',
-                    ],
-                ]
-            );
-
-            $this->add_control(
-                'heading_thumbs_style',
-                [
-                    'label' => esc_html__( 'Thumbnails', 'lastudio-kit' ),
-                    'type' => Controls_Manager::HEADING,
-                    'separator' => 'before',
-                ]
-            );
-
-            $this->add_group_control(
-                Group_Control_Border::get_type(),
-                [
-                    'name' => 'thumbs_border',
-                    'selector' => '.woocommerce {{WRAPPER}} .flex-control-thumbs img',
-                ]
-            );
-
-            $this->add_responsive_control(
-                'thumbs_border_radius',
-                [
-                    'label' => esc_html__( 'Border Radius', 'lastudio-kit' ),
-                    'type' => Controls_Manager::DIMENSIONS,
-                    'size_units' => [ 'px', '%' ],
-                    'selectors' => [
-                        '.woocommerce {{WRAPPER}} .flex-control-thumbs img' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}',
-                    ],
-                ]
-            );
-
-            $this->add_control(
-                'spacing_thumbs',
-                [
-                    'label' => esc_html__( 'Spacing', 'lastudio-kit' ),
-                    'type' => Controls_Manager::SLIDER,
-                    'size_units' => [ 'px', 'em' ],
-                    'selectors' => [
-                        '.woocommerce {{WRAPPER}} .flex-control-thumbs li' => 'padding-right: calc({{SIZE}}{{UNIT}} / 2); padding-left: calc({{SIZE}}{{UNIT}} / 2); padding-bottom: {{SIZE}}{{UNIT}}',
-                        '.woocommerce {{WRAPPER}} .flex-control-thumbs' => 'margin-right: calc(-{{SIZE}}{{UNIT}} / 2); margin-left: calc(-{{SIZE}}{{UNIT}} / 2)',
-                    ],
-                ]
-            );
-
-            $this->end_controls_section();
-
-            do_action('lastudiokit/woocommerce/single/setting/product-images', $this);
-            do_action('lastudio-kit/woocommerce/single/setting/product-images', $this);
-        }
+        $this->register_lastudio_theme_controls();
     }
 
     protected function register_lastudio_theme_controls()
@@ -301,6 +170,38 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
                 'default' => 'yes'
             ]
         );
+        $this->add_control(
+            'enable_zoom',
+            [
+                'label' => esc_html__( 'Enable Zoom', 'lastudio-kit' ),
+                'type' => Controls_Manager::SWITCHER,
+                'label_on' => esc_html__( 'Yes', 'lastudio-kit' ),
+                'label_off' => esc_html__( 'No', 'lastudio-kit' ),
+                'return_value' => 'yes',
+                'default' => '',
+                'render_type' => 'ui',
+                'frontend_available' => true,
+            ]
+        );
+        $this->add_control(
+            'zoom_scale',
+            [
+                'label' => esc_html__( 'Max Scale', 'lastudio-kit' ),
+                'type' => Controls_Manager::SLIDER,
+                'render_type' => 'ui',
+                'range' => array(
+                    'px' => array(
+                        'min' => 1,
+                        'max' => 3,
+                        'step' => 0.1
+                    ),
+                ),
+                'condition' => [
+                    'enable_zoom' => 'yes'
+                ],
+                'frontend_available' => true,
+            ]
+        );
         $this->end_controls_section();
         $this->start_controls_section(
             'section_product_image_style',
@@ -315,8 +216,8 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
                 'label' => esc_html__( 'Background Color', 'lastudio-kit' ),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .zoominner' => 'background-color: {{VALUE}}',
-                    '{{WRAPPER}} .woocommerce-product-gallery img' => 'background-color: {{VALUE}}',
+                    '{{WRAPPER}} .woocommerce-product-gallery__image' => 'background-color: {{VALUE}}',
+                    '{{WRAPPER}} .layout-type-4 .woocommerce-product-gallery__image a' => 'background-color: {{VALUE}}',
                 ],
             ]
         );
@@ -398,7 +299,6 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
                 'size_units' => array( 'px', '%' ),
                 'selectors'  => array(
                     '{{WRAPPER}}' => '--singleproduct-gallery-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-                    '{{WRAPPER}} .zoominner' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ),
             )
         );
@@ -411,7 +311,6 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
 			    'size_units' => array( 'px', '%', 'em' ),
 			    'selectors'  => array(
 				    '{{WRAPPER}}' => '--singleproduct-gallery-padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
-				    '{{WRAPPER}} .zoominner' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
 			    ),
 		    )
 	    );
@@ -423,7 +322,7 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
 			    'label'       => esc_html__( 'Border', 'lastudio-kit' ),
 			    'placeholder' => '1px',
 			    'default'     => '1px',
-			    'selector'    => '{{WRAPPER}} .zoominner',
+			    'selector'    => '{{WRAPPER}} .lakit-product-images:is(.layout-type-5, .layout-type-6) .woocommerce-product-gallery__image, {{WRAPPER}} .lakit-product-images:is(.layout-type-1, .layout-type-2, .layout-type-3, .layout-type-wc) .lakit-embla-main, {{WRAPPER}} .layout-type-4 .woocommerce-product-gallery__image a',
 		    )
 	    );
 
@@ -431,7 +330,7 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
             Group_Control_Box_Shadow::get_type(),
             array(
                 'name'     => 'gallery_shadow',
-                'selector' => '{{WRAPPER}} .zoominner',
+                'selector' => '{{WRAPPER}} .lakit-product-images:is(.layout-type-5, .layout-type-6) .woocommerce-product-gallery__image, {{WRAPPER}} .lakit-product-images:is(.layout-type-1, .layout-type-2, .layout-type-3, .layout-type-wc) .lakit-embla-main, {{WRAPPER}} .layout-type-4 .woocommerce-product-gallery__image a',
             )
         );
 
@@ -442,6 +341,9 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
             [
                 'label' => esc_html__( 'Thumbnails', 'lastudio-kit' ),
                 'tab' => Controls_Manager::TAB_STYLE,
+                'condition' => [
+                    'layout_type!' => ['4', '5', '6']
+                ]
             ]
         );
 
@@ -487,7 +389,7 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
 	    $this->add_responsive_control(
 		    'thumb_image_spacing',
 		    [
-			    'label' => esc_html__( 'Thumbnail gap', 'lastudio-kit' ),
+			    'label' => esc_html__( 'Thumbnail item gap', 'lastudio-kit' ),
 			    'type' => Controls_Manager::SLIDER,
 			    'size_units' => [ 'px', 'em' ],
 			    'selectors' => [
@@ -515,7 +417,7 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => array( 'px', '%', 'em' ),
                 'selectors'  => array(
-                    '{{WRAPPER}} .flex-control-thumbs li img' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .embla__dot span:first-child' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ),
             )
         );
@@ -526,14 +428,14 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
 			    'label'       => esc_html__( 'Border', 'lastudio-kit' ),
 			    'placeholder' => '1px',
 			    'default'     => '1px',
-			    'selector'    => '{{WRAPPER}} .flex-control-thumbs li img',
+			    'selector'    => '{{WRAPPER}} .embla__dot span:first-child',
 		    )
 	    );
 	    $this->add_group_control(
 		    Group_Control_Box_Shadow::get_type(),
 		    array(
 			    'name'     => 'thumb_shadow',
-			    'selector' => '{{WRAPPER}} .flex-control-thumbs li img',
+			    'selector' => '{{WRAPPER}} .embla__dot span:first-child',
 		    )
 	    );
         $this->end_controls_section();
@@ -546,7 +448,9 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
             array(
                 'label' => esc_html__('Arrows', 'lastudio-kit'),
                 'tab' => Controls_Manager::TAB_STYLE,
-                'show_label' => false,
+                'condition' => [
+                    'layout_type!' => ['5', '6']
+                ]
             )
         );
 
@@ -852,7 +756,7 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
                 'label' => esc_html__('Border', 'lastudio-kit'),
                 'placeholder' => '1px',
                 'default' => '1px',
-                'selector' => '{{WRAPPER}} .flex-direction-nav a',
+                'selector' => '{{WRAPPER}} .lakit-embla__arrow',
             )
         );
         $this->add_responsive_control(
@@ -862,7 +766,7 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => [ 'px', '%' ],
                 'selectors' => [
-					'{{WRAPPER}} .flex-direction-nav a' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}',
+					'{{WRAPPER}} .lakit-embla__arrow' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}',
                 ],
             ]
         );
@@ -870,7 +774,7 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
             Group_Control_Box_Shadow::get_type(),
             array(
                 'name' => 'arrow_shadow',
-                'selector' => '{{WRAPPER}} .flex-direction-nav a'
+                'selector' => '{{WRAPPER}} .lakit-embla__arrow'
             )
         );
         $this->end_controls_tab();
@@ -973,7 +877,7 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
                 'label' => esc_html__('Border', 'lastudio-kit'),
                 'placeholder' => '1px',
                 'default' => '1px',
-                'selector' => '{{WRAPPER}} .flex-direction-nav a:hover',
+                'selector' => '{{WRAPPER}} .lakit-embla__arrow:hover',
             )
         );
         $this->add_responsive_control(
@@ -983,7 +887,7 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
                 'type' => Controls_Manager::DIMENSIONS,
                 'size_units' => [ 'px', '%' ],
                 'selectors' => [
-                    '{{WRAPPER}} .flex-direction-nav a:hover' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}',
+                    '{{WRAPPER}} .lakit-embla__arrow:hover' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}}',
                 ],
             ]
         );
@@ -991,7 +895,7 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
             Group_Control_Box_Shadow::get_type(),
             array(
                 'name' => 'arrow_hover_shadow',
-                'selector' => '{{WRAPPER}} .flex-direction-nav a:hover'
+                'selector' => '{{WRAPPER}} .lakit-embla__arrow:hover'
             )
         );
         $this->end_controls_tab();
@@ -1001,6 +905,9 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
 
     public function render()
     {
+        if ( ! function_exists( 'wc_get_gallery_image_html' ) ) {
+            return;
+        }
         $_product_id = $this->get_settings_for_display('product_id');
         $product_id = !empty($_product_id) ? $_product_id : get_queried_object_id();
         global $product;
@@ -1021,87 +928,97 @@ class LaStudioKit_Woo_Single_Product_Images extends LaStudioKit_Base {
         $classes[] = 'layout-type-' . esc_attr($layout_type);
 
         $product_gallery_ids = $product->get_gallery_image_ids();
-        if(empty($product_gallery_ids)){
+        $post_thumbnail_id = $product->get_image_id();
+        if(empty($product_gallery_ids) || empty($post_thumbnail_id)) {
             $classes[] = 'no-gallery';
         }
 
         $bk_vl = false;
         $force_layout_bottom = $this->get_settings_for_display('force_layout_bottom');
-        if(!empty($force_layout_bottom)){
+        if(!empty($force_layout_bottom) && in_array($layout_type, ['2', '3'], true)){
             $active_breakpoints = lastudio_kit_helper()->get_active_breakpoints();
             if(isset($active_breakpoints[$force_layout_bottom])){
                 $bk_vl = $active_breakpoints[$force_layout_bottom];
             }
         }
-
-        echo '<div class="'. join(' ', $classes) .'">';
-
-        if ('yes' === $this->get_settings_for_display('sale_flash')) {
-            wc_get_template('loop/sale-flash.php');
-        }
-
-        wc_get_template('single-product/product-image.php');
-
-        do_action('lastudiokit/woocommerce/product-images/render', $product, $this);
-        do_action('lastudio-kit/woocommerce/product-images/render', $product, $this);
-
-        // On render widget from Editor - trigger the init manually.
-        if (wp_doing_ajax()) {
-            ?>
-            <script>
-                jQuery('.woocommerce-product-gallery').each(function () {
-                    jQuery(this).wc_product_gallery();
-                });
-                jQuery(document).trigger('lastudiokit/woocommerce/single/product-images lastudio-kit/woocommerce/single/product-images');
-            </script>
-            <?php
-        }
-        $css_content = '';
-        if(!empty($bk_vl)){
-            $el_css_unique_base = 'body .lastudio-kit.elementor-lakit-wooproduct-images.elementor-element-' . $this->get_id();
-            $el_css_unique = 'body .lastudio-kit.elementor-lakit-wooproduct-images.elementor-element-' . $this->get_id() . ' .lakit-product-images .woocommerce-product-gallery';
-            ob_start();
-            ?>
-            <style>
-                @media(max-width: <?php echo esc_html($bk_vl) ?>px){
-                    <?php echo esc_html($el_css_unique); ?>{
-                        flex-direction: column;
-                        gap: var(--singleproduct-image-spacing)
+        ?>
+            <div class="<?php echo esc_attr(implode(' ', $classes)); ?>">
+                <div class="woocommerce-product-gallery lakit-woo-gallery-embla">
+                    <div class="lakit-embla lakit-embla-main">
+                        <?php
+                        if ('yes' === $this->get_settings_for_display('sale_flash')) {
+                            wc_get_template('loop/sale-flash.php');
+                        }
+                        ?>
+                        <div class="lakit-embla__viewport">
+                            <div class="lakit-embla__container">
+                                <?php
+                                if ( $post_thumbnail_id ) {
+                                    $html = wc_get_gallery_image_html( $post_thumbnail_id, true );
+                                }
+                                else {
+                                    $wrapper_classname = $product->is_type( 'variable' ) && ! empty( $product->get_visible_children() ) && '' !== $product->get_price() ?
+                                            'woocommerce-product-gallery__image woocommerce-product-gallery__image--placeholder' :
+                                            'woocommerce-product-gallery__image--placeholder';
+                                    $html              = sprintf( '<div class="%s">', esc_attr( $wrapper_classname ) );
+                                    $html             .= sprintf( '<img src="%s" alt="%s" class="wp-post-image" />', esc_url( wc_placeholder_img_src( 'woocommerce_single' ) ), esc_html__( 'Awaiting product image', 'lastudio-kit' ) );
+                                    $html             .= '</div>';
+                                }
+                                echo str_replace( 'class="woocommerce-product-gallery__image"', 'class="woocommerce-product-gallery__image lakit-embla__slide"', apply_filters( 'woocommerce_single_product_image_thumbnail_html', $html, $post_thumbnail_id ) ); // phpcs:disable WordPress.XSS.EscapeOutput.OutputNotEscaped
+                                if(!empty($product_gallery_ids) && !empty($post_thumbnail_id)){
+                                    foreach ( $product_gallery_ids as $key => $attachment_id ) {
+                                        echo str_replace('class="woocommerce-product-gallery__image"', 'class="woocommerce-product-gallery__image lakit-embla__slide"', apply_filters( 'woocommerce_single_product_image_thumbnail_html', wc_get_gallery_image_html( $attachment_id, false, $key ), $attachment_id )); // PHPCS:Ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                                    }
+                                }
+                                ?>
+                            </div>
+                        </div>
+                        <?php
+                            if(!in_array($layout_type, ['5', '6'], true)){
+                                echo '<button type="button" class="lakit-embla__arrow lakit-embla__arrow-prev"><i class="lastudioicon lastudioicon-arrow-left"></i></button><button type="button" class="lakit-embla__arrow lakit-embla__arrow-next"><i class="lastudioicon lastudioicon-arrow-right"></i></button>';
+                            }
+                        ?>
+                    </div>
+                    <?php
+                    if(!in_array($layout_type, ['5', '6'], true)){
+                        echo '<div class="lakit-embla--dots"></div>';
                     }
-                    <?php echo esc_html($el_css_unique); ?> .flex-viewport,
-                    <?php echo esc_html($el_css_unique); ?> .flex-control-thumbs{
-                      width: 100%;
-                      height: auto;
-                    }
-                    <?php echo esc_html($el_css_unique); ?> .flex-control-thumbs{
-                      flex-flow: row nowrap;
-                      gap: var(--singleproduct-thumb-spacing);
-                      width: calc(100% - var(--singleproduct-boxthumb-margin-left) - var(--singleproduct-boxthumb-margin-right));
-                    }
-                    <?php echo esc_html($el_css_unique); ?> .flex-control-thumbs li{
-                      width: var(--singleproduct-thumbs-width);
-                      flex: 0 0 var(--singleproduct-thumbs-width);
-                      margin-bottom: 0;
-                    }
-                    <?php echo esc_html($el_css_unique); ?> .woocommerce-product-gallery__wrapper{
-                        width: 100%;
-                    }
-                    <?php echo esc_html($el_css_unique); ?>:not(.e--overflow) .flex-control-thumbs {
-                        justify-content: center;
-                    }
-                    <?php echo esc_html($el_css_unique_base); ?> .layout-type-2 .flex-direction-nav a.flex-prev{
-                        margin-left: 0
-                    }
-                    <?php echo esc_html($el_css_unique_base); ?> .layout-type-3 .flex-direction-nav a.flex-next{
-                      margin-right: 0
-                    }
+                    ?>
+                </div>
+                <?php
+                if(!empty($bk_vl)){
+                    $el_css_base = 'body .elementor-element-' . $this->get_id() . ' .lakit-product-images';
+                    ?>
+<style>
+@media(max-width: <?php echo esc_html($bk_vl) ?>px){
+    <?php echo esc_html($el_css_base); ?> .lakit-woo-gallery-embla{
+        flex-direction: column;
+        gap: var(--singleproduct-image-spacing)
+    }
+    <?php echo esc_html($el_css_base); ?> .lakit-embla--dots{
+        order: 2;
+        flex: 0 0 100%;
+        flex-flow: row nowrap;
+        max-height: none;
+        width: 100%;
+    }
+    <?php echo esc_html($el_css_base); ?>.e--dots-center .lakit-embla--dots{
+        justify-content: center;
+    }
+    <?php echo esc_html($el_css_base); ?> .lakit-embla-main{
+        flex: 0 0 100%;
+    }
+    <?php echo esc_html($el_css_base); ?> .lakit-embla--dots .embla__dot{
+        flex: 0 0 var(--singleproduct-thumbs-width);
+        padding:0 calc(var(--singleproduct-thumb-spacing) / 2);
+    }
+}
+</style>
+                    <?php
                 }
-            </style>
-            <?php
-            $css_content = ob_get_clean();
-        }
-        echo '</div>';
-        echo lastudio_kit_helper()->minify_css($css_content);
+                ?>
+            </div>
+        <?php
     }
 
 }

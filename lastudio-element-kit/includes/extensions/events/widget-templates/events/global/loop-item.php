@@ -12,7 +12,8 @@ $show_excerpt   = $this->get_settings_for_display('show_excerpt');
 $excerpt_length   = $this->get_settings_for_display('excerpt_length');
 $title_html_tag = $this->get_settings_for_display('title_html_tag');
 $more_text = $this->get_settings_for_display( 'more_text' );
-
+$show_buy_btn = $this->get_settings_for_display('show_buy_btn');
+$btn_buy_text = $this->get_settings_for_display('buy_text');
 
 $meta1_pos = $this->get_settings_for_display('meta_position1');
 $meta2_pos = $this->get_settings_for_display('meta_position2');
@@ -41,7 +42,10 @@ if(empty($post_format)){
 }
 
 $post_link = get_the_permalink();
-$buy_link = get_post_meta( get_the_ID(), 'event_ticket_link', true ) ?: get_the_permalink();
+$buy_link = get_post_meta( get_the_ID(), 'event_ticket_link', true );
+if(!$buy_link || $buy_link === '#'){
+	$buy_link = $post_link;
+}
 
 $show_meta = $this->get_settings_for_display('show_meta');
 $show_content = false;
@@ -146,13 +150,23 @@ if($show_title == 'yes' || $show_more == 'yes' || $show_meta == 'yes' || $show_e
             }
 
             if ($show_more == 'yes' && !in_array($preset, ['evt-1', 'evt-2', 'evt-3']) ) {
+                echo '<div class="lakit-posts__more-wrap lakit-btn-more-wrap">';
+	            if($show_buy_btn === 'yes' && !empty($btn_buy_text)){
+		            echo sprintf(
+			            '<a href="%2$s" class="elementor-button lakit-posts__btn-more lakit-btn-evt-buy" title="%3$s"><span class="btn__text">%1$s</span></a>',
+			            esc_html($btn_buy_text),
+			            esc_url($buy_link),
+			            esc_html(get_the_title())
+		            );
+	            }
                 echo sprintf(
-                    '<div class="lakit-posts__more-wrap lakit-btn-more-wrap"><a href="%2$s" class="elementor-button lakit-posts__btn-more lakit-btn-more" title="%3$s" rel="bookmark"><span class="btn__text">%1$s</span>%4$s</a></div>',
+                    '<a href="%2$s" class="elementor-button lakit-posts__btn-more lakit-btn-more" title="%3$s"><span class="btn__text">%1$s</span>%4$s</a>',
                     esc_html($more_text),
-                    esc_url($buy_link),
+                    esc_url($post_link),
                     esc_html(get_the_title()),
                     $this->_get_icon('more_icon', '<span class="lakit-btn-more-icon">%s</span>') // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                 );
+                echo '</div>';
             }
 
             if ($meta1_pos == 'after_button') {
@@ -167,13 +181,23 @@ if($show_title == 'yes' || $show_more == 'yes' || $show_meta == 'yes' || $show_e
         echo '</div>';
 
         if($show_more == 'yes' && in_array($preset, ['evt-1', 'evt-2', 'evt-3'])){
-            echo sprintf(
-                '<div class="lakit-posts__more-wrap lakit-btn-more-wrap"><a href="%2$s" class="elementor-button lakit-posts__btn-more lakit-btn-more" title="%3$s" rel="bookmark"><span class="btn__text">%1$s</span>%4$s</a></div>',
-                esc_html($more_text),
-                esc_url($buy_link),
-                esc_html(get_the_title()),
-                $this->_get_icon('more_icon', '<span class="lakit-btn-more-icon">%s</span>') // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-            );
+	        echo '<div class="lakit-posts__more-wrap lakit-btn-more-wrap">';
+	        if($show_buy_btn === 'yes' && !empty($btn_buy_text)){
+		        echo sprintf(
+			        '<a href="%2$s" class="elementor-button lakit-posts__btn-more lakit-btn-evt-buy" title="%3$s"><span class="btn__text">%1$s</span></a>',
+			        esc_html($btn_buy_text),
+			        esc_url($buy_link),
+			        esc_html(get_the_title())
+		        );
+	        }
+	        echo sprintf(
+		        '<a href="%2$s" class="elementor-button lakit-posts__btn-more lakit-btn-more" title="%3$s"><span class="btn__text">%1$s</span>%4$s</a>',
+		        esc_html($more_text),
+		        esc_url($post_link),
+		        esc_html(get_the_title()),
+		        $this->_get_icon('more_icon', '<span class="lakit-btn-more-icon">%s</span>') // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	        );
+	        echo '</div>';
         }
 
     ?></div>

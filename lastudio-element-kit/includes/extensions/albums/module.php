@@ -6,6 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit; // Exit if accessed directly
 }
 
+use Elementor\Core\DynamicTags\Manager as DynamicTagsManager;
 use LaStudioKitExtensions\Module_Base;
 
 class Module extends Module_Base {
@@ -40,12 +41,19 @@ class Module extends Module_Base {
         return !empty($available_extension['album_content_type']) && filter_var($available_extension['album_content_type'], FILTER_VALIDATE_BOOLEAN);
     }
 
+	public function register_tag( DynamicTagsManager $dynamic_tags ) {
+		$tag = __NAMESPACE__ . '\DynamicTags\Tag';
+
+		$dynamic_tags->register( new $tag() );
+	}
+
     public function __construct()
     {
         $this->path = lastudio_kit()->plugin_path('includes/extensions/events/');
         $this->url  = lastudio_kit()->plugin_url('includes/extensions/events/');
 		add_action( 'init', [ $this, 'register_content_type' ] );
 	    add_action( 'init', [ $this, 'add_metaboxes' ], -5 );
+	    add_action( 'elementor/dynamic_tags/register', [ $this, 'register_tag' ] );
 
 	    add_action( 'elementor/widgets/register', function ($widgets_manager){
 		    $widgets_manager->register( new Widgets\Album_Lists() );
@@ -367,8 +375,9 @@ class Module extends Module_Base {
 				if(!empty($_source)){
 					$_lyrics = $item['lyrics'] ?? '';
 					if(!empty($_lyrics)){
-						$_lyrics = lastudio_kit_helper()->transfer_text($_lyrics, true);
+						$_lyrics = wp_trim_words($_lyrics, 14);
 					}
+
 					$tracks[] = [
 						'src' => $_source,
 						'image' => wp_get_attachment_url($item['preview']),

@@ -85,7 +85,6 @@ class Module extends \Elementor\Core\Base\Module {
 	public function save_display_settings( $data ) {
 		/** @var Document $popup_document */
 		$popup_document = lastudio_kit()->elementor()->documents->get( $data['editor_post_id'] );
-
 		$popup_document->save_display_settings_data( $data['settings'] );
 	}
 
@@ -144,7 +143,7 @@ class Module extends \Elementor\Core\Base\Module {
 	}
 
     public function register_enqueue_scripts(){
-        wp_register_script('lastudio-kit-popup', lastudio_kit()->plugin_url('includes/modules/popup/assets/js/popup.min.js'), ['lastudio-kit-base'], lastudio_kit()->get_version(), true);
+        wp_register_script('lastudio-kit-popup', lastudio_kit()->plugin_url('includes/modules/popup/assets/js/popup.min.js'), ['lastudio-kit-base'], lastudio_kit()->get_version(), [ 'in_footer' => true, 'strategy' => 'defer' ]);
         wp_register_style('lastudio-kit-popup', lastudio_kit()->plugin_url('includes/modules/popup/assets/css/popup.min.css'), [], lastudio_kit()->get_version());
     }
 }

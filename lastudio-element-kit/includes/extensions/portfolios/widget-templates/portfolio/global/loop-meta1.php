@@ -54,6 +54,12 @@ if (filter_var($show_metadata, FILTER_VALIDATE_BOOLEAN) && !empty($metadata)) {
                 $meta_value = get_post_meta( get_the_ID(), '_pf_' . $item_type, true );
                 $item_type_class = 'pf__' . $item_type;
                 break;
+            case 'custom_field':
+                if(!empty($meta['custom_field_key'])){
+                    $meta_value = get_post_meta(get_the_ID(), $meta['custom_field_key'], true);
+                    $item_type_class = 'post__custom_field';
+                }
+                break;
         }
 
         if (!empty($meta_value)) {

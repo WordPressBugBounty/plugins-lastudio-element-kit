@@ -18,6 +18,11 @@ if (!defined('WPINC')) {
  */
 class LaStudioKit_Archive_Title extends Widget_Heading {
 
+    protected function is_dynamic_content(): bool
+    {
+        return true;
+    }
+
     public function get_name() {
         return 'lakit-archive-title';
     }

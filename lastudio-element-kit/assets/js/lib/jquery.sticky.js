@@ -2,345 +2,351 @@
  * By LaStudio Team
  */
 ( function( $ ) {
-	var Sticky = function( element, userSettings ) {
-		var $element,
-			isSticky = false,
-			isFollowingParent = false,
-			isReachedEffectsPoint = false,
-			elements = {},
-			settings;
-
-		var defaultSettings = {
-			to: 'top',
-			offset: 0,
-			effectsOffset: 0,
-			parent: false,
-			classes: {
-				sticky: 'sticky',
-				stickyActive: 'sticky-active',
-				stickyEffects: 'sticky-effects',
-				spacer: 'sticky-spacer',
-			},
-		};
-
-		var initElements = function() {
-			$element = $( element ).addClass( settings.classes.sticky );
-
-			elements.$window = $( window );
-
-			if ( settings.parent ) {
-				elements.$parent = $element.parent();
-
-				if ( 'parent' !== settings.parent ) {
-					elements.$parent = elements.$parent.closest( settings.parent );
-				}
-			}
-		};
-
-		var initSettings = function() {
-			settings = jQuery.extend( true, defaultSettings, userSettings );
-		};
 
-		var bindEvents = function() {
-			elements.$window.on('scroll', onWindowScroll).on('resize', onWindowResize)
-		};
+    var Sticky = function( element, userSettings ) {
+        var $element,
+            isSticky = false,
+            isFollowingParent = false,
+            isReachedEffectsPoint = false,
+            elements = {},
+            settings;
+
+        var defaultSettings = {
+            to: 'top',
+            offset: 0,
+            effectsOffset: 0,
+            parent: false,
+            classes: {
+                sticky: 'sticky',
+                stickyActive: 'sticky-active',
+                stickyEffects: 'sticky-effects',
+                spacer: 'sticky-spacer',
+            },
+        };
+
+        var initElements = function() {
+            $element = $( element ).addClass( settings.classes.sticky );
+
+            elements.$window = $( window );
+
+            if ( settings.parent ) {
+                elements.$parent = $element.parent();
+
+                if ( 'parent' !== settings.parent ) {
+                    elements.$parent = elements.$parent.closest( settings.parent );
+                }
+            }
+        };
+
+        var initSettings = function() {
+            settings = jQuery.extend( true, defaultSettings, userSettings );
+        };
 
-		var unbindEvents = function() {
-			elements.$window
-				.off( 'scroll', onWindowScroll )
-				.off( 'resize', onWindowResize );
-		};
+        var bindEvents = function() {
+            elements.$window.on('scroll', onWindowScroll).on('resize', onWindowResize)
+        };
 
-		var init = function() {
-			initSettings();
+        var unbindEvents = function() {
+            elements.$window
+                .off( 'scroll', onWindowScroll )
+                .off( 'resize', onWindowResize );
+        };
 
-			initElements();
+        var init = function() {
+            initSettings();
 
-			bindEvents();
+            initElements();
 
-			checkPosition();
-		};
+            bindEvents();
 
-		var backupCSS = function( $elementBackupCSS, backupState, properties ) {
-			var css = {},
-				elementStyle = $elementBackupCSS[ 0 ].style;
-
-			properties.forEach( function( property ) {
-				css[ property ] = undefined !== elementStyle[ property ] ? elementStyle[ property ] : '';
-			} );
+            checkPosition();
+        };
 
-			$elementBackupCSS.data( 'css-backup-' + backupState, css );
-		};
-
-		var getCSSBackup = function( $elementCSSBackup, backupState ) {
-			return $elementCSSBackup.data( 'css-backup-' + backupState );
-		};
-
-		var addSpacer = function() {
-			elements.$spacer = $element.clone()
-				.addClass( settings.classes.spacer )
-				.css( {
-					visibility: 'hidden',
-					transition: 'none',
-					animation: 'none',
-				} );
-
-			$element.after( elements.$spacer );
-		};
-
-		var removeSpacer = function() {
-			elements.$spacer.remove();
-		};
-
-		var stickElement = function() {
-			backupCSS( $element, 'unsticky', [ 'position', 'width', 'margin-top', 'margin-bottom', 'top', 'bottom' ] );
-
-			var css = {
-				position: 'fixed',
-				width: getElementOuterSize( $element, 'width' ),
-				marginTop: 0,
-				marginBottom: 0,
-			};
-
-			css[ settings.to ] = settings.offset;
+        var backupCSS = function( $elementBackupCSS, backupState, properties ) {
+            var css = {},
+                elementStyle = $elementBackupCSS[ 0 ].style;
 
-			css[ 'top' === settings.to ? 'bottom' : 'top' ] = '';
+            properties.forEach( function( property ) {
+                css[ property ] = undefined !== elementStyle[ property ] ? elementStyle[ property ] : '';
+            } );
 
-			$element
-				.css( css )
-				.addClass( settings.classes.stickyActive );
-		};
+            $elementBackupCSS.data( 'css-backup-' + backupState, css );
+        };
 
-		var unstickElement = function() {
-			$element
-				.css( getCSSBackup( $element, 'unsticky' ) )
-				.removeClass( settings.classes.stickyActive );
-		};
+        var getCSSBackup = function( $elementCSSBackup, backupState ) {
+            return $elementCSSBackup.data( 'css-backup-' + backupState );
+        };
 
-		var followParent = function() {
-			backupCSS( elements.$parent, 'childNotFollowing', [ 'position' ] );
+        var addSpacer = function() {
+            elements.$spacer = $element.clone()
+                .addClass( settings.classes.spacer )
+                .css( {
+                    visibility: 'hidden',
+                    transition: 'none',
+                    animation: 'none',
+                } );
+
+            $element.after( elements.$spacer );
+        };
+
+        var removeSpacer = function() {
+            elements.$spacer.remove();
+        };
+
+        var stickElement = function() {
+            backupCSS( $element, 'unsticky', [ 'position', 'width', 'margin-top', 'margin-bottom', 'top', 'bottom', 'left', 'right' ] );
+
+            var css = {
+                position: 'fixed',
+                width: getElementOuterSize( $element, 'width' ),
+                marginTop: 0,
+                marginBottom: 0,
+            };
+
+            if('widget' === elements.$spacer.data('element_type')){
+                css.left = elements.$spacer.offset().left;
+                css.right = 'auto'
+            }
 
-			elements.$parent.css( 'position', 'relative' );
+            css[ settings.to ] = settings.offset;
 
-			backupCSS( $element, 'notFollowing', [ 'position', 'top', 'bottom' ] );
+            css[ 'top' === settings.to ? 'bottom' : 'top' ] = '';
 
-			var css = {
-				position: 'absolute',
-			};
+            $element
+                .css( css )
+                .addClass( settings.classes.stickyActive );
+        };
 
-			css[ settings.to ] = '';
+        var unstickElement = function() {
+            $element
+                .css( getCSSBackup( $element, 'unsticky' ) )
+                .removeClass( settings.classes.stickyActive );
+        };
 
-			css[ 'top' === settings.to ? 'bottom' : 'top' ] = 0;
+        var followParent = function() {
+            backupCSS( elements.$parent, 'childNotFollowing', [ 'position' ] );
 
-			$element.css( css );
+            elements.$parent.css( 'position', 'relative' );
 
-			isFollowingParent = true;
-		};
+            backupCSS( $element, 'notFollowing', [ 'position', 'top', 'bottom', 'left', 'right' ] );
 
-		var unfollowParent = function() {
-			elements.$parent.css( getCSSBackup( elements.$parent, 'childNotFollowing' ) );
+            var css = {
+                position: 'absolute',
+            };
 
-			$element.css( getCSSBackup( $element, 'notFollowing' ) );
+            css[ settings.to ] = '';
 
-			isFollowingParent = false;
-		};
+            css[ 'top' === settings.to ? 'bottom' : 'top' ] = 0;
 
-		var getElementOuterSize = function( $elementOuterSize, dimension, includeMargins ) {
-			var computedStyle = getComputedStyle( $elementOuterSize[ 0 ] ),
-				elementSize = parseFloat( computedStyle[ dimension ] ),
-				sides = 'height' === dimension ? [ 'top', 'bottom' ] : [ 'left', 'right' ],
-				propertiesToAdd = [];
+            $element.css( css );
 
-			if ( 'border-box' !== computedStyle.boxSizing ) {
-				propertiesToAdd.push( 'border', 'padding' );
-			}
+            isFollowingParent = true;
+        };
 
-			if ( includeMargins ) {
-				propertiesToAdd.push( 'margin' );
-			}
+        var unfollowParent = function() {
+            elements.$parent.css( getCSSBackup( elements.$parent, 'childNotFollowing' ) );
 
-			propertiesToAdd.forEach( function( property ) {
-				sides.forEach( function( side ) {
-					elementSize += parseFloat( computedStyle[ property + '-' + side ] );
-				} );
-			} );
+            $element.css( getCSSBackup( $element, 'notFollowing' ) );
 
-			return elementSize;
-		};
+            isFollowingParent = false;
+        };
 
-		var getElementViewportOffset = function( $elementViewportOffset ) {
-			var windowScrollTop = elements.$window.scrollTop(),
-				elementHeight = getElementOuterSize( $elementViewportOffset, 'height' ),
-				viewportHeight = innerHeight,
-				elementOffsetFromTop = $elementViewportOffset.offset().top,
-				distanceFromTop = elementOffsetFromTop - windowScrollTop,
-				topFromBottom = distanceFromTop - viewportHeight;
+        var getElementOuterSize = function( $elementOuterSize, dimension, includeMargins ) {
+            var computedStyle = getComputedStyle( $elementOuterSize[ 0 ] ),
+                elementSize = parseFloat( computedStyle[ dimension ] ),
+                sides = 'height' === dimension ? [ 'top', 'bottom' ] : [ 'left', 'right' ],
+                propertiesToAdd = [];
 
-			return {
-				top: {
-					fromTop: distanceFromTop,
-					fromBottom: topFromBottom,
-				},
-				bottom: {
-					fromTop: distanceFromTop + elementHeight,
-					fromBottom: topFromBottom + elementHeight,
-				},
-			};
-		};
+            if ( 'border-box' !== computedStyle.boxSizing ) {
+                propertiesToAdd.push( 'border', 'padding' );
+            }
 
-		var stick = function() {
-			addSpacer();
+            if ( includeMargins ) {
+                propertiesToAdd.push( 'margin' );
+            }
 
-			stickElement();
+            propertiesToAdd.forEach( function( property ) {
+                sides.forEach( function( side ) {
+                    elementSize += parseFloat( computedStyle[ property + '-' + side ] );
+                } );
+            } );
 
-			isSticky = true;
+            return elementSize;
+        };
 
-			$element.trigger( 'sticky:stick' );
-		};
+        var getElementViewportOffset = function( $elementViewportOffset ) {
+            var windowScrollTop = elements.$window.scrollTop(),
+                elementHeight = getElementOuterSize( $elementViewportOffset, 'height' ),
+                viewportHeight = innerHeight,
+                elementOffsetFromTop = $elementViewportOffset.offset().top,
+                distanceFromTop = elementOffsetFromTop - windowScrollTop,
+                topFromBottom = distanceFromTop - viewportHeight;
 
-		var unstick = function() {
-			unstickElement();
+            return {
+                top: {
+                    fromTop: distanceFromTop,
+                    fromBottom: topFromBottom,
+                },
+                bottom: {
+                    fromTop: distanceFromTop + elementHeight,
+                    fromBottom: topFromBottom + elementHeight,
+                },
+            };
+        };
 
-			removeSpacer();
+        var stick = function() {
+            addSpacer();
 
-			isSticky = false;
+            stickElement();
 
-			$element.trigger( 'sticky:unstick' );
-		};
+            isSticky = true;
 
-		var checkParent = function() {
-			var elementOffset = getElementViewportOffset( $element ),
-				isTop = 'top' === settings.to;
+            $element.trigger( 'sticky:stick' );
+        };
 
-			if ( isFollowingParent ) {
-				var isNeedUnfollowing = isTop ? elementOffset.top.fromTop > settings.offset : elementOffset.bottom.fromBottom < -settings.offset;
+        var unstick = function() {
+            unstickElement();
 
-				if ( isNeedUnfollowing ) {
-					unfollowParent();
-				}
-			} else {
-				var parentOffset = getElementViewportOffset( elements.$parent ),
-					parentStyle = getComputedStyle( elements.$parent[ 0 ] ),
-					borderWidthToDecrease = parseFloat( parentStyle[ isTop ? 'borderBottomWidth' : 'borderTopWidth' ] ),
-					parentViewportDistance = isTop ? parentOffset.bottom.fromTop - borderWidthToDecrease : parentOffset.top.fromBottom + borderWidthToDecrease,
-					isNeedFollowing = isTop ? parentViewportDistance <= elementOffset.bottom.fromTop : parentViewportDistance >= elementOffset.top.fromBottom;
+            removeSpacer();
 
-				if ( isNeedFollowing ) {
-					followParent();
-				}
-			}
-		};
+            isSticky = false;
 
-		var checkEffectsPoint = function( distanceFromTriggerPoint ) {
-			if ( isReachedEffectsPoint && -distanceFromTriggerPoint < settings.effectsOffset ) {
-				$element.removeClass( settings.classes.stickyEffects );
+            $element.trigger( 'sticky:unstick' );
+        };
 
-				isReachedEffectsPoint = false;
-			} else if ( ! isReachedEffectsPoint && -distanceFromTriggerPoint >= settings.effectsOffset ) {
-				$element.addClass( settings.classes.stickyEffects );
+        var checkParent = function() {
+            var elementOffset = getElementViewportOffset( $element ),
+                isTop = 'top' === settings.to;
 
-				isReachedEffectsPoint = true;
-			}
-		};
+            if ( isFollowingParent ) {
+                var isNeedUnfollowing = isTop ? elementOffset.top.fromTop > settings.offset : elementOffset.bottom.fromBottom < -settings.offset;
 
-		var checkPosition = function() {
-			var offset = settings.offset,
-				distanceFromTriggerPoint;
+                if ( isNeedUnfollowing ) {
+                    unfollowParent();
+                }
+            } else {
+                var parentOffset = getElementViewportOffset( elements.$parent ),
+                    parentStyle = getComputedStyle( elements.$parent[ 0 ] ),
+                    borderWidthToDecrease = parseFloat( parentStyle[ isTop ? 'borderBottomWidth' : 'borderTopWidth' ] ),
+                    parentViewportDistance = isTop ? parentOffset.bottom.fromTop - borderWidthToDecrease : parentOffset.top.fromBottom + borderWidthToDecrease,
+                    isNeedFollowing = isTop ? parentViewportDistance <= elementOffset.bottom.fromTop : parentViewportDistance >= elementOffset.top.fromBottom;
 
-			if ( isSticky ) {
-				var spacerViewportOffset = getElementViewportOffset( elements.$spacer );
+                if ( isNeedFollowing ) {
+                    followParent();
+                }
+            }
+        };
 
-				distanceFromTriggerPoint = 'top' === settings.to ? spacerViewportOffset.top.fromTop - offset : -spacerViewportOffset.bottom.fromBottom - offset;
+        var checkEffectsPoint = function( distanceFromTriggerPoint ) {
+            if ( isReachedEffectsPoint && -distanceFromTriggerPoint < settings.effectsOffset ) {
+                $element.removeClass( settings.classes.stickyEffects );
 
-				if ( settings.parent ) {
-					checkParent();
-				}
+                isReachedEffectsPoint = false;
+            } else if ( ! isReachedEffectsPoint && -distanceFromTriggerPoint >= settings.effectsOffset ) {
+                $element.addClass( settings.classes.stickyEffects );
 
-				if ( distanceFromTriggerPoint > 0 ) {
-					unstick();
-				}
-			} else {
-				var elementViewportOffset = getElementViewportOffset( $element );
+                isReachedEffectsPoint = true;
+            }
+        };
 
-				distanceFromTriggerPoint = 'top' === settings.to ? elementViewportOffset.top.fromTop - offset : -elementViewportOffset.bottom.fromBottom - offset;
+        var checkPosition = function() {
+            var offset = settings.offset,
+                distanceFromTriggerPoint;
 
-				if ( distanceFromTriggerPoint <= 0 ) {
-					stick();
+            if ( isSticky ) {
+                var spacerViewportOffset = getElementViewportOffset( elements.$spacer );
 
-					if ( settings.parent ) {
-						checkParent();
-					}
-				}
-			}
+                distanceFromTriggerPoint = 'top' === settings.to ? spacerViewportOffset.top.fromTop - offset : -spacerViewportOffset.bottom.fromBottom - offset;
 
-			checkEffectsPoint( distanceFromTriggerPoint );
-		};
+                if ( settings.parent ) {
+                    checkParent();
+                }
 
-		var onWindowScroll = function() {
-			checkPosition();
-		};
+                if ( distanceFromTriggerPoint > 0 ) {
+                    unstick();
+                }
+            } else {
+                var elementViewportOffset = getElementViewportOffset( $element );
 
-		var onWindowResize = function() {
-			if ( ! isSticky ) {
-				return;
-			}
+                distanceFromTriggerPoint = 'top' === settings.to ? elementViewportOffset.top.fromTop - offset : -elementViewportOffset.bottom.fromBottom - offset;
 
-			unstickElement();
+                if ( distanceFromTriggerPoint <= 0 ) {
+                    stick();
 
-			stickElement();
+                    if ( settings.parent ) {
+                        checkParent();
+                    }
+                }
+            }
 
-			if ( settings.parent ) {
-				// Force recalculation of the relation between the element and its parent
-				isFollowingParent = false;
+            checkEffectsPoint( distanceFromTriggerPoint );
+        };
 
-				checkParent();
-			}
-		};
+        var onWindowScroll = function() {
+            checkPosition();
+        };
 
-		this.destroy = function() {
-			if ( isSticky ) {
-				unstick();
-			}
+        var onWindowResize = function() {
+            if ( ! isSticky ) {
+                return;
+            }
 
-			unbindEvents();
+            unstickElement();
 
-			$element.removeClass( settings.classes.sticky );
-		};
+            stickElement();
 
-		init();
-	};
+            if ( settings.parent ) {
+                // Force recalculation of the relation between the element and its parent
+                isFollowingParent = false;
 
-	$.fn.sticky = function( settings ) {
-		var isCommand = 'string' === typeof settings;
+                checkParent();
+            }
+        };
 
-		this.each( function() {
-			var $this = $( this );
+        this.destroy = function() {
+            if ( isSticky ) {
+                unstick();
+            }
 
-			if ( ! isCommand ) {
-				$this.data( 'sticky', new Sticky( this, settings ) );
+            unbindEvents();
 
-				return;
-			}
+            $element.removeClass( settings.classes.sticky );
+        };
 
-			var instance = $this.data( 'sticky' );
+        init();
+    };
 
-			if ( ! instance ) {
-				throw Error( 'Trying to perform the `' + settings + '` method prior to initialization' );
-			}
+    $.fn.sticky = function( settings ) {
+        var isCommand = 'string' === typeof settings;
 
-			if ( ! instance[ settings ] ) {
-				throw ReferenceError( 'Method `' + settings + '` not found in sticky instance' );
-			}
+        this.each( function() {
+            var $this = $( this );
 
-			instance[ settings ].apply( instance, Array.prototype.slice.call( arguments, 1 ) );
+            if ( ! isCommand ) {
+                $this.data( 'sticky', new Sticky( this, settings ) );
 
-			if ( 'destroy' === settings ) {
-				$this.removeData( 'sticky' );
-			}
-		} );
+                return;
+            }
 
-		return this;
-	};
+            var instance = $this.data( 'sticky' );
 
-	window.Sticky = Sticky;
+            if ( ! instance ) {
+                throw Error( 'Trying to perform the `' + settings + '` method prior to initialization' );
+            }
+
+            if ( ! instance[ settings ] ) {
+                throw ReferenceError( 'Method `' + settings + '` not found in sticky instance' );
+            }
+
+            instance[ settings ].apply( instance, Array.prototype.slice.call( arguments, 1 ) );
+
+            if ( 'destroy' === settings ) {
+                $this.removeData( 'sticky' );
+            }
+        } );
+
+        return this;
+    };
+
+    window.Sticky = Sticky;
 } )( jQuery );

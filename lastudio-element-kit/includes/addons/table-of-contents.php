@@ -14,32 +14,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class LaStudioKit_Table_Of_Contents extends LaStudioKit_Base {
 
-	public function has_widget_inner_wrapper(): bool {
-		return true;
-	}
-
-  protected function enqueue_addon_resources() {
-    if ( ! lastudio_kit_settings()->is_combine_js_css() ) {
-      $this->add_script_depends( 'lastudio-kit-w__tableofcontent');
-      if ( ! lastudio_kit()->is_optimized_css_mode() ) {
-        wp_register_style( $this->get_name(), lastudio_kit()->plugin_url( 'assets/css/addons/tablet-contents.min.css' ), [ 'lastudio-kit-base' ], lastudio_kit()->get_version() );
-        $this->add_style_depends( $this->get_name() );
-      }
-    }
+  public function get_style_depends()
+  {
+      return ['lakit-table-of-contents'];
   }
 
-  public function get_widget_css_config( $widget_name ) {
-    $file_url  = lastudio_kit()->plugin_url( 'assets/css/addons/tablet-contents.min.css' );
-    $file_path = lastudio_kit()->plugin_path( 'assets/css/addons/tablet-contents.min.css' );
-
-    return [
-      'key'       => $widget_name,
-      'version'   => lastudio_kit()->get_version( true ),
-      'file_path' => $file_path,
-      'data'      => [
-        'file_url' => $file_url
-      ]
-    ];
+  public function get_script_depends()
+  {
+      return ['lastudio-kit-w__tableofcontent'];
   }
 
   public function get_name() {

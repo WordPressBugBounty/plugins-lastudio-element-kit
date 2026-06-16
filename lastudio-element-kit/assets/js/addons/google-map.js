@@ -33,7 +33,7 @@
                                 map: map
                             };
 
-                        if ('' !== pin.image) {
+                        if (pin.image && '' !== pin.image) {
                             pinData.icon = pin.image;
                         }
 

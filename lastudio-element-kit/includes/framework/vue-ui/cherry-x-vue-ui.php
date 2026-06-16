@@ -97,7 +97,7 @@ if ( ! class_exists( 'CX_Vue_UI' ) ) {
 				$this->url . 'assets/js/vue' . $suffix . '.js',
 				array(),
 				'2.6.10',
-				true
+                [ 'in_footer' => true ]
 			);
 
 			wp_enqueue_script(
@@ -105,7 +105,7 @@ if ( ! class_exists( 'CX_Vue_UI' ) ) {
 				$this->url . 'assets/js/cx-vue-ui.js',
 				array( 'cx-vue' ),
 				$this->version,
-				true
+                [ 'in_footer' => true ]
 			);
 
 			add_action( 'admin_footer', array( $this, 'print_templates' ), 0 );
@@ -120,38 +120,38 @@ if ( ! class_exists( 'CX_Vue_UI' ) ) {
 		 * @return array
 		 */
 		public function components_list() {
-			return apply_filters( 'cx-vue-ui/components-list', array(
+            $basics = [
+                // Layout elements
+                'title',
+                'collapse',
+                'component-wrapper',
+                'button',
+                'repeater',
+                'repeater-item',
+                'popup',
+                'list-table',
+                'list-table-heading',
+                'list-table-item',
+                'tabs',
+                'tabs-panel',
+                'pagination',
+                'notice',
 
-				// Layout elements
-				'title',
-				'collapse',
-				'component-wrapper',
-				'button',
-				'repeater',
-				'repeater-item',
-				'popup',
-				'list-table',
-				'list-table-heading',
-				'list-table-item',
-				'tabs',
-				'tabs-panel',
-				'pagination',
-				'notice',
-
-				// Form elements
-				'input',
-				'time',
-				'textarea',
-				'switcher',
-				'iconpicker',
-				'select',
-				'f-select',
-				'checkbox',
-				'radio',
-				'colorpicker',
-				'wp-media',
-				'dimensions',
-			) );
+                // Form elements
+                'input',
+                'time',
+                'textarea',
+                'switcher',
+                'iconpicker',
+                'select',
+                'f-select',
+                'checkbox',
+                'radio',
+                'colorpicker',
+                'wp-media',
+                'dimensions',
+            ];
+			return apply_filters( 'cx-vue-ui/components-list', [] );
 		}
 
 		/**
@@ -161,31 +161,48 @@ if ( ! class_exists( 'CX_Vue_UI' ) ) {
 		 */
 		public function print_templates() {
 
-			$path        = $this->path . 'components/*.php';
-			$whitelisted = $this->components_list();
-
-			foreach ( glob( $path ) as $file ) {
-
-				$slug = basename( $file, '.php' );
-
-				if ( ! in_array( $slug, $whitelisted ) ) {
-					continue;
-				}
-
-				ob_start();
-				include $file;
-				$template = ob_get_clean();
-
-				printf(
-					'<script type="text/x-template" id="%1$s">%2$s</script>',
-					esc_attr('cx-vui-' . $slug),
-                    $template // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				);
-
-			}
-
+            $core_templates = $this->path . 'dist/templates.php';
+            if ( is_readable( $core_templates ) ) {
+                require $core_templates;
+            }
+            $dynamic_templates = $this->get_dynamic_templates();
+            if(!empty($dynamic_templates)){
+                foreach ( $dynamic_templates as $slug => $template ) {
+                    printf(
+                        '<script type="text/x-template" id="%1$s">%2$s</script>',
+                        esc_attr( 'cx-vui-' . $slug ),
+                        $template
+                    );
+                }
+            }
 		}
 
+        protected function get_dynamic_templates() {
+            $dynamic_lists = $this->components_list();
+            if(empty($dynamic_lists)){
+                return [];
+            }
+            $cache_key = sprintf( 'cx_vui_%s_%s',
+                md5( $this->path ),
+                filemtime( $this->path . 'components/' )
+            );
+            $templates = wp_cache_get( $cache_key, 'lakit_cx_vui' );
+            if ( false !== $templates ) {
+                return $templates;
+            }
+            $templates = array();
+            foreach ( $dynamic_lists as $slug ) {
+                $file = $this->path . 'components/' . $slug . '.php';
+                if ( ! is_readable( $file ) ) {
+                    continue;
+                }
+                ob_start();
+                include $file;
+                $templates[ $slug ] = ob_get_clean();
+            }
+            wp_cache_set( $cache_key, $templates, 'lakit_cx_vui', HOUR_IN_SECONDS );
+            return $templates;
+        }
 	}
 
 }

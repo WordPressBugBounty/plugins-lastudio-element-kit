@@ -17,12 +17,14 @@ if (!defined('WPINC')) {
  */
 class LaStudioKit_Woo_Filters extends LaStudioKit_Base {
 
-    protected function enqueue_addon_resources(){
-        if(!lastudio_kit_settings()->is_combine_js_css()) {
-            $this->add_style_depends( 'lastudio-kit-base' );
-            $this->add_style_depends( 'lastudio-kit-woocommerce' );
-            $this->add_script_depends('lastudio-kit-base' );
-        }
+    protected function is_dynamic_content(): bool
+    {
+        return true;
+    }
+
+    public function get_style_depends()
+    {
+        return ['lastudio-kit-woocommerce'];
     }
 
     public function get_name() {
@@ -1524,7 +1526,7 @@ class LaStudioKit_Woo_Filters extends LaStudioKit_Base {
             Group_Control_Typography::get_type(),
             [
                 'name' => 'filter_list_item_dd_font',
-                'selector' => '{{WRAPPER}} .woocommerce-result-count,{{WRAPPER}} .lakit-dropdown--label, {{WRAPPER}} select',
+                'selector' => '{{WRAPPER}} .woocommerce-result-count, {{WRAPPER}} .lakit-dropdown--label, {{WRAPPER}} select, {{WRAPPER}} .lakit-custom-dropdown ul',
             ]
         );
         $this->add_control(
@@ -1572,6 +1574,78 @@ class LaStudioKit_Woo_Filters extends LaStudioKit_Base {
                 ),
             )
         );
+
+        $this->add_control(
+            '_dd_heading',
+            [
+                'label' => esc_html__( 'Dropdowns', 'lastudio-kit' ),
+                'type' => Controls_Manager::HEADING,
+            ]
+        );
+
+        $this->add_responsive_control(
+            'dd_item_padding',
+            array(
+                'label' => esc_html__('Padding', 'lastudio-kit'),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => array('px', 'em', 'rem', '%'),
+                'selectors' => array(
+                    '{{WRAPPER}} .lakit-custom-dropdown ul li a' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ),
+            )
+        );
+        $this->add_control(
+            'dd_item_color',
+            [
+                'label' => esc_html__('Text Color', 'lastudio-kit'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .lakit-custom-dropdown ul' => 'color: {{VALUE}}',
+                ],
+            ]
+        );
+        $this->add_control(
+            'dd_item_bgcolor',
+            [
+                'label' => esc_html__('Border Color', 'lastudio-kit'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .lakit-custom-dropdown ul' => '--theme-border-color: {{VALUE}}',
+                ],
+            ]
+        );
+        $this->add_control(
+            'dd_item_border_color',
+            [
+                'label' => esc_html__('Border Color', 'lastudio-kit'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .lakit-custom-dropdown ul' => 'color: {{VALUE}}',
+                ],
+            ]
+        );
+
+        $this->add_control(
+            'dd_item_hover_color',
+            [
+                'label' => esc_html__('Hover Text Color', 'lastudio-kit'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .lakit-custom-dropdown li:hover a, {{WRAPPER}} .lakit-custom-dropdown li.active a' => 'color: {{VALUE}}',
+                ],
+            ]
+        );
+        $this->add_control(
+            'dd_item_hover_bgcolor',
+            [
+                'label' => esc_html__('Hover Background Color', 'lastudio-kit'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .lakit-custom-dropdown li:hover a, {{WRAPPER}} .lakit-custom-dropdown li.active a' => 'background-color: {{VALUE}}',
+                ],
+            ]
+        );
+
         $this->end_controls_section();
     }
 

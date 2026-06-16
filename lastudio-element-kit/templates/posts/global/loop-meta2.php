@@ -67,6 +67,12 @@ if (filter_var($show_metadata, FILTER_VALIDATE_BOOLEAN) && !empty($metadata)) {
 		        $meta_value = sprintf( /* translators: %s is replaced with "string" */ _n( '%s view', '%s views', $views_count, 'lastudio-kit' ), lastudio_kit_helper()->number_format_short($views_count, 2) );
 		        $item_type_class = 'post__views';
 		        break;
+            case 'custom_field':
+                if(!empty($meta['custom_field_key'])){
+                    $meta_value = get_post_meta(get_the_ID(), $meta['custom_field_key'], true);
+                    $item_type_class = 'post__custom_field';
+                }
+                break;
         }
 
         if (!empty($meta_value)) {

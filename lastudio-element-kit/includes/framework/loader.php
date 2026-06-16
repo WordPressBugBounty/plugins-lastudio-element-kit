@@ -106,7 +106,7 @@ if ( ! class_exists( 'LaStudio_Kit_CX_Loader' ) ) {
 		 */
 		public function include_modules() {
 
-			$modules_data = wp_cache_get( $this->key );
+			$modules_data = wp_cache_get( $this->key, 'lastudio-kit' );
 
 			foreach ( $this->modules_slugs as $slug ) {
 
@@ -192,7 +192,7 @@ if ( ! class_exists( 'LaStudio_Kit_CX_Loader' ) ) {
 		private function store_module_version( $module_path = null ) {
 
 			$slug         = basename( $module_path );
-			$modules_data = wp_cache_get( $this->key );
+			$modules_data = wp_cache_get( $this->key, 'lastudio-kit' );
 			$modules_data = ! empty( $modules_data ) ? $modules_data : array();
 
 			if ( empty( $modules_data[ $slug ] ) ) {
@@ -216,7 +216,7 @@ if ( ! class_exists( 'LaStudio_Kit_CX_Loader' ) ) {
 
 			$this->modules_slugs[] = $slug;
 
-			wp_cache_set( $this->key, $modules_data, '', 1 );
+			wp_cache_set( $this->key, $modules_data, 'lastudio-kit', 2 );
 
 			return true;
 

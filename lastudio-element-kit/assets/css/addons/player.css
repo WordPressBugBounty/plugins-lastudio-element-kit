@@ -295,6 +295,15 @@
 .lakitplayer_playlist__item.active-track {
   color: var(--lakit-primary-color)
 }
+.lakitplayer_playlist__item_lyric {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  line-clamp: 1;
+  -webkit-box-orient: vertical;
+  width: 90%;
+}
 @media (max-width: 1280px) {
   .lakitplayer {
     --preview-size: 50px;

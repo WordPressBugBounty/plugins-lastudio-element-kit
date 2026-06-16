@@ -39,6 +39,21 @@ abstract class LaStudioKit_Base extends Widget_Base
         $this->enqueue_addon_resources();
     }
 
+    protected function is_dynamic_content(): bool
+    {
+        return false;
+    }
+
+    public function get_style_depends()
+    {
+        return ['lastudio-kit-base'];
+    }
+
+    public function get_script_depends()
+    {
+        return ['lastudio-kit-base'];
+    }
+
     protected function enqueue_addon_resources() { }
 
     public function has_widget_inner_wrapper(): bool {
@@ -118,21 +133,38 @@ abstract class LaStudioKit_Base extends Widget_Base
 	 *
 	 * @return false|string
 	 */
-    protected function get_template_output( $name = null ){
+    protected function get_template_output( $name = null ) {
 
-	    $name = $this->sanitize_file_name($name);
+        if ( empty($name) || ! is_string($name) ) {
+            return false;
+        }
 
-	    $template = locate_template( lastudio_kit()->template_path() . $name );
+        $name = wp_normalize_path($name);
+        $name = ltrim($name, '/');
 
-	    if ( ! $template ) {
+        if ( pathinfo($name, PATHINFO_EXTENSION) !== 'php' ) {
+            return false;
+        }
+
+        $pathname = lastudio_kit()->template_path() . $name;
+
+        $template = locate_template($pathname);
+
+        if ( empty($template) ) {
             $template = $this->set_template_output() . '/' . $name;
-	    }
+        }
 
-	    if ( file_exists( $template ) ) {
-		    return $template;
-	    } else {
-		    return false;
-	    }
+        $template = wp_normalize_path($template);
+
+        if (
+            ! empty($template)
+            && is_string($template)
+            && is_readable($template)
+        ) {
+            return $template;
+        }
+
+        return false;
     }
 
     /**
@@ -185,7 +217,11 @@ abstract class LaStudioKit_Base extends Widget_Base
      * @access protected
      */
     protected function _load_template($template) {
-        if(file_exists($template)){
+        if (
+            ! empty($template)
+            && is_string($template)
+            && is_readable($template)
+        ) {
             include $template;
         }
     }

@@ -18,47 +18,22 @@ class LaStudioKit_Google_Maps extends LaStudioKit_Base {
 
     public $geo_api_url = 'https://maps.googleapis.com/maps/api/geocode/json';
 
-    protected function enqueue_addon_resources()
+    public function get_style_depends()
     {
-
-        $disable_gmap_api_js = lastudio_kit_settings()->get_option('disable_gmap_api_js');
-        if (!filter_var($disable_gmap_api_js, FILTER_VALIDATE_BOOLEAN)) {
-            $google_api_key = lastudio_kit_settings()->get_option('gmap_api_key', lastudio_kit_settings()->get_option('gmap_backend_api_key'));
-
-            $api = add_query_arg(
-                array(
-                    'key' => $google_api_key,
-                    'libraries' => 'marker'
-                ),
-                'https://maps.googleapis.com/maps/api/js'
-            );
-            wp_register_script('lastudio-kit-google-maps-api', $api, false, lastudio_kit()->get_version(), [
-                'in_footer' => true
-            ]);
-            $this->add_script_depends('lastudio-kit-google-maps-api');
-        }
-
-        if (!lastudio_kit_settings()->is_combine_js_css()) {
-            $this->add_script_depends('lastudio-kit-w__gmap');
-            if (!lastudio_kit()->is_optimized_css_mode()) {
-                wp_register_style($this->get_name(), lastudio_kit()->plugin_url('assets/css/addons/google-map.min.css'), null, lastudio_kit()->get_version());
-                $this->add_style_depends($this->get_name());
-            }
-        }
+        return ['lakit-google-maps'];
     }
 
-	public function get_widget_css_config($widget_name){
-		$file_url = lastudio_kit()->plugin_url(  'assets/css/addons/google-map.min.css' );
-		$file_path = lastudio_kit()->plugin_path( 'assets/css/addons/google-map.min.css' );
-		return [
-			'key' => $widget_name,
-			'version' => lastudio_kit()->get_version(true),
-			'file_path' => $file_path,
-			'data' => [
-				'file_url' => $file_url
-			]
-		];
-	}
+    public function get_script_depends()
+    {
+        $disable_gmap_api_js    = lastudio_kit_settings()->get_option('disable_gmap_api_js');
+        $google_api_key         = lastudio_kit_settings()->get_option('gmap_api_key', lastudio_kit_settings()->get_option('gmap_backend_api_key'));
+        if (!filter_var($disable_gmap_api_js, FILTER_VALIDATE_BOOLEAN) && !empty($google_api_key)) {
+            return ['lastudio-kit-gmap_api', 'lastudio-kit-w__gmap'];
+        }
+        else{
+            return ['lastudio-kit-w__gmap'];
+        }
+    }
 
     public function get_name() {
         return 'lakit-google-maps';
@@ -352,17 +327,40 @@ class LaStudioKit_Google_Maps extends LaStudioKit_Base {
      */
     public function _get_available_map_styles() {
 
-        $key           = 'lakit-gmap-style-' . lastudio_kit()->get_version(true);
-        $plugin_styles = get_transient( $key );
+        $cache_key = sprintf(
+            'lakit_gmap_styles_%s',
+            md5( get_template_directory() . get_stylesheet_directory() . lastudio_kit()->get_version(true) )
+        );
 
-        if ( ! $plugin_styles ) {
+        // Object Cache
+        $styles = wp_cache_get(
+            $cache_key,
+            'lastudio_kit'
+        );
 
-            $plugin_styles = $this->_get_map_styles_from_path(
-                lastudio_kit()->plugin_path('assets/google-maps/')
+        if ( false !== $styles ) {
+            return $styles;
+        }
+
+        // Transient
+        $styles = get_transient( $cache_key );
+
+        if ( false !== $styles ) {
+
+            wp_cache_set(
+                $cache_key,
+                $styles,
+                'lastudio_kit',
+                MONTH_IN_SECONDS
             );
 
-            set_transient( $key, $plugin_styles, WEEK_IN_SECONDS );
+            return $styles;
         }
+
+        // Build styles
+        $plugin_styles = $this->_get_map_styles_from_path(
+            lastudio_kit()->plugin_path( 'assets/google-maps/' )
+        );
 
         $parent_styles = $this->_get_map_styles_from_path(
             get_template_directory() . '/' . lastudio_kit()->template_path() . 'google-map-styles/'
@@ -373,15 +371,31 @@ class LaStudioKit_Google_Maps extends LaStudioKit_Base {
                 get_stylesheet_directory() . '/' . lastudio_kit()->template_path() . 'google-map-styles/'
             );
         } else {
-            $child_styles = array();
+            $child_styles = [];
         }
 
-        return array_merge(
-            array( 'default' => esc_html__( 'Default', 'lastudio-kit' ) ),
+        $styles = array_merge(
+            [ 'default' => esc_html__( 'Default', 'lastudio-kit' ), ],
             $plugin_styles,
             $parent_styles,
             $child_styles
         );
+
+        // Save cache
+        set_transient(
+            $cache_key,
+            $styles,
+            MONTH_IN_SECONDS
+        );
+
+        wp_cache_set(
+            $cache_key,
+            $styles,
+            'lastudio_kit',
+            MONTH_IN_SECONDS
+        );
+
+        return $styles;
     }
 
     /**
@@ -398,12 +412,19 @@ class LaStudioKit_Google_Maps extends LaStudioKit_Base {
 
         $result = array();
         $absp   = untrailingslashit( ABSPATH );
-
-        foreach ( glob( $path . '*.json' ) as $file ) {
-            $data = get_file_data( $file, array( 'name'=>'Name' ) );
-            $result[ str_replace( $absp, '', $file ) ] = ! empty( $data['name'] ) ? $data['name'] : basename( $file );
+        $iterator = new \FilesystemIterator(
+            $path,
+            \FilesystemIterator::SKIP_DOTS
+        );
+        foreach ( $iterator as $file ) {
+            if ( 'json' !== $file->getExtension() ) {
+                continue;
+            }
+            $pathname = $file->getPathname();
+            $data = get_file_data( $pathname, [ 'name' => 'Name' ] );
+            $key = str_replace( $absp, '', $pathname );
+            $result[$key] = ! empty( $data['name'] ) ? $data['name'] : $file->getBasename( '.json' );
         }
-
         return $result;
     }
 
@@ -430,7 +451,7 @@ class LaStudioKit_Google_Maps extends LaStudioKit_Base {
             return [];
         }
 
-        $file_data = file_get_contents( $include_path, false, null, 0, 8 * KB_IN_BYTES );
+        $file_data = file_get_contents( $include_path, false, null, 0, 10 * KB_IN_BYTES );
         $file_data = preg_replace( '/\/\/?\s*\*[\s\S]*?\*\s*\/\/?/m', '', $file_data );
 
         $isValid = json_decode($file_data, true);
@@ -443,22 +464,25 @@ class LaStudioKit_Google_Maps extends LaStudioKit_Base {
     /**
      * Get location coordinates by entered address and store into metadata.
      *
-     * @return array|void
+     * @return array|false
      */
-    private function get_location_coord( $location ) {
+    private function get_location_coord( $location, $displayMsg = false ) {
 
         $api_key = lastudio_kit_settings()->get_option('gmap_backend_api_key', lastudio_kit_settings()->get_option('gmap_api_key'));
 
         // Do nothing if api key not provided
         if ( ! $api_key ) {
-            $message = esc_html__( 'Please set Google maps API key before using this widget.', 'lastudio-kit' );
-
-            echo $this->get_map_message( $message ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-
-            return;
+            if($displayMsg){
+                $message = esc_html__( 'Please set Google maps API key before using this widget.', 'lastudio-kit' );
+                echo $this->get_map_message( $message ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            }
+            return false;
         }
 
-        $key = md5( $location );
+        $key = sprintf(
+            'lakit_gmap_loc_%s',
+            md5( $location )
+        );
 
         $coord = get_transient( $key );
 
@@ -486,24 +510,29 @@ class LaStudioKit_Google_Maps extends LaStudioKit_Base {
                 'referer' => get_site_url()
             ]
         ] );
+        if ( is_wp_error( $response ) ) {
+            return false;
+        }
         $json     = wp_remote_retrieve_body( $response );
         $data     = json_decode( $json, true );
 
-        $coord = isset( $data['results'][0]['geometry']['location'] )
-            ? $data['results'][0]['geometry']['location']
-            : false;
+        if ( JSON_ERROR_NONE !== json_last_error() ) {
+            return false;
+        }
+
+        $coord = $data['results'][0]['geometry']['location'] ?? false;
 
         if ( ! $coord ) {
 
-            $message = esc_html__( 'Coordinates of this location not found', 'lastudio-kit' );
-
-            if(!empty($data['error_message'])){
-                $message = $data['error_message'];
+            if($displayMsg) {
+                $message = esc_html__('Coordinates of this location not found', 'lastudio-kit');
+                if (!empty($data['error_message'])) {
+                    $message = $data['error_message'];
+                }
+                echo $this->get_map_message($message); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
             }
 
-            echo $this->get_map_message( $message ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-
-            return;
+            return false;
         }
 
         set_transient( $key, $coord, MONTH_IN_SECONDS );
@@ -519,16 +548,16 @@ class LaStudioKit_Google_Maps extends LaStudioKit_Base {
             return;
         }
 
-        $coordinates = $this->get_location_coord( $settings['map_center'] );
+        $coordinates = $this->get_location_coord( $settings['map_center'], true );
 
         if ( ! $coordinates ) {
             return;
         }
 
-        $scroll_ctrl     = isset( $settings['scrollwheel'] ) ? $settings['scrollwheel'] : '';
-        $zoom_ctrl       = isset( $settings['zoom_controls'] ) ? $settings['zoom_controls'] : '';
-        $fullscreen_ctrl = isset( $settings['fullscreen_control'] ) ? $settings['fullscreen_control'] : '';
-        $streetview_ctrl = isset( $settings['street_view'] ) ? $settings['street_view'] : '';
+        $scroll_ctrl     = $settings['scrollwheel'] ?? '';
+        $zoom_ctrl       = $settings['zoom_controls'] ?? '';
+        $fullscreen_ctrl = $settings['fullscreen_control'] ?? '';
+        $streetview_ctrl = $settings['street_view'] ?? '';
 
         $init = apply_filters( 'lastudio-kit/google-maps/data-args', array(
             'center'            => $coordinates,
@@ -537,7 +566,7 @@ class LaStudioKit_Google_Maps extends LaStudioKit_Base {
             'zoomControl'       => filter_var( $zoom_ctrl, FILTER_VALIDATE_BOOLEAN ),
             'fullscreenControl' => filter_var( $fullscreen_ctrl, FILTER_VALIDATE_BOOLEAN ),
             'streetViewControl' => filter_var( $streetview_ctrl, FILTER_VALIDATE_BOOLEAN ),
-            'mapTypeControl'    => filter_var( $settings['map_type'], FILTER_VALIDATE_BOOLEAN ),
+            'mapTypeControl'    => filter_var( $settings['map_type'], FILTER_VALIDATE_BOOLEAN )
         ) );
 
         if ( 'false' === $settings['drggable'] ) {

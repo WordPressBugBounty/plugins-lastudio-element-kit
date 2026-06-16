@@ -38,7 +38,7 @@ final class Modules_Manager {
 			$class_name = '\LaStudioKitThemeBuilder\Modules\\' . $class_name . '\Module';
 
 			/** @var Module_Base $class_name */
-            if( ( $class_name::is_active() && ( !lastudio_kit()->has_elementor_pro() || in_array($module_name, $forceActivateModules) ) ) ){
+            if( ( $class_name::is_active() && ( !lastudio_kit()->has_elementor_pro() || in_array($module_name, $forceActivateModules, true) ) ) ){
                 $this->modules[ $module_name ] = $class_name::instance();
             }
 		}

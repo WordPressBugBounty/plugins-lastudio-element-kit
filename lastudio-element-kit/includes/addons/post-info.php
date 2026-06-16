@@ -17,11 +17,14 @@ if (!defined('WPINC')) {
  */
 class LaStudioKit_Post_Info extends LaStudioKit_Base {
 
-    protected function enqueue_addon_resources(){
-	    if(!lastudio_kit_settings()->is_combine_js_css()) {
-		    $this->add_style_depends( 'lastudio-kit-base' );
-		    $this->add_style_depends( 'lakit-posts' );
-	    }
+    protected function is_dynamic_content(): bool
+    {
+        return true;
+    }
+
+    public function get_style_depends()
+    {
+        return ['lakit-posts'];
     }
 
     public function get_name() {
@@ -301,7 +304,7 @@ class LaStudioKit_Post_Info extends LaStudioKit_Base {
 				    ),
 			    ),
 			    'selectors'  => array(
-				    '{{WRAPPER}} ' . $css_scheme['meta-item'] . ':not(:first-child):before' => 'margin-left: {{SIZE}}{{UNIT}};margin-right: {{SIZE}}{{UNIT}};'
+                    '{{WRAPPER}}' => '--lakit-meta1-item-gap: {{SIZE}}{{UNIT}}'
 			    ),
 		    )
 	    );
@@ -361,7 +364,7 @@ class LaStudioKit_Post_Info extends LaStudioKit_Base {
         }
 
 	    foreach ($metadata as $meta) {
-		    $item_type = isset($meta['item_type']) ? $meta['item_type'] : '';
+		    $item_type = $meta['item_type'] ?? '';
 		    $meta_icon = $this->_get_icon_setting($meta['item_icon'], '<span class="meta--icon">%s</span>', '', false);
 		    $meta_label = !empty($meta['item_label']) ? sprintf('<span class="meta--label">%s</span>', $meta['item_label']) : '';
 		    $meta_value = '';
@@ -421,7 +424,7 @@ class LaStudioKit_Post_Info extends LaStudioKit_Base {
 	    }
 
 	    if (!empty($output)) {
-		    echo sprintf('<div class="lakit-posts__meta">%s</div>', $output); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		    echo sprintf('<div class="lakit-posts__meta lakit-posts__meta1">%s</div>', $output); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 	    }
     }
 

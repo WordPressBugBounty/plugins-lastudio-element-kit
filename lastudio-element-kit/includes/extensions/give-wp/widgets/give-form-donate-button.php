@@ -12,34 +12,15 @@ use Elementor\LaStudioKit_Button;
 
 class GiveFormDonateButton extends LaStudioKit_Button {
 
-	public $givewp_css_handle = 'lakit-givewp';
+    protected function is_dynamic_content(): bool
+    {
+        return true;
+    }
 
-	public $css_file_name = 'givewp.min.css';
-
-	protected function enqueue_addon_resources(){
-		if(!lastudio_kit()->is_optimized_css_mode()) {
-			$this->add_style_depends( 'lastudio-kit-base' );
-			wp_register_style( $this->givewp_css_handle, lastudio_kit()->plugin_url( 'assets/css/addons/' . $this->css_file_name ), null, lastudio_kit()->get_version() );
-			$this->add_style_depends( $this->givewp_css_handle );
-		}
-	}
-
-	public function get_widget_css_config($widget_name){
-
-        $css_file_name = $this->css_file_name;
-
-		$file_url = lastudio_kit()->plugin_url(  'assets/css/addons/' . $css_file_name );
-		$file_path = lastudio_kit()->plugin_path( 'assets/css/addons/' . $css_file_name );
-
-		return [
-			'key'       => $this->givewp_css_handle,
-			'version'   => lastudio_kit()->get_version(true),
-			'file_path' => $file_path,
-			'data' => [
-				'file_url' => $file_url
-			]
-		];
-	}
+    public function get_style_depends()
+    {
+        return ['lakit-givewp'];
+    }
 
 	public function get_name() {
 		return 'lakit-give-donate-button';

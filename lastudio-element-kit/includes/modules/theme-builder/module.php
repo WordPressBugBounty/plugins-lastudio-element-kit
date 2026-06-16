@@ -23,15 +23,18 @@ class Module extends \Elementor\Core\Base\Module {
 	}
 
 	public static function get_public_post_types( $args = [] ) {
-
-	    $post_types = lastudio_kit_helper()->get_post_types();
+        static $cache = null;
+        if ($cache !== null) {
+            return $cache;
+        }
+        $post_types = lastudio_kit_helper()->get_post_types();
 
 		// Product form WooCommerce are handled separately.
 		if ( function_exists( 'WC' ) ) {
 			unset( $post_types['product'] );
 		}
-
-		return $post_types;
+        $cache = $post_types;
+		return $cache;
 	}
 
 	public function get_name() {

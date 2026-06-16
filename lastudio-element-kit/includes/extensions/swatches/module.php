@@ -15,14 +15,14 @@ class Module extends Module_Base {
 
     public function __construct()
     {
-        $this->init_term_metaboxes();
+        add_action('lastudio-kit/init', [$this, 'init_term_metaboxes'], 10 );
         add_action('admin_enqueue_scripts', [$this, 'admin_enqueue'], 99 );
         add_filter('woocommerce_product_data_tabs', [$this, 'add_swatches_to_product_tab']);
         add_action('woocommerce_product_data_panels', [$this, 'add_swatches_to_product_tab_panel']);
         add_action('woocommerce_process_product_meta', [$this, 'save_metabox'], 10, 2);
         add_action('lastudio-kit/ajax/register_actions', [ $this, 'register_ajax_actions' ] );
         add_filter('woocommerce_dropdown_variation_attribute_options_html', [ $this, 'override_dropdown_attributes' ], 101, 2 );
-        add_action('wp_enqueue_scripts', [$this, 'frontend_enqueue'], 99 );
+//        add_action('wp_enqueue_scripts', [$this, 'frontend_enqueue'], 99 );
         add_filter('woocommerce_ajax_variation_threshold', [$this, 'increase_ajax_variation_threshold'], 30);
         add_filter('woocommerce_ajax_variation_threshold_in_list', [$this, 'increase_ajax_variation_threshold_in_list'], 30);
         add_filter('woocommerce_post_class', [$this, 'post_class'], 10, 2);
@@ -50,7 +50,7 @@ class Module extends Module_Base {
     public function frontend_enqueue(){
         wp_enqueue_script(
             'lastudio-kit-swatches-frontend',
-            lastudio_kit()->plugin_url('includes/extensions/swatches/assets/js/swatches.js'),
+            lastudio_kit()->plugin_url('includes/extensions/swatches/assets/js/swatches.min.js'),
             array( 'jquery' ),
             lastudio_kit()->get_version(true),
             true

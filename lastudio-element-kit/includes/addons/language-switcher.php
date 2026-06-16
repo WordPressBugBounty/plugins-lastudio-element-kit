@@ -17,27 +17,10 @@ if (!defined('WPINC')) {
  */
 class LaStudioKit_Language_Switcher extends LaStudioKit_Base {
 
-    protected function enqueue_addon_resources(){
-	    if(!lastudio_kit_settings()->is_combine_js_css()) {
-		    if(!lastudio_kit()->is_optimized_css_mode()){
-			    wp_register_style( 'lakit-curlang-switcher', lastudio_kit()->plugin_url( 'assets/css/addons/language-switcher.min.css' ), [], lastudio_kit()->get_version() );
-			    $this->add_style_depends( 'lakit-curlang-switcher' );
-			}
-	    }
+    public function get_style_depends()
+    {
+        return ['lakit-curlang-switcher'];
     }
-
-	public function get_widget_css_config($widget_name){
-		$file_url = lastudio_kit()->plugin_url( 'assets/css/addons/language-switcher.min.css' );
-		$file_path = lastudio_kit()->plugin_path( 'assets/css/addons/language-switcher.min.css' );
-		return [
-			'key' => $widget_name,
-			'version' => lastudio_kit()->get_version(true),
-			'file_path' => $file_path,
-			'data' => [
-				'file_url' => $file_url
-			]
-		];
-	}
 
     public function get_name() {
         return 'lakit-language-switcher';
@@ -364,6 +347,38 @@ class LaStudioKit_Language_Switcher extends LaStudioKit_Base {
                     'right' => '--e-switcher-dropdown-left: auto;--e-switcher-dropdown-right: 0;',
                 ],
             ]
+        );
+        $this->_add_group_control(
+            Group_Control_Typography::get_type(),
+            [
+                'name'     => 'dropdown_font_size',
+                'label'    => esc_html__( 'Typography', 'lastudio-kit' ),
+                'selector' => '{{WRAPPER}} .switcher-dropdown .switcher-flex-item',
+            ]
+        );
+        $this->_add_responsive_control(
+            'dropdown_text_alignment',
+            array(
+                'label'   => esc_html__( 'Text Alignment', 'lastudio-kit' ),
+                'type'    => Controls_Manager::CHOOSE,
+                'options' => array(
+                    'flex-start'    => array(
+                        'title' => esc_html__( 'Left', 'lastudio-kit' ),
+                        'icon'  => 'eicon-h-align-left',
+                    ),
+                    'center' => array(
+                        'title' => esc_html__( 'Center', 'lastudio-kit' ),
+                        'icon'  => 'eicon-h-align-center',
+                    ),
+                    'flex-end' => array(
+                        'title' => esc_html__( 'Right', 'lastudio-kit' ),
+                        'icon'  => 'eicon-h-align-right',
+                    ),
+                ),
+                'selectors'  => array(
+                    '{{WRAPPER}} .switcher-dropdown .switcher-flex-item' => 'justify-content: {{VALUE}};'
+                )
+            )
         );
         $this->_add_control(
             'dropdown_item_color',

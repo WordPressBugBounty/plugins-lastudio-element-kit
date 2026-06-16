@@ -82,7 +82,8 @@
   width: 100%
 }
 .lakit-bannerlist.layout-type-overlay .lakit-bannerlist__content-inner {
-  position: absolute
+  position: absolute;
+  z-index: 1
 }
 .lakit-bannerlist__image:after {
   content: '';

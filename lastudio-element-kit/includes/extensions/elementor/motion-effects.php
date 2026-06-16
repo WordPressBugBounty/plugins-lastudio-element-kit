@@ -39,19 +39,21 @@ class Motion_Effects
                 $this,
                 'init_sticky'
             ]);
-            add_action('elementor/frontend/after_enqueue_scripts', [ $this, 'register_enqueue_scripts'], 100);
+            add_action('elementor/frontend/after_enqueue_scripts', [
+                $this,
+                'register_enqueue_scripts'
+            ], 100);
             add_action('elementor/preview/enqueue_scripts', [
                 $this,
                 'enqueue_preview_scripts'
             ]);
-            add_action('elementor/frontend/before_render', [
-                $this,
-                'enqueue_in_widget'
-            ]);
-            add_action('elementor/controls/register', array(
+            /*
+            add_action('elementor/frontend/before_render', [ $this, 'enqueue_in_widget' ]);
+            */
+            add_action('elementor/controls/register', [
                 $this,
                 'register_controls'
-            ));
+            ]);
 
 	        add_action('elementor/element/container/section_effects/after_section_start', [
 		        $this,

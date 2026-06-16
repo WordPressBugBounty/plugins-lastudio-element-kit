@@ -16,9 +16,16 @@ $show_image_overlay = $this->get_settings_for_display('show_image_overlay');
 $info_box_hover_animation = $this->get_settings_for_display('info_box_hover_animation');
 $section_bg_hover_color_direction = $this->get_settings_for_display('section_bg_hover_color_direction');
 
+
+$enable_header_icon = $this->get_settings_for_display('enable_header_icon');
+$enable_tooltip = $this->get_settings_for_display('enable_tooltip');
+$tooltip_position = $this->get_settings_for_display('tooltip_position');
+
 $box_classes = ['lakit-iconbox'];
 $box_classes[] = 'lakit-iconbox__icon-align-' . $icon_position;
-$box_classes[] = 'elementor-animation-' . $info_box_hover_animation;
+if(!empty($info_box_hover_animation)){
+    $box_classes[] = 'elementor-animation-' . $info_box_hover_animation;
+}
 if ($show_overlay == 'yes') {
     $box_classes[] = 'gradient-active';
 }
@@ -26,7 +33,7 @@ if ($show_image_overlay == 'yes') {
     $box_classes[] = 'image-active';
 }
 $box_classes[] = $section_bg_hover_color_direction;
-// info box style
+
 
 $this->add_render_attribute('infobox_wrapper', 'class', $box_classes);
 
@@ -75,8 +82,20 @@ $this->print_var(sprintf('<div %1$s>', $this->get_render_attribute_string('infob
 
     $this->print_var($this->get_overlay_image('<figure class="lakit-iconbox__image-hover">%s</figure>'));
 
-    $this->print_var($this->get_main_icon( sprintf('<div class="lakit-iconbox__box_header elementor-animation-%1$s"><div class="lakit-iconbox__box_icon icon_pos_%2$s">', esc_attr($icons_hover_animation), esc_attr($icon_position) )  . '%s' . sprintf('</div>%1$s%2$s</div>', $box_title, $badge_header_html) ));
-    $this->print_var($this->get_main_image( sprintf('<div class="lakit-iconbox__box_header elementor-animation-%1$s"><div class="lakit-iconbox__box_icon icon_pos_%2$s">', esc_attr($icons_hover_animation), esc_attr($icon_position))  . '%s' . sprintf('</div>%1$s%2$s</div>', $box_title, $badge_header_html) ));
+    if( $enable_header_icon !== 'none' ){
+        echo '<div class="lakit-iconbox__box_header'. ( !empty($icons_hover_animation) ? ' elementor-animation-' . esc_attr($icons_hover_animation) : '' ) .'">';
+        echo '<div class="lakit-iconbox__box_icon icon_pos_' . esc_attr($icon_position) . '">';
+        if($enable_header_icon === 'icon'){
+            $this->print_var($this->get_main_icon('%s'));
+        }
+        if($enable_header_icon === 'image'){
+            $this->print_var($this->get_main_image('%s'));
+        }
+        echo '</div>';
+        $this->print_var($box_title);
+        $this->print_var($badge_header_html);
+        echo '</div>';
+    }
 
     echo '<div class="lakit-iconbox__box_body">';
 
@@ -112,5 +131,20 @@ $this->print_var(sprintf('<div %1$s>', $this->get_render_attribute_string('infob
     $this->print_var($this->get_water_icon('<div class="lakit-iconbox__icon-hover">%s</div>'));
     if(!$badge_in_header){
     	$this->print_var($this->get_badge());
+    }
+
+    if($enable_tooltip === 'yes'){
+        echo '<span class="lakit--hint lakit--hint-parent" data-tip-pos="'. esc_attr($tooltip_position) .'" data-tip-class="lakit--hint-tip-follow-cursor eid-'. esc_attr($this->get_id()) .'"></span>';
+        echo '<div class="lakit--hint_content hidden">';
+        if($enable_header_icon === 'icon'){
+            $this->print_var($this->get_main_icon('<div class="lakit-tip__icon">%s</div>'));
+        }
+        if($enable_header_icon === 'image'){
+            $this->print_var($this->get_main_image('<div class="lakit-tip__image">%s</div>'));
+        }
+        if( $this->get_settings_for_display('tooltip_show_title') === 'yes' ){
+            $this->_html( 'title_text', '<div class="lakit-tip__title">%s</div>' );
+        }
+        echo '</div>';
     }
 echo '</div>';

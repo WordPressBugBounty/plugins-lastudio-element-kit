@@ -6,6 +6,18 @@
   flex-direction: var(--e-switcher-direction, row);
   gap: var(--e-switcher-item-gap, .5em);
 }
+.lakit-curlang-switcher[data-type="dropdown"] .switcher-item--default{
+  cursor: pointer;
+}
+.lakit-curlang-switcher[data-type="dropdown"] .switcher-item--default:after{
+  width:.6em;
+  content: '\ea10';
+  font: normal normal normal .6em / 1 LaStudioIcons;
+  speak: none;
+  text-transform: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 .switcher-dropdown{
   flex-direction: column;
   position: absolute;

@@ -31,7 +31,6 @@ class Settings {
 	 * @return object
 	 */
 	public static function get_instance() {
-
 		// If the single instance hasn't been set, set it now.
 		if ( null == self::$instance ) {
 			self::$instance = new self;
@@ -40,7 +39,7 @@ class Settings {
 	}
 
 	// Here initialize our namespace and resource name.
-	public function __construct() {
+	private function __construct() {
 
 	    $subpage_modules = [
             'lastudio-kit-general-settings' => array(
@@ -73,9 +72,9 @@ class Settings {
 
 		$this->subpage_modules = apply_filters( 'lastudio-kit/settings/registered-subpage-modules', $subpage_modules );
 
-		add_action( 'init', array( $this, 'register_settings_category' ), 10 );
+		add_action( 'init', array( $this, 'register_settings_category' ), 12 );
 
-		add_action( 'init', array( $this, 'init_plugin_subpage_modules' ), 10 );
+		add_action( 'init', array( $this, 'init_plugin_subpage_modules' ), 12 );
 	}
 
 	/**

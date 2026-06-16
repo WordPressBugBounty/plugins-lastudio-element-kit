@@ -99,18 +99,20 @@ if ( ! class_exists( 'LaStudio_Kit_Settings' ) ) {
 		 */
 		public function init() {
 
-            $available_widgets = [];
-            $available_widgets_slugs = [];
+            $registry = require lastudio_kit()->plugin_path(
+                'includes/addons/widget-registry.php'
+            );
 
-			foreach ( glob( lastudio_kit()->plugin_path( 'includes/addons/' ) . '*.php' ) as $file ) {
-				$data = get_file_data( $file, array( 'class' => 'Class', 'name' => 'Name', 'slug' => 'Slug' ) );
-
-				$slug = basename( $file, '.php' );
-                $available_widgets[$slug] = $data['name'];
-                $available_widgets_slugs[] = $data['slug'];
-			}
-            $this->available_widgets = $available_widgets;
-            $this->available_widgets_slugs = $available_widgets_slugs;
+            $this->available_widgets = wp_list_pluck(
+                $registry,
+                'name'
+            );
+            $this->available_widgets_slugs = array_filter(
+                wp_list_pluck(
+                    $registry,
+                    'slug'
+                )
+            );
 
 			// Refresh Instagram Access Token
 			add_action( 'admin_init', array( $this, 'refresh_instagram_access_token' ) );
@@ -460,10 +462,10 @@ if ( ! class_exists( 'LaStudio_Kit_Settings' ) ) {
 		public function get_option( $setting, $default = false ) {
 
 			if ( null === $this->settings ) {
-				$this->settings = get_option( $this->key, array() );
+				$this->settings = get_option( $this->key, [] );
 			}
 
-			return isset( $this->settings[ $setting ] ) ? $this->settings[ $setting ] : $default;
+			return $this->settings[$setting] ?? $default;
 
 		}
 
@@ -595,7 +597,7 @@ if ( ! class_exists( 'LaStudio_Kit_Settings' ) ) {
 		 *
 		 * @since  1.0.0
 		 * @access public
-		 * @return object
+		 * @return LaStudio_Kit_Settings
 		 */
 		public static function get_instance() {
 			// If the single instance hasn't been set, set it now.

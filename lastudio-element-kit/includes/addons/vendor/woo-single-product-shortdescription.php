@@ -16,12 +16,13 @@ if (!defined('WPINC')) {
  * Woo Widget
  */
 class LaStudioKit_Woo_Single_Product_ShortDescription extends LaStudioKit_Base {
-
-    protected function enqueue_addon_resources(){
-	    if(!lastudio_kit_settings()->is_combine_js_css()) {
-		    $this->add_style_depends( 'lastudio-kit-woocommerce' );
-		    $this->add_script_depends( 'lastudio-kit-base' );
-	    }
+    protected function is_dynamic_content(): bool
+    {
+        return true;
+    }
+    public function get_style_depends()
+    {
+        return ['lastudio-kit-woocommerce' ];
     }
 
     public function get_name() {

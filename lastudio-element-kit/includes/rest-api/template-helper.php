@@ -437,6 +437,8 @@ class Template_Helper {
         $link = remove_query_arg(['_', 'lakitpagedkey', 'lakit-ajax', '_nonce', 'actions'], $link);
         $old_link = $link;
 
+        return $old_link;
+
         $curl = add_query_arg( null, null, false );
         $curl = remove_query_arg(['_', 'lakitpagedkey', 'lakit-ajax', '_nonce', 'actions'], $curl);
 
@@ -448,14 +450,6 @@ class Template_Helper {
 
         $link = str_replace($curl, '', $link);
         $link = str_replace('&', '?', $link);
-
-//        la_log([
-//            '$curl' => $curl,
-//            '$old_link' => $old_link,
-//            '$link' => $link
-//        ]);
-
-        return $old_link;
 
         return $link;
     }

@@ -29,7 +29,7 @@
 					direction: 'alternate',
 					easing: 'easeInOutSine',
 					loop: true,
-					targets: this.findElement('.elementor-widget-container').get(0),
+					targets: this.$element.get(0).firstElementChild,
 				};
 			},
 
@@ -113,10 +113,7 @@
 				}
 
 				if (this.getFxVal('translate_toggle') || this.getFxVal('rotate_toggle') || this.getFxVal('scale_toggle')) {
-
-					console.log(config);
-
-					this.findElement('.elementor-widget-container').css('will-change', 'transform');
+                    $(config.targets).css('will-change', 'transform');
 					this.anime = window.anime && window.anime(config);
 				}
 			}

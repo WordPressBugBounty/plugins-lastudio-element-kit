@@ -71,7 +71,7 @@ if ( ! class_exists( 'CX_Control_Select' ) ) {
 				$this->base_url . 'assets/lib/select2/select2.min.js',
 				array( 'jquery' ),
 				'4.0.5',
-				true
+                [ 'in_footer' => true ]
 			);
 
 			wp_register_style(

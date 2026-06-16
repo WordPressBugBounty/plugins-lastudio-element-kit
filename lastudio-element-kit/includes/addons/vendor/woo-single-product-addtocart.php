@@ -18,14 +18,18 @@ if (!defined('WPINC')) {
 class LaStudioKit_Woo_Single_Product_AddToCart extends LaStudioKit_Base
 {
 
-    protected function enqueue_addon_resources()
+    protected function is_dynamic_content(): bool
     {
-        if (!lastudio_kit_settings()->is_combine_js_css()) {
-            $this->add_style_depends('lastudio-kit-woocommerce');
-            $this->add_script_depends('lastudio-kit-base');
-        }
-        wp_register_script(  'lakit-buynow' , lastudio_kit()->plugin_url('assets/js/addons/buynow.min.js') , [],  lastudio_kit()->get_version() , true );
-        $this->add_script_depends('lakit-buynow');
+        return true;
+    }
+
+    public function get_style_depends()
+    {
+        return ['lastudio-kit-woocommerce' ];
+    }
+
+    public function get_script_depends(){
+        return ['lastudio-kit-w__buynow'];
     }
 
     public function get_name()

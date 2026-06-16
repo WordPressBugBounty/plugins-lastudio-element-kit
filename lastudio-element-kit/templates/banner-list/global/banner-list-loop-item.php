@@ -77,11 +77,11 @@ $__content_html = $this->get_loop_icon('<div class="lakit-bannerlist__icon">%1$s
 
 $subtitle = $this->_loop_item( ['subtitle'] );
 if(!empty($subtitle)){
-    $__content_html .= sprintf('<div class="lakit-bannerlist__subtitle" data-title="%2$s">%1$s</div>', $subtitle, esc_attr(wp_strip_all_tags($subtitle)));
+    $__content_html .= sprintf('<div class="lakit-bannerlist__subtitle" data-title="%2$s"><span>%1$s</span></div>', $subtitle, esc_attr(wp_strip_all_tags($subtitle)));
 }
 $title = $this->_loop_item( ['title'] );
 if(!empty($title)){
-    $__content_html .= sprintf('<%3$s class="lakit-bannerlist__title" data-title="%2$s">%1$s</%3$s>', $title, esc_attr(wp_strip_all_tags($title)), $title_tag);
+    $__content_html .= sprintf('<%3$s class="lakit-bannerlist__title" data-title="%2$s"><span>%1$s</span></%3$s>', $title, esc_attr(wp_strip_all_tags($title)), $title_tag);
 }
 
 $_bn_desc = $this->_loop_item( array( 'description' ) );

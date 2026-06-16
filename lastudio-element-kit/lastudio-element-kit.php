@@ -3,9 +3,9 @@
  * Plugin Name:       LA-Studio Element Kit for Elementor
  * Plugin URI:        https://la-studioweb.com/lastudio-element-kit/
  * Description:       Additional widgets for Elementor page builder. It has 60 highly customizable widgets
- * Version:           1.6.0
- * Requires at least: 5.2
- * Requires PHP:      7.2
+ * Version:           1.6.1
+ * Requires at least: 6.0
+ * Requires PHP:      7.4
  * Author:            LA-Studio
  * Author URI:        https://1.envato.market/POnObq
  * License:           GPL-2.0+
@@ -13,9 +13,9 @@
  * Text Domain:       lastudio-kit
  * Domain Path:       /languages
  *
- * Elementor tested up to: 3.34.1
- * Elementor Pro tested up to: 3.34.1
- * WooCommerce tested up to: 10.4.30
+ * Elementor tested up to: 4.1.5
+ * Elementor Pro tested up to: 4.1.5
+ * WooCommerce tested up to: 10.8.1
  *
  * @package lastudio-kit
  * @author  LA-Studio
@@ -62,7 +62,7 @@ if(!class_exists('LaStudio_Kit')){
          *
          * @var string
          */
-        private $version = '1.6.0';
+        private $version = '1.6.1';
 
         /**
          * Framework component
@@ -121,7 +121,7 @@ if(!class_exists('LaStudio_Kit')){
             add_action( 'after_setup_theme', array( $this, 'init_customizer' ), 6 );
 
             // Internationalize the text strings used.
-            add_action( 'init', array( $this, 'lang' ), -999 );
+            add_action( 'init', array( $this, 'lang' ), 0 );
 
             // Load files.
             add_action( 'init', array( $this, 'init' ), -999 );
@@ -220,17 +220,7 @@ if(!class_exists('LaStudio_Kit')){
             lastudio_kit_svg_manager()->init();
 
             //Init Rest Api
-            new \LaStudioKit\Rest_Api();
-
-            if ( is_admin() ) {
-
-                //Init Settings Manager
-                new \LaStudioKit\Settings();
-                // include DB upgrader
-                require $this->plugin_path( 'includes/class-db-upgrader.php' );
-                // Init DB upgrader
-                new LaStudio_Kit_DB_Upgrader();
-            }
+            \LaStudioKit\Rest_Api::get_instance();
 
             $this->extensions_manager = new LaStudioKitExtensions\Manager();
 
@@ -244,6 +234,8 @@ if(!class_exists('LaStudio_Kit')){
         public function dashboard_init() {
 
             if ( is_admin() ) {
+
+                \LaStudioKit\Settings::get_instance();
 
                 $lastudio_kit_dashboard_module_data = $this->module_loader->get_included_module_data( 'dashboard.php' );
 
@@ -376,9 +368,6 @@ if(!class_exists('LaStudio_Kit')){
             require_once $this->plugin_path( 'includes/rest-api/endpoints/elementor-template.php' );
             require_once $this->plugin_path( 'includes/rest-api/endpoints/plugin-settings.php' );
 
-//            require_once $this->plugin_path( 'includes/rest-api/endpoints/elementor-widget.php' );
-//            require_once $this->plugin_path( 'includes/rest-api/endpoints/get-menu-items.php' );
-
 	        require_once $this->plugin_path( 'includes/integrations/override.php' );
 	        require_once $this->plugin_path( 'includes/integrations/advance.php' );
 
@@ -440,20 +429,36 @@ if(!class_exists('LaStudio_Kit')){
          */
         public function get_template( $name = null ) {
 
-            $pathname = $this->template_path() . $name;
-            $pathname = str_replace(['//', '../'], ['/', ''], $pathname);
-
-            $template = locate_template( $pathname );
-
-            if ( ! $template ) {
-                $template = $this->plugin_path( 'templates/' . $name );
-            }
-
-            if ( file_exists( $template ) ) {
-                return $template;
-            } else {
+            if ( empty($name) || ! is_string($name) ) {
                 return false;
             }
+
+            $name = wp_normalize_path($name);
+            $name = ltrim($name, '/');
+
+            if ( pathinfo($name, PATHINFO_EXTENSION) !== 'php' ) {
+                return false;
+            }
+
+            $pathname = $this->template_path() . $name;
+
+            $template = locate_template($pathname);
+
+            if ( empty($template) ) {
+                $template = $this->plugin_path('templates/' . $name);
+            }
+
+            $template = wp_normalize_path($template);
+
+            if (
+                ! empty($template)
+                && is_string($template)
+                && is_readable($template)
+            ) {
+                return $template;
+            }
+
+            return false;
         }
 
         /**
@@ -462,7 +467,7 @@ if(!class_exists('LaStudio_Kit')){
          * @since  1.0.0
          * @return void
          */
-        public function activation() {
+        public static function activation() {
         }
 
         /**
@@ -471,7 +476,7 @@ if(!class_exists('LaStudio_Kit')){
          * @since  1.0.0
          * @return void
          */
-        public function deactivation() {
+        public static function deactivation() {
         }
 
         /**
@@ -482,10 +487,7 @@ if(!class_exists('LaStudio_Kit')){
          * @return array
          */
         public function body_class( $classes ){
-            if(is_rtl()){
-                $classes[] = 'rtl';
-            }
-            else{
+            if(!is_rtl()){
                 $classes[] = 'ltr';
             }
             return $classes;
@@ -528,7 +530,7 @@ if(!class_exists('LaStudio_Kit')){
 	        ];
 
         	if( array_key_exists( $class, $mappings ) ){
-		        if ( ! class_exists( $class ) ) {
+		        if ( ! class_exists( $class, false ) ) {
 			        $filename = $this->plugin_path($mappings[$class]);
 			        if ( is_readable( $filename ) ) {
 				        include( $filename );
@@ -537,8 +539,8 @@ if(!class_exists('LaStudio_Kit')){
 		        return;
 	        }
 
-	        if ( 0 === strpos( $class, 'Elementor\LaStudioKit_' ) ) {
-		        if ( ! class_exists( $class ) ) {
+	        if (str_starts_with($class, 'Elementor\LaStudioKit_')) {
+		        if ( ! class_exists( $class, false ) ) {
 			        $class = str_replace('Elementor\LaStudioKit_', '', $class);
 			        $file_addons = strtolower(
 				        preg_replace(
@@ -559,9 +561,9 @@ if(!class_exists('LaStudio_Kit')){
 				return;
 	        }
 
-            if ( 0 === strpos( $class, 'LaStudioKitExtensions' ) ) {
+            if (str_starts_with($class, 'LaStudioKitExtensions')) {
 
-                if ( ! class_exists( $class ) ) {
+                if ( ! class_exists( $class, false ) ) {
                     $filename_extends = strtolower(
                         preg_replace(
                             [ '/^' . 'LaStudioKitExtensions' . '\\\/', '/([a-z])([A-Z])/', '/_/', '/\\\/' ],
@@ -578,9 +580,9 @@ if(!class_exists('LaStudio_Kit')){
 				return;
             }
 
-            if ( 0 === strpos( $class, 'LaStudioKitIntegrations' ) ) {
+            if (str_starts_with($class, 'LaStudioKitIntegrations')) {
 
-                if ( ! class_exists( $class ) ) {
+                if ( ! class_exists( $class, false ) ) {
                     $filename_extends = strtolower(
                         preg_replace(
                             [ '/^' . 'LaStudioKitIntegrations' . '\\\/', '/([a-z])([A-Z])/', '/_/', '/\\\/' ],
@@ -597,11 +599,11 @@ if(!class_exists('LaStudio_Kit')){
 				return;
             }
 
-            if ( 0 !== strpos( $class, 'LaStudioKitThemeBuilder' ) ) {
+            if (!str_starts_with($class, 'LaStudioKitThemeBuilder')) {
                 return;
             }
 
-            if ( ! class_exists( $class ) ) {
+            if ( ! class_exists( $class, false ) ) {
 
                 $filename = strtolower(
                     preg_replace(
@@ -677,13 +679,12 @@ if(!class_exists('LaStudio_Kit')){
         }
 
 		public function is_optimized_css_mode(){
-			$is_optimized_css_loading = $this->elementor()->experiments->is_feature_active( 'e_optimized_css_loading' );
-			return $is_optimized_css_loading && ! $this->elementor()->preview->is_preview_mode();
+			return false;
 		}
 
         public function solve_wpml_missing_addon(){
             new LaStudioKitIntegrations\WPML\Base();
-            if( !defined('WPML_ST_VERSION') && class_exists('\WPML_Elementor_Translate_IDs_Factory')){
+            if( !defined('WPML_ST_VERSION') && class_exists('\WPML_Elementor_Translate_IDs_Factory', false)){
                 $factory = new \WPML_Elementor_Translate_IDs_Factory();
                 $integration = $factory->create();
                 $integration->add_hooks();

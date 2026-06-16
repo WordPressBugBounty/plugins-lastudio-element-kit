@@ -3,6 +3,47 @@ document.addEventListener('DOMContentLiteSpeedLoaded', function(){
     document.body.classList.remove('body-loading');
     document.body.classList.add('body-loaded');
 })
+let _lakitP_Interacted = false;
+const _lakitP_Interactive_Events = [
+    'keydown',
+    'mousemove',
+    'touchmove',
+    'touchstart',
+    'touchend',
+    'wheel'
+];
+/**
+ * @type {Promise}
+ * @private
+ */
+const _lakitP_WaitForInteraction = new Promise(resolve => {
+    const handleUserInteraction = () => {
+        if (_lakitP_Interacted) {
+            resolve(true);
+            return;
+        }
+        _lakitP_Interacted = true;
+        console.log('User interacted');
+        _lakitP_Interactive_Events.forEach(eventName => {
+            window.removeEventListener(eventName, handleUserInteraction);
+        });
+        resolve(true);
+    };
+    _lakitP_Interactive_Events.forEach(eventName => {
+        window.addEventListener( eventName, handleUserInteraction, { passive: true } );
+    });
+});
+
+/**
+ * @returns {*|Promise}
+ * @constructor
+ */
+function LaStudioKit_WaitForInteraction(){
+    if (_lakitP_Interacted || document.body.classList.contains('lakit-is-elementor-editor-mode')) {
+        return Promise.resolve(true);
+    }
+    return _lakitP_WaitForInteraction;
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     document.body.classList.add('lakit--js-ready');
@@ -17,7 +58,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     } );
     const getHeaderHeight = () => {
-        let stickySection = document.querySelector('.elementor-location-header .e-con[data-settings*="sticky_on"]') ?? document.querySelector('.elementor-location-header');
+        let stickySection = document.querySelector('.elementor-location-header .e-con[data-settings*="sticky_on"]') ?? document.querySelector('.elementor-location-header > .elementor-section-wrap') ?? document.querySelector('.elementor-location-header');
         return stickySection?.clientHeight || 0;
     }
     const setHeaderHeight = () => {
@@ -55,15 +96,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     document.addEventListener('DOMContentLoaded', () => {
         fixHeaderTransparency();
-        if(!LaStudioKits.isPageSpeed()){
-            LaStudioKits.localCache.validCache(false);
+        LaStudioKits.localCache.validCache(false);
+        $('.col-row').each(function (){
+            if($(this).closest('[data-lakit_ajax_loadtemplate]').length === 0){
+                $(this).trigger('lastudio-kit/LazyloadSequenceEffects');
+            }
+        })
+        LaStudioKit_WaitForInteraction().then(() => {
             LaStudioKits.ajaxTemplateHelper.init();
-            $('.col-row').each(function (){
-                if($(this).closest('[data-lakit_ajax_loadtemplate]').length === 0){
-                    $(this).trigger('lastudio-kit/LazyloadSequenceEffects');
-                }
-            })
-        }
+        });
     });
 
     $(window).on('load', function (){
@@ -80,93 +121,37 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    $(window).on('resize', function (){
-        setTimeout(function (){
-            $('.lakit--enabled .woocommerce-product-gallery').each(function (){
-                let _height = $('.woocommerce-product-gallery__wrapper', $(this)).height() + 'px';
-                $(this).css('--singleproduct-thumbs-height', _height);
-                $('.flex-viewport', $(this)).css('height', _height);
-            });
-        }, 50);
-    });
+    $(document).on('lastudiokit/threesixty/init', '.lakit-threesixty', async function (){
+        const $that = $(this);
+        const $this = $that.find('.lakit-threesixty-inner'),
+            _settings = $this.data('settings');
 
-    $(document).on('lastudiokit/threesixty/init', '.lakit-threesixty', function (){
-        const _this = $(this).find('.lakit-threesixty-inner'),
-            _settings = _this.data('settings');
-        if(typeof $.fn.spritespin === "undefined" && !LaStudioKits.addedScripts.hasOwnProperty('spritespin')){
-            LaStudioKits.addedAssetsPromises.push(LaStudioKits.loadScriptAsync('spritespin', LaStudioKitSettings.resources['spritespin'], '', true));
+        if($that.hasClass('-initialized')){
+            return;
         }
-        Promise.all(LaStudioKits.addedAssetsPromises).then( () => {
-            _this.spritespin({
-                source: _settings.source,
-                frames: parseInt(_settings.totalframes),
-                framesX: parseInt(_settings.framesperrow),
-                responsive: false,
-                animate: 1,
-                retainAnimate: 1,
-                sense: -1,
-                plugins: [
-                    '360',
-                    'wheel',
-                    'drag',
-                ],
-                sizeMode: 'fit',
-                loop: true
-            });
-        }, ( reason ) => {
-            LaStudioKits.log('Spritespin error', reason)
-        } )
+        if ( typeof $.fn.spritespin === "undefined" && !LaStudioKits.addedScripts.hasOwnProperty('spritespin') ) {
+            LaStudioKits.addedAssetsPromises.push(LaStudioKits.loadScriptAsync( 'spritespin', LaStudioKitSettings.resources['spritespin'], '', true ));
+        }
+        await Promise.all(LaStudioKits.addedAssetsPromises);
+        $this.spritespin({
+            source: _settings.source,
+            frames: parseInt(_settings.totalframes),
+            framesX: parseInt(_settings.framesperrow),
+            responsive: false,
+            animate: 1,
+            retainAnimate: 1,
+            sense: -1,
+            plugins: [
+                '360',
+                'wheel',
+                'drag',
+            ],
+            sizeMode: 'fit',
+            loop: true
+        });
+        $that.addClass('-initialized')
     })
 
-    $(document).on('lastudiokit/woocommerce/single/product-gallery-start-hook', function ( e, slider, isOneItem ){
-        if( isOneItem ){
-            slider?.slides?.each(function ( idx, elm ){
-                let _type = $(elm).data('media-attach-type');
-                if(_type === 'video'){
-                    $(elm).find('a').attr('href', $(elm).data('media-attach-video')).attr('lapopup', 'yes')
-                }
-                else if( _type === 'threesixty' ){
-                    if($(elm).find('.lakit-threesixty').length === 0){
-                        let _id = 'lakit_threesixty_' + LaStudioKits.makeID(10);
-                        $(elm).append(`<div class='lakit-threesixty' id='${_id}'><div class='lakit-threesixty-inner' data-settings='${$(elm).attr("data-media-attach-threesixty")}'></div></div>`);
-                        $(elm).find('a').attr('href', '#' + _id).attr('lapopup', 'yes').attr('data-component_name', 'product-threesixty-com')
-                    }
-                }
-            });
-        }
-        else{
-            slider?.slides?.each(function ( idx, elm ){
-                let _type = $(elm).data('media-attach-type');
-                $('.flex-control-thumbs li', $(slider[0])).eq(idx).attr('data-type', _type);
-                if(_type === 'video'){
-                    $(elm).find('a').attr('href', $(elm).data('media-attach-video')).attr('lapopup', 'yes')
-                }
-                else if( _type === 'threesixty' ){
-                    if($(elm).find('.lakit-threesixty').length === 0){
-                        let _id = 'lakit_threesixty_' + LaStudioKits.makeID(10);
-                        $(elm).find('.zoominner a').prepend(`<div class='lakit-threesixty' id='${_id}'><div class='lakit-threesixty-inner' data-settings='${$(elm).attr("data-media-attach-threesixty")}'></div></div>`);
-                        $(elm).find('a').attr('href', '#' + _id).attr('lapopup', 'yes').attr('data-component_name', 'product-threesixty-com')
-                    }
-                }
-            });
-        }
-        $('.lakit-threesixty').trigger('lastudiokit/threesixty/init');
-    });
-
-    $(document).on('lastudiokit/woocommerce/single/init_product_slider', function (e, slider) {
-        slider.controlNav.eq(slider.animatingTo).closest('li').get(0).scrollIntoView({
-            inline: "center",
-            block: "nearest",
-            behavior: "smooth"
-        });
-        slider.viewport.closest('.woocommerce-product-gallery').css('--singleproduct-thumbs-height', $(slider.slides[slider.animatingTo]).height() + 'px');
-    });
-    $(document).on('lastudiokit/woocommerce/single/product-gallery-init-hook', function (e, slider) {
-        slider.viewport.closest('.woocommerce-product-gallery').addClass('js--is_ready')
-        setTimeout(() => {
-            slider.viewport.closest('.woocommerce-product-gallery').find('.flex-direction-nav').addClass('js--is_ready')
-        }, 500)
-    });
 
     $(document).on('lastudiokit/ajaxload/widget', '[data-lakit_ajax_loadwidget="true"]', function (e){
         let $this = $(this);
@@ -217,11 +202,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     })
-
-    // $(document).on('click', '.woocommerce-product-gallery .woocommerce-product-gallery__image[data-media-attach-type]', function (e){
-    //     e.preventDefault();
-    //     let _type = $(this).data('media-attach-type');
-    // })
 
     const LaStudioKits = {
         log: function(){
@@ -338,22 +318,21 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         },
         getCoords: function (elem){
-            let box = elem.getBoundingClientRect();
-            let body = document.body;
-            let docEl = document.documentElement;
-            let scrollTop = window.pageYOffset || docEl.scrollTop || body.scrollTop;
-            let scrollLeft = window.pageXOffset || docEl.scrollLeft || body.scrollLeft;
-            let clientTop = docEl.clientTop || body.clientTop || 0;
-            let clientLeft = docEl.clientLeft || body.clientLeft || 0;
-            let top  = box.top +  scrollTop - clientTop;
-            let left = box.left + scrollLeft - clientLeft;
-            return { top: Math.round(top), left: Math.round(left) };
+            const rect = elem.getBoundingClientRect();
+            return {
+                top: rect.top + window.scrollY,
+                left: rect.left + window.scrollX,
+                right: window.innerWidth - rect.right,
+                bottom: window.innerHeight - rect.bottom,
+                width: rect.width,
+                height: rect.height,
+            }
         },
         isRTL: function (){
             return document.body.classList ? document.body.classList.contains('rtl') : /\brtl\b/g.test(document.body.className);
         },
         isPageSpeed: function () {
-            return"undefined"!=typeof navigator&&/(lighthouse|gtmetrix)/i.test(navigator.userAgent.toLocaleLowerCase())||navigator?.userAgentData?.brands?.filter(e=>"lighthouse"===e?.brand?.toLocaleLowerCase())?.length>0||(window.innerWidth > 1340 && window.innerWidth < 1360 && window.devicePixelRatio <= 1) || (window.innerWidth < 413 && window.innerWidth > 410 && "undefined" != typeof navigator && /moto/i.test(navigator.userAgent))
+            return "undefined"!=typeof navigator&&/(lighthouse|gtmetrix)/i.test(navigator.userAgent.toLocaleLowerCase())||navigator?.userAgentData?.brands?.filter(e=>"lighthouse"===e?.brand?.toLocaleLowerCase())?.length>0||(window.innerWidth > 1340 && window.innerWidth < 1360 && window.devicePixelRatio <= 1) || (window.innerWidth < 413 && window.innerWidth > 410 && "undefined" != typeof navigator && /moto/i.test(navigator.userAgent))
         },
         addQueryArg: function (url, key, value) {
             let re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
@@ -455,7 +434,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 speed: elementSettings.speed,
                 handleElementorBreakpoints: false,
                 slidesPerGroup: parseInt(elementSettings.slidesToScroll.desktop || 1),
-                loopFillGroupWithBlank: false,
+                loopFillGroupWithBlank: true,
                 loopedSlides: slidesToShow,
                 loopAdditionalSlides: 1,
                 preloadImages: false,
@@ -517,7 +496,6 @@ document.addEventListener('DOMContentLoaded', function () {
             else{
                 swiperOptions.scrollbar = false
             }
-
 
             const adjustBreakpointConfigs = ( bkp ) => {
                 const elementorBreakpointValues = elementorFrontend.breakpoints.getBreakpointValues();
@@ -835,14 +813,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     $carouseInner.removeClass('sw--vertical sw--horizontal').addClass('sw--' + _swiper.params.direction)
                 },
                 afterInit: ( _swiper ) => {
-                    $('.swiper-slide-duplicate .lakit-embla_wrap.embla--inited', _swiper.$wrapperEl).removeClass('embla--inited').trigger('lastudio-kit/init-embla-slider');
+                    $('.swiper-slide-duplicate .lakit-embla_wrap.embla--inited', $(_swiper.wrapperEl)).removeClass('embla--inited').trigger('lastudio-kit/init-embla-slider');
                     if(swiperOptions?.scrollbar?.el){
                         $('.swiper-scrollbar-drag', $(swiperOptions.scrollbar?.el)).append('<span/>').wrap('<div class="lakit-carousel__scrollbar-inner"/>')
                         $(swiperOptions.scrollbar?.el).addClass('la_modified')
                     }
                 },
                 beforeResize: function (){
-                    $('>.swiper-slide', this.$wrapperEl).css('width', '')
+                    $('>.swiper-slide', $(this.wrapperEl)).css('width', '')
                 },
                 slideChangeTransitionEnd: function (){
                     const _swiper = this;
@@ -864,22 +842,23 @@ document.addEventListener('DOMContentLoaded', function () {
                     $('[data-carousel-goto="#'+carousel_id+'"]').removeClass('s-active');
                     $('[data-carousel-goto="#'+carousel_id+'"][data-carousel-index="'+_swiper.realIndex+'"]').addClass('s-active');
                 },
-                snapIndexChange: function (_swiper){
-                    if (elementSettings?.variableWidth) {
-                        let _max_w = Math.max(..._swiper.slidesSizesGrid),
-                            _min_w = Math.min(..._swiper.slidesSizesGrid);
-                        let ml = (_max_w - _min_w) + 'px'
-                        if( _swiper.slidesSizesGrid[_swiper.activeIndex] === _max_w ){
-                            ml = 0
-                        }
-                        if(!_swiper.controller.control){
-                            if(_swiper.activeIndex === _swiper.realIndex){
-                                ml = 0
-                            }
-                        }
-                        _swiper.$wrapperEl.css('margin-left', ml)
-                    }
-                }
+                // snapIndexChange: function (_swiper){
+                //     if (elementSettings?.variableWidth) {
+                //         let _max_w = Math.max(..._swiper.slidesSizesGrid),
+                //             _min_w = Math.min(..._swiper.slidesSizesGrid);
+                //         let ml = (_max_w - _min_w) + 'px'
+                //         if( _swiper.slidesSizesGrid[_swiper.activeIndex] === _max_w ){
+                //             ml = 0
+                //         }
+                //         if(!_swiper.controller.control){
+                //             if(_swiper.activeIndex === _swiper.realIndex){
+                //                 ml = 0
+                //             }
+                //         }
+                //         console.log(_swiper)
+                //         $(_swiper.wrapperEl).css('margin-left', ml)
+                //     }
+                // }
             };
 
             if( $scope.hasClass('elementor-lakit-portfolio') && $('.preset-grid-2b, .preset-grid-2b', $scope).length > 0){
@@ -896,72 +875,71 @@ document.addEventListener('DOMContentLoaded', function () {
                 swiperOptions.loop = false;
                 swiperOptions.noSwipingSelector = '.swiper-slide > .e-con .elementor-element';
             }
+            return LaStudioKit_WaitForInteraction().then(() => {
+                new LaStudioKits.utils.Swiper($swiperContainer, swiperOptions).then(function (SwiperInstance) {
 
-            const Swiper = LaStudioKits.utils.Swiper;
-            new Swiper($swiperContainer, swiperOptions).then(function (SwiperInstance) {
+                    LaStudioKits.swiperInstances[carousel_id] = SwiperInstance
 
-                LaStudioKits.swiperInstances[carousel_id] = SwiperInstance
+                    if(elementSettings?.variableWidth || elementSettings?.infiniteEffect){
+                        SwiperInstance.update()
+                    }
 
-                if(elementSettings?.variableWidth || elementSettings?.infiniteEffect){
-                    SwiperInstance.update()
-                }
+                    LaStudioKits.carouselInited.push({
+                        id: carousel_id,
+                        syncWith: elementSettings.asFor,
+                        thumbs: elementSettings.thumbs
+                    })
 
-                LaStudioKits.carouselInited.push({
-                    id: carousel_id,
-                    syncWith: elementSettings.asFor,
-                    thumbs: elementSettings.thumbs
-                })
+                    $swiperContainer.data('swiper', SwiperInstance);
 
-                $swiperContainer.data('swiper', SwiperInstance);
+                    if(SwiperInstance?.pagination?.bullets?.length < 5){
+                        SwiperInstance?.pagination?.$el?.addClass('no-bullets-dynamic');
+                    }
 
-                if(SwiperInstance?.pagination?.bullets?.length < 5){
-                    SwiperInstance?.pagination?.$el?.addClass('no-bullets-dynamic');
-                }
+                    if(elementSettings.autoHeight){
+                        SwiperInstance.wrapperEl.style.height = 'auto';
+                    }
 
-                if(elementSettings.autoHeight){
-                    SwiperInstance.wrapperEl.style.height = 'auto';
-                }
+                    $carousel.css('--data-autoplay-speed', SwiperInstance.params.autoplay.delay + 'ms');
 
-                $carousel.css('--data-autoplay-speed', SwiperInstance.params.autoplay.delay + 'ms');
+                    $swiperContainer.find('.e-parent').trigger('lastudio-kit/section/calculate-container-width');
 
-                $swiperContainer.find('.e-parent').trigger('lastudio-kit/section/calculate-container-width');
-
-                LaStudioKits.carouselInited.forEach( _syncItem => {
-                    if(_syncItem?.synced !== true && _syncItem?.syncWith !== ''){
-                        const _c = _syncItem?.syncWith?.split(',')?.map( _a => _a?.trim())?.filter( _b => _b !== '' )
-                        const _ok = _c?.filter( (_d) => {
-                            return LaStudioKits.carouselInited.filter( _e => _e.id === _d ).length > 0
-                        })
-                        if(_c?.length > 0 && _c?.length === _ok?.length){
-                            _syncItem.synced = true;
-                            LaStudioKits.swiperInstances[_syncItem.id].controller.control = _ok?.map( _e => LaStudioKits.swiperInstances[_e] )
+                    LaStudioKits.carouselInited.forEach( _syncItem => {
+                        if(_syncItem?.synced !== true && _syncItem?.syncWith !== ''){
+                            const _c = _syncItem?.syncWith?.split(',')?.map( _a => _a?.trim())?.filter( _b => _b !== '' )
+                            const _ok = _c?.filter( (_d) => {
+                                return LaStudioKits.carouselInited.filter( _e => _e.id === _d ).length > 0
+                            })
+                            if(_c?.length > 0 && _c?.length === _ok?.length){
+                                _syncItem.synced = true;
+                                LaStudioKits.swiperInstances[_syncItem.id].controller.control = _ok?.map( _e => LaStudioKits.swiperInstances[_e] )
+                            }
                         }
+                        if(_syncItem?.syncedThumbs !== true && _syncItem?.thumbs !== '' && LaStudioKits.swiperInstances[_syncItem?.thumbs]){
+                            const _mainS = LaStudioKits.swiperInstances[_syncItem.id],
+                                _thumbS = LaStudioKits.swiperInstances[_syncItem.thumbs];
+                            _thumbS.params.slideToClickedSlide = true
+                            _thumbS.update()
+                            _mainS.params.thumbs.swiper = _thumbS
+                            _mainS.update()
+                            _mainS.thumbs.init()
+                            _mainS.thumbs.update()
+                            _syncItem.syncedThumbs = true;
+                        }
+                    })
+
+                    if (_has_slidechange_effect) {
+                        $carousel.find(elementSettings.content_selector).addClass('animated no-effect-class');
+                        $carousel.find('.swiper-slide-visible ' + elementSettings.content_selector).removeClass('no-effect-class').addClass(_slide_change_effect_in);
                     }
-                    if(_syncItem?.syncedThumbs !== true && _syncItem?.thumbs !== '' && LaStudioKits.swiperInstances[_syncItem?.thumbs]){
-                        const _mainS = LaStudioKits.swiperInstances[_syncItem.id],
-                            _thumbS = LaStudioKits.swiperInstances[_syncItem.thumbs];
-                        _thumbS.params.slideToClickedSlide = true
-                        _thumbS.update()
-                        _mainS.params.thumbs.swiper = _thumbS
-                        _mainS.update()
-                        _mainS.thumbs.init()
-                        _mainS.thumbs.update()
-                        _syncItem.syncedThumbs = true;
-                    }
-                })
 
-                if (_has_slidechange_effect) {
-                    $carousel.find(elementSettings.content_selector).addClass('animated no-effect-class');
-                    $carousel.find('.swiper-slide-visible ' + elementSettings.content_selector).removeClass('no-effect-class').addClass(_slide_change_effect_in);
-                }
+                    $('.elementor-motion-effects-element', $scope).trigger('resize');
 
-                $('.elementor-motion-effects-element', $scope).trigger('resize');
-
-                $(document).trigger('lastudio-kit/carousel/init_success', { swiperContainer: $swiperContainer, SwiperInstance: SwiperInstance, parentContainer: $scope });
-            });
-
+                    $(document).trigger('lastudio-kit/carousel/init_success', { swiperContainer: $swiperContainer, SwiperInstance: SwiperInstance, parentContainer: $scope });
+                });
+            })
         },
-        initMasonry: function ($scope) {
+        initMasonry: async function ($scope) {
             let $container = $scope.find('.lakit-masonry-wrapper').first();
 
             if ($container.length === 0) {
@@ -977,56 +955,45 @@ document.addEventListener('DOMContentLoaded', function () {
 
             if ($list_wrap.length) {
 
+                await LaStudioKit_WaitForInteraction();
+
                 if(typeof jQuery.fn.isotope === "undefined" && !LaStudioKits.addedScripts.hasOwnProperty('jquery-isotope')){
                     LaStudioKits.addedAssetsPromises.push(LaStudioKits.loadScriptAsync('jquery-isotope', LaStudioKitSettings.resources['jquery-isotope'], '', true));
                 }
 
-                Promise.all(LaStudioKits.addedAssetsPromises).then( () => {
-                    if ($advanceSettings !== false) {
-                        $(document).trigger('lastudio-kit/masonry/calculate-item-sizes', [$container, false]);
-                        $(window).on('resize', function () {
-                            $(document).trigger('lastudio-kit/masonry/calculate-item-sizes', [$container, true]);
-                        });
-                        _configs = {
-                            itemSelector: itemSelector,
-                            percentPosition: false,
-                            masonry: {
-                                columnWidth: 1,
-                                gutter: 0,
-                            }
+                await Promise.all(LaStudioKits.addedAssetsPromises);
+
+                if ($advanceSettings !== false) {
+                    $(document).trigger('lastudio-kit/masonry/calculate-item-sizes', [$container, false]);
+                    $(window).on('resize', function () {
+                        $(document).trigger('lastudio-kit/masonry/calculate-item-sizes', [$container, true]);
+                    });
+                    _configs = {
+                        itemSelector: itemSelector,
+                        percentPosition: false,
+                        masonry: {
+                            columnWidth: 1,
+                            gutter: 0,
                         }
                     }
-                    else {
-                        _configs = {
-                            itemSelector: itemSelector,
-                            percentPosition: false,
-                        }
+                }
+                else {
+                    _configs = {
+                        itemSelector: itemSelector,
+                        percentPosition: false,
                     }
+                }
 
-                    $list_wrap.addClass('lakit-masonry--con');
-                    $itemsList.addClass('lakit-masonry--item');
+                $list_wrap.addClass('lakit-masonry--con');
+                $itemsList.addClass('lakit-masonry--item');
 
-                    $masonryInstance = $list_wrap.isotope(_configs);
+                $masonryInstance = $list_wrap.isotope(_configs);
 
-                    $itemsList.find('img').on('load', function (){
-                        const $parentItem = $(this).closest(itemSelector);
-                        $parentItem.addClass('item-loaded');
-                        $masonryInstance?.isotope('layout');
-                    })
-
-                    // $('img', $itemsList).imagesLoaded().progress(function (instance, image) {
-                    //     var $image = $(image.img),
-                    //         $parentItem = $image.closest(itemSelector);
-                    //     $parentItem.addClass('item-loaded');
-                    //     if ($masonryInstance) {
-                    //         $masonryInstance.isotope('layout');
-                    //     }
-                    // });
-
-                }, ( reason ) => {
-                    LaStudioKits.log('initMasonry error', reason)
-                } )
-
+                $itemsList.find('img').on('load', function (){
+                    const $parentItem = $(this).closest(itemSelector);
+                    $parentItem.addClass('item-loaded');
+                    $masonryInstance?.isotope('layout');
+                })
             }
         },
         initCustomHandlers: function () {
@@ -1576,15 +1543,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 })
                 .on('lastudio-kit/section/calculate-container-width', '.e-parent', function (e){
-                    var $scope = $(this);
-                    var $child_container = $scope.find('>.e-con-inner');
-                    if(!$child_container.length){
-                        $child_container = $scope;
-                    }
-                    $child_container.css('--lakit-section-width', $child_container.width() + 'px');
-                    $(window).on('resize', function (){
+                    const $scope = $(this);
+                    const _CB = () => {
+                        let $child_container = $scope.find('>.e-con-inner');
+                        if(!$child_container.length){
+                            $child_container = $scope;
+                        }
                         $child_container.css('--lakit-section-width', $child_container.width() + 'px');
-                    });
+                    }
+                    requestAnimationFrame(_CB)
+                    $(window).on('resize', () => requestAnimationFrame(_CB));
                 })
                 .on('click', function (e){
                     if( $(e.target).closest('.elementor-widget-lakit-addtocart').length === 0
@@ -1620,9 +1588,8 @@ document.addEventListener('DOMContentLoaded', function () {
             })
 
             if( $('.lakit-portfolio-parallax').length > 0 ){
-                const CustomParallax = LaStudioKits.utils.CustomParallax;
-                new CustomParallax(document.querySelectorAll('.lakit-portfolio-parallax .lakit-posts__thumbnail-img'), {
-                    scale: 1.3
+                LaStudioKit_WaitForInteraction().then(() => {
+                    new LaStudioKits.utils.CustomParallax(document.querySelectorAll('.lakit-portfolio-parallax .lakit-posts__thumbnail-img'), { scale: 1.3 })
                 })
             }
         },
@@ -1652,7 +1619,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         },
         loadStyle: function (style, uri) {
-
             if (LaStudioKits.addedStyles.hasOwnProperty(style) && LaStudioKits.addedStyles[style] === uri) {
                 return style;
             }
@@ -1668,7 +1634,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 tag.id = style + '-css';
                 tag.rel = 'stylesheet';
-                tag.href = uri;
+                tag.href = uri + '?ver=' + LaStudioKitSettings.version;
                 tag.type = 'text/css';
                 tag.media = 'all';
                 tag.onload = function () {
@@ -1692,7 +1658,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return new Promise(function (resolve, reject) {
                 let tag = document.createElement('script');
 
-                tag.src = uri;
+                tag.src = uri + '?ver=' + LaStudioKitSettings.version;
                 tag.id = script + '-js';
                 tag.async = async;
                 tag.onload = function () {
@@ -1718,7 +1684,7 @@ document.addEventListener('DOMContentLoaded', function () {
             }
             LaStudioKits.detectWidgetsNotInHeader();
             if(reinit_global_trigger){
-                $(window).trigger('elementor/frontend/init');
+                $(window).trigger('elementor/frontend/init')
             }
             $container.removeClass('need-reinit-js');
             $container.find('[data-element_type]').each(function () {
@@ -1728,13 +1694,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (!elementType) {
                     return;
                 }
-
                 try {
                     if ('widget' === elementType) {
                         elementType = $this.data('widget_type');
                         window.elementorFrontend.hooks.doAction('frontend/element_ready/widget', $this, $);
                     }
-
                     window.elementorFrontend.hooks.doAction('frontend/element_ready/global', $this, $);
                     window.elementorFrontend.hooks.doAction('frontend/element_ready/' + elementType, $this, $);
 
@@ -1787,7 +1751,7 @@ document.addEventListener('DOMContentLoaded', function () {
             let wid = $scope.data('id'),
                 _wid_tpl_id = $scope.find('.lakit-hamburger-panel__content').attr('data-template-id'),
                 _need_add_remove = true,
-                $wContent = $scope.find('>.elementor-widget-container').clone();
+                $wContent = $scope.find('>.lakit-hamburger-panel').clone();
 
             if( !!$scope.data('hamburgerTemplateId') && ( _wid_tpl_id === $scope.data('hamburgerTemplateId') ) ){
                 _need_add_remove = false;
@@ -1900,11 +1864,12 @@ document.addEventListener('DOMContentLoaded', function () {
                 settings = $target.data('settings'),
                 firstMouseEvent = true,
                 wid = $scope.data('id'),
-                $cartList = $('.lakit-cart__list', $scope),
+                $cartList2Remove = $('.lakit-cart__list', $scope),
+                $cartList = $cartList2Remove.clone(),
                 $wContent;
 
-            $('.lakit-cart__list', $scope).remove();
-            $wContent = $scope.find('>.elementor-widget-container').clone();
+            // $cartList2Remove.remove();
+            $wContent = $target.clone();
 
             if( !$(document.body).hasClass('woocommerce-checkout') && !$(document.body).hasClass('woocommerce-cart') ){
                 switch (settings['triggerType']) {
@@ -1975,219 +1940,96 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         },
         wooGallery: function ($scope) {
-
-            if (LaStudioKits.isEditMode()) {
-                $('.woocommerce-product-gallery', $scope).wc_product_gallery();
-            }
-
-            $('.woocommerce-product-gallery__image', $scope).each(function (){
-                $(this).trigger('zoom.destroy')
+            const eW_Id = $scope.data('id');
+            const $galleryWrap = $scope.find('.lakit-product-images');
+            const $imageDiv = $('.woocommerce-product-gallery__image', $scope)
+            $imageDiv.each(function (){
+                const $that = $(this);
+                const mType = $that.data('media-attach-type');
+                if(mType === 'video'){
+                    $that.find('a').attr('href', $that.data('media-attach-video')).attr('lapopup', 'yes')
+                }
+                else if( mType === 'threesixty' ){
+                    if($that.find('.lakit-threesixty').length === 0){
+                        let _id = 'lakit_threesixty_' + LaStudioKits.makeID(10);
+                        $that.find('a').attr('href', '#' + _id).attr('lapopup', 'yes').attr('data-component_name', 'product-threesixty-com').prepend(`<div class='lakit-threesixty' id='${_id}'><div class='lakit-threesixty-inner' data-settings='${$that.attr("data-media-attach-threesixty")}'></div></div>`);
+                    }
+                }
             })
 
-            const $galleryWrap = $scope.find('.lakit-product-images');
+            $('.lakit-threesixty', $scope).trigger('lastudiokit/threesixty/init');
 
-            const centerdots_cb = function () {
+            $scope.find('.woocommerce-product-gallery__image a').attr('data-elementor-open-lightbox', 'yes');
+            $scope.find('.woocommerce-product-gallery__image a').attr('data-elementor-lightbox-slideshow', eW_Id);
+            $scope.find('.woocommerce-product-gallery__image[data-media-attach-type] a').attr('data-elementor-open-lightbox', 'no').removeAttr('data-elementor-lightbox-slideshow');
 
-                $('.woocommerce-product-gallery__image', $scope).each(function (){
-                    $(this).trigger('zoom.destroy')
-                })
+            const $emblaWrap = $('.lakit-woo-gallery-embla', $scope);
+            $emblaWrap.addClass('js--is_ready');
 
-                if ($scope.find('.flex-viewport').length) {
-                    $scope.find('.woocommerce-product-gallery').css('--singleproduct-thumbs-height', $scope.find('.flex-viewport').height() + 'px');
-                    if ($scope.find('.woocommerce-product-gallery__trigger').length) {
-                        $scope.find('.woocommerce-product-gallery__trigger').appendTo($scope.find('.flex-viewport'));
-                    }
-                    if ($('.la-custom-badge', $scope).length) {
-                        $('.la-custom-badge', $scope).prependTo($scope.find('.flex-viewport'));
-                    }
-                    if ($('.woocommerce-product-gallery__actions', $scope).length) {
-                        $('.woocommerce-product-gallery__actions', $scope).prependTo($scope.find('.flex-viewport'));
-                    }
-                }
+            if($galleryWrap.is('.layout-type-5, .layout-type-6')){
+                return;
+            }
+            $emblaWrap.addClass('lakit-embla_wrap').trigger('lastudio-kit/init-embla-slider')
 
-                let $nav = $scope.find('.flex-direction-nav');
-                if ($nav.length && $scope.find('.flex-viewport').length) {
-                    // $nav.appendTo($scope.find('.flex-viewport'))
-                }
-
-                let $thumbs = $scope.find('.flex-control-thumbs').get(0);
-                if (typeof $thumbs === "undefined" || $galleryWrap.hasClass('layout-type-wc')) {
-                    return;
-                }
-
-                $scope.find('.flex-control-thumbs li').append('<span/>');
-
+            const makeCenterDotsCallback = () => {
+                const $dotNodes = $scope.find('.lakit-embla--dots').get(0);
                 let pos = {top: 0, left: 0, x: 0, y: 0};
-                let mouseDownHandler = function (e) {
-                    $thumbs.style.cursor = 'grabbing';
-                    $thumbs.style.userSelect = 'none';
-
+                const mouseDownHandler = function (e) {
+                    $dotNodes.style.cursor = 'grabbing';
+                    $dotNodes.style.userSelect = 'none';
                     pos = {
-                        left: $thumbs.scrollLeft,
-                        top: $thumbs.scrollTop,
-                        // Get the current mouse position
+                        left: $dotNodes.scrollLeft,
+                        top: $dotNodes.scrollTop,
                         x: e.clientX,
                         y: e.clientY,
                     };
-
                     document.addEventListener('mousemove', mouseMoveHandler);
                     document.addEventListener('mouseup', mouseUpHandler);
                 };
-
-                let mouseMoveHandler = function (e) {
+                const mouseMoveHandler = function (e) {
                     // How far the mouse has been moved
                     const dx = e.clientX - pos.x;
                     const dy = e.clientY - pos.y;
-
                     // Scroll the element
-                    $thumbs.scrollTop = pos.top - dy;
-                    $thumbs.scrollLeft = pos.left - dx;
+                    $dotNodes.scrollTop = pos.top - dy;
+                    $dotNodes.scrollLeft = pos.left - dx;
                 };
-
-                let mouseUpHandler = function () {
-                    $thumbs.style.cursor = 'grab';
-                    $thumbs.style.removeProperty('user-select');
-
+                const mouseUpHandler = function () {
+                    $dotNodes.style.cursor = 'grab';
+                    $dotNodes.style.removeProperty('user-select');
                     document.removeEventListener('mousemove', mouseMoveHandler);
                     document.removeEventListener('mouseup', mouseUpHandler);
                 };
                 // Attach the handler
-                $thumbs.addEventListener('mousedown', mouseDownHandler);
+                $dotNodes?.addEventListener('mousedown', mouseDownHandler);
             }
-            setTimeout(centerdots_cb, 300);
+            makeCenterDotsCallback();
 
-            function flexdestroy($els) {
-                $els.each(function () {
-                    let $el = jQuery(this);
-                    let $elClean = $el.clone();
-
-                    $elClean.find('.flex-viewport').children().unwrap();
-                    $elClean.find('img.zoomImg, .woocommerce-product-gallery__trigger').remove();
-                    $elClean
-                        .removeClass('flexslider')
-                        .find('.clone, .flex-direction-nav, .flex-control-nav')
-                        .remove()
-                        .end()
-                        .find('*').removeAttr('style').removeClass(function (index, css) {
-                        // If element is SVG css has an Object inside (?)
-                        if (typeof css === 'string') {
-                            return (css.match(/\bflex\S+/g) || []).join(' ');
+            const checkMaxWidthCb = () => {
+                $emblaWrap.css('--singleproduct-thumbs-height', $emblaWrap.find('.lakit-embla').height() + 'px');
+                if($galleryWrap.hasClass('layout-type-4')){
+                    const cssCol = parseInt($scope.css('--singleproduct-image-column'))
+                    if( !isNaN(cssCol) ){
+                        if(cssCol > $imageDiv.length ){
+                            $emblaWrap.addClass('e-center-embla')
                         }
-                    });
-                    $elClean.insertBefore($el);
-                    $el.remove();
-                });
-
-            }
-
-            if ($galleryWrap.hasClass('layout-type-5') || $galleryWrap.hasClass('layout-type-6')) {
-                flexdestroy($galleryWrap);
-            }
-
-            let $gallery_target = $scope.find('.woocommerce-product-gallery');
-
-            const checkMaxWidth = () => {
-                if ($scope.find('.flex-viewport').length) {
-                    $gallery_target.css('--singleproduct-thumbs-maxwidth', $scope.find('.flex-viewport').width())
-                    const g_thumbs = $scope.find('.flex-control-thumbs').get(0);
-                    if(g_thumbs.scrollWidth > g_thumbs.clientWidth ){
-                        $gallery_target.addClass('e--overflow')
-                    }
-                    else{
-                        $gallery_target.removeClass('e--overflow')
+                        else{
+                            $emblaWrap.removeClass('e-center-embla')
+                        }
                     }
                 }
-            }
-            checkMaxWidth()
-            window.addEventListener('resize', checkMaxWidth)
-
-            let data_columns = parseInt($gallery_target.data('columns'));
-            if($galleryWrap.hasClass('layout-type-4')){
-                data_columns = parseInt($gallery_target.closest('.elementor-lakit-wooproduct-images').css('--singleproduct-image-column'));
-            }
-
-            let galleryItems = $gallery_target.find('.woocommerce-product-gallery__image');
-
-            if( galleryItems.length === 1 ) {
-                $(document).trigger('lastudiokit/woocommerce/single/product-gallery-start-hook', [ { slides: galleryItems }, true ] )
-            }
-
-            if (galleryItems.length <= data_columns) {
-                $gallery_target.addClass('center-thumb');
-                if($galleryWrap.hasClass('layout-type-4')){
-                    flexdestroy($galleryWrap);
-                    $gallery_target = $scope.find('.woocommerce-product-gallery');
+                if($galleryWrap.is('.layout-type-1, .layout-type-2, .layout-type-3')){
+                    let dotsWidth = $galleryWrap.find('.lakit-embla--dots').outerWidth();
+                    let dotItemsWidth = 0;
+                    $('.embla__dot', $galleryWrap).each(function (){
+                        dotItemsWidth += $(this).outerWidth()
+                    })
+                    $galleryWrap.toggleClass('e--dots-center', dotItemsWidth < dotsWidth)
                 }
             }
-
-            if(wc_single_product_params.photoswipe_enabled !== '1' || ( $galleryWrap.hasClass('layout-type-wc') || $galleryWrap.hasClass('layout-type-4') || $galleryWrap.hasClass('layout-type-5') || $galleryWrap.hasClass('layout-type-6') ) ){
-                $scope.find('.woocommerce-product-gallery__image a').attr('data-elementor-open-lightbox', 'yes');
-                $scope.find('.woocommerce-product-gallery__image a').attr('data-elementor-lightbox-slideshow', $scope.data('id'));
-            }
-            else{
-                $scope.find('.woocommerce-product-gallery__image a').attr('data-elementor-open-lightbox', 'no');
-            }
-
-            $scope.find('.woocommerce-product-gallery__image[data-media-attach-type] a').attr('data-elementor-open-lightbox', 'no').removeAttr('data-elementor-lightbox-slideshow');
-
-            $scope.find('.woocommerce-product-gallery__image').each(function (){
-                if( $(this).find('.zoominner').length === 0 ){
-                    $(this).wrapInner('<div class="zoomouter"><div class="zoominner"></div></div>');
-                }
-                $('img.zoomImg', $(this)).remove();
-            })
-            // $scope.find('.woocommerce-product-gallery__image').wrapInner('<div class="zoomouter"><div class="zoominner"></div></div>');
-            const initZoom = function (zoomTarget) {
-
-                let zoom_enabled = $.isFunction($.fn.zoom) && wc_single_product_params.zoom_enabled;
-                if (!zoom_enabled) {
-                    return;
-                }
-                let galleryWidth = $gallery_target.width(),
-                    zoomEnabled = false,
-                    zoom_options;
-
-                if($galleryWrap.hasClass('layout-type-4')){
-                    galleryWidth = zoomTarget.width()
-                }
-
-                let image = zoomTarget.find('img');
-                if (image.data('large_image_width') > galleryWidth ) {
-                    zoomEnabled = true;
-                }
-
-                if(zoomTarget.closest('.woocommerce-product-gallery__image[data-media-attach-type="threesixty"]').length){
-                    zoomEnabled = false;
-                }
-
-                // But only zoom if the img is larger than its container.
-                if (zoomEnabled) {
-                    try {
-                        zoom_options = $.extend({
-                            touch: false
-                        }, wc_single_product_params.zoom_options);
-                    } catch (ex) {
-                        zoom_options = {
-                            touch: false
-                        };
-                    }
-                    if ('ontouchstart' in document.documentElement) {
-                        zoom_options.on = 'click';
-                    }
-                    zoomTarget.trigger('zoom.destroy');
-                    zoomTarget.zoom(zoom_options);
-                }
-                else{
-                    zoomTarget.trigger('zoom.destroy');
-                }
-            }
-
-            $gallery_target.find('.woocommerce-product-gallery__image .zoominner').each(function (){
-                initZoom( $(this) );
-            })
-            setTimeout(() => {
-                $('.woocommerce-product-gallery', $scope).addClass('js--is_ready')
-            }, 500)
+            checkMaxWidthCb()
+            window.addEventListener('load', checkMaxWidthCb)
+            window.addEventListener('resize', checkMaxWidthCb)
         },
         wooTabs: function ($scope) {
             let $tabs = $scope.find('.wc-tabs-wrapper').first();
@@ -2259,13 +2101,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 $target.on('touchstart', function (event) {
                     scrollOffset = $(window).scrollTop();
                 });
-
                 $target.on('touchend', function (event) {
-
                     if (scrollOffset !== $(window).scrollTop()) {
                         return false;
                     }
-
                     if (!$(this).hasClass('flipped-stop')) {
                         $(this).toggleClass('flipped');
                     }
@@ -2273,11 +2112,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
             } else {
                 $target.on(toogleEvents, function (event) {
-
                     if (firstMouseEvent && 'mouseleave' === event.type) {
                         return;
                     }
-
                     if (firstMouseEvent && 'mouseenter' === event.type) {
                         firstMouseEvent = false;
                     }
@@ -2306,22 +2143,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if(LaStudioKits.ajaxTemplateHelper.template_processed_count >= LaStudioKits.ajaxTemplateHelper.total_template && LaStudioKits.ajaxTemplateHelper.need_reinit_js){
                     LaStudioKits.ajaxTemplateHelper.need_reinit_js = false;
-                    Promise.all(LaStudioKits.addedAssetsPromises).then(function (value) {
-                        // $(window).trigger('elementor/frontend/init');
-                        LaStudioKits.elementorFrontendInit($('.need-reinit-js[data-lakit_ajax_loadtemplate="true"]'), false);
-                        $('.elementor-motion-effects-element').trigger('resize');
-                        $('body').trigger('jetpack-lazy-images-load');
-                        LaStudioKits.log('LaStudioKits.addedAssetsPromises --- FINISHED');
-
-                    }, function (reason){
-
-                        LaStudioKits.log(`An error occurred while insert the asset resources, however we still need to insert content. Reason detail: "${reason}"`);
-                        // $(window).trigger('elementor/frontend/init');
-                        LaStudioKits.elementorFrontendInit($('.need-reinit-js[data-lakit_ajax_loadtemplate="true"]'), false);
-                        $('.elementor-motion-effects-element').trigger('resize');
-                        $('body').trigger('jetpack-lazy-images-load');
-                        LaStudioKits.log('LaStudioKits.addedAssetsPromises --- ERROR');
-                    });
+                    LaStudioKit_WaitForInteraction()
+                        .then(() => Promise.all(LaStudioKits.addedAssetsPromises))
+                        .then(() => {
+                            LaStudioKits.elementorFrontendInit($('.need-reinit-js[data-lakit_ajax_loadtemplate="true"]'), false);
+                            $('.elementor-motion-effects-element').trigger('resize');
+                            $('body').trigger('jetpack-lazy-images-load');
+                            LaStudioKits.log('LaStudioKits.addedAssetsPromises --- FINISHED');
+                        }).catch((reason) => {
+                            LaStudioKits.log(`An error occurred while insert the asset resources, however we still need to insert content. Reason detail: "${reason}"`);
+                            LaStudioKits.elementorFrontendInit($('.need-reinit-js[data-lakit_ajax_loadtemplate="true"]'), false);
+                            $('.elementor-motion-effects-element').trigger('resize');
+                            $('body').trigger('jetpack-lazy-images-load');
+                            LaStudioKits.log('LaStudioKits.addedAssetsPromises --- ERROR');
+                        });
                 }
 
                 $(document).trigger('lastudio-kit/ajax-load-template/after', {
@@ -2949,7 +2784,7 @@ document.addEventListener('DOMContentLoaded', function () {
         },
 
         utils: {
-            Swiper: function (container, config){
+            Swiper: function (container, config) {
                 if (container instanceof jQuery) {
                     container = container[0];
                 }
@@ -2958,14 +2793,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     return new SwiperSource(_container, _config);
                 }
                 return new Promise(resolve => {
-                    if ('undefined' === typeof Swiper) {
+                    if ('undefined' === typeof window.Swiper) {
                         if(!LaStudioKits.addedScripts.hasOwnProperty('swiper')){
                             LaStudioKits.addedAssetsPromises.push(LaStudioKits.loadScriptAsync('swiper', LaStudioKitSettings.resources.swiperjs, '', true))
                         }
                         Promise.all(LaStudioKits.addedAssetsPromises).then(() => {
                             resolve(createSwiperInstance(container, config));
                         })
-                        return;
                     }
                     else{
                         resolve(createSwiperInstance(container, config));
@@ -2978,14 +2812,13 @@ document.addEventListener('DOMContentLoaded', function () {
                     return new LakitSimpleParallax(_container, _config);
                 }
                 return new Promise(resolve => {
-                    if ('undefined' === typeof SimpleParallax) {
+                    if ('undefined' === typeof window.SimpleParallax) {
                         if(!LaStudioKits.addedScripts.hasOwnProperty('simpleparallax')){
                             LaStudioKits.addedAssetsPromises.push(LaStudioKits.loadScriptAsync('simpleparallax', LaStudioKitSettings.resources.simpleparallax, '', true))
                         }
                         Promise.all(LaStudioKits.addedAssetsPromises).then(() => {
                             resolve(createParallaxInstance(container, config));
                         })
-                        return;
                     }
                     else{
                         resolve(createParallaxInstance(container, config));
@@ -3075,21 +2908,6 @@ document.addEventListener('DOMContentLoaded', function () {
             LaStudioKits.animatedBoxHandler($scope);
         });
 
-        window.elementorFrontend.hooks.addAction('frontend/element_ready/lakit-wooproducts.default', function ($scope) {
-            $scope.find('.lakitp-zone').on('mouseenter mouseleave', function (event) {
-                if ('mouseenter' === event.type) {
-                    $(this).addClass('is-active');
-                }
-                if ('mouseleave' === event.type) {
-                    $(this).removeClass('is-active');
-                }
-            });
-            $('.lakit--hint.only-icon', $scope).trigger('lastudio-kit/init-tooltip');
-            $(document).on('lastudio-kit/carousel/init_success', function (){
-                $('.lakit--hint.only-icon', $scope).trigger('lastudio-kit/init-tooltip');
-            });
-        });
-
         window.elementorFrontend.hooks.addAction('frontend/element_ready/lakit-wooproduct-images.default', function ($scope) {
             LaStudioKits.wooGallery($scope);
         });
@@ -3110,6 +2928,10 @@ document.addEventListener('DOMContentLoaded', function () {
             if( $scope.hasClass('e-parent') ) {
                 $scope.trigger('lastudio-kit/section/calculate-container-width');
             }
+        });
+
+        window.elementorFrontend.hooks.addAction('frontend/element_ready/lakit-icon-box.default', function ($scope) {
+            $('.lakit--hint', $scope).trigger('lastudio-kit/init-tooltip');
         });
     }
 
@@ -3165,7 +2987,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
     "use strict";
 
-    function setMegaMenuPosition( $menu_item, $container, container_width, isVerticalMenu ){
+    function setMegaMenuPosition( $menu_item, $container, container_width, isVerticalMenu, isCenter = false ){
         if ($('.lakit-megamenu-inited', $menu_item).length) {
             return false;
         }
@@ -3187,15 +3009,19 @@ document.addEventListener('DOMContentLoaded', function () {
             var megamenu_offset_x = megamenu_offset.left,
                 container_offset_x = container_offset.left;
 
+            const winWidth = $(window).width();
+
+            const liRect = LaStudioKits.getCoords($menu_item.get(0))
+
             if (megamenu_width > parent_width) {
                 left = -(megamenu_width - parent_width) / 2;
-            } else {
+            }
+            else {
                 left = 0;
             }
-
             if (LaStudioKits.isRTL()) {
-                var megamenu_offset_x_swap = $(window).width() - (megamenu_width + megamenu_offset_x),
-                    container_offset_x_swap = $(window).width() - ($container.outerWidth() + container_offset_x);
+                var megamenu_offset_x_swap = winWidth - (megamenu_width + megamenu_offset_x),
+                    container_offset_x_swap = winWidth - ($container.outerWidth() + container_offset_x);
 
                 if (megamenu_offset_x_swap - container_offset_x_swap - container_padding_right + left < 0) {
                     left = -(megamenu_offset_x_swap - container_offset_x_swap - container_padding_right);
@@ -3204,23 +3030,25 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (megamenu_offset_x_swap + megamenu_width + left > container_offset_x + $container.outerWidth() - container_padding_left) {
                     left -= megamenu_offset_x_swap + megamenu_width + left - (container_offset_x + $container.outerWidth() - container_padding_left);
                 }
-
+                if(isCenter){
+                    left = (winWidth/2) - liRect.right - (megamenu_width/2);
+                }
                 $popup.css('right', left).css('right');
             }
             else {
                 if (megamenu_offset_x - container_offset_x - container_padding_left + left < 0) {
                     left = -1 * (megamenu_offset_x - container_offset_x - container_padding_left);
                 }
-
                 if (megamenu_offset_x + megamenu_width + left > container_offset_x + $container.outerWidth() - container_padding_right) {
                     left = 0;
                     left = -1 * (megamenu_offset_x + megamenu_width + left - (container_offset_x + $container.outerWidth() - container_padding_right));
                 }
-
                 if ($container.is('body')) {
                     left = -1 * megamenu_offset_x;
                 }
-
+                if(isCenter){
+                    left = (winWidth / 2) - liRect.left - (megamenu_width / 2)
+                }
                 $popup.css('left', left).css('left');
             }
         }
@@ -3321,7 +3149,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             default_width = container_width;
                         }
                         $popup.width(default_width);
-                        setMegaMenuPosition($menu_item, $_container, container_width, isVerticalMenu);
+                        setMegaMenuPosition($menu_item, $_container, container_width, isVerticalMenu, $menu_item.hasClass('lakit-nav__item--center-window'));
                     });
                 });
             }
@@ -3690,18 +3518,18 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // START Mobile Layout: Full-width
             var initMobileFullWidthCss = false;
-
-            setFullWidthMenuPosition();
-            $( window ).on( 'resize.lakitMobileNavMenu', setFullWidthMenuPosition );
-
             function setFullWidthMenuPosition() {
-
                 var mobileLayout = $nav_wrap.data( 'mobile-layout' );
-
                 if ( 'full-width' !== mobileLayout) {
                     return;
                 }
-
+                if($navmenu.innerWidth() >= $(window).innerWidth()){
+                    $scope.css('position', 'static');
+                    return;
+                }
+                else{
+                    $scope.removeAttr('style')
+                }
                 if ( !!$scope.data('LakitIsActiveMobileMenu') ) {
                     if ( initMobileFullWidthCss ) {
                         $navmenu.css( { 'left': '' } );
@@ -3709,16 +3537,16 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     return;
                 }
-
                 if ( initMobileFullWidthCss ) {
                     $navmenu.css( { 'left': '' } );
                 }
-
                 var offset = - $navmenu.offset().left;
 
                 $navmenu.css( { 'left': offset } );
                 initMobileFullWidthCss = true;
             }
+            setFullWidthMenuPosition();
+            $( window ).on( 'resize.lakitMobileNavMenu', setFullWidthMenuPosition );
             // END Mobile Layout: Full-width
 
             // Menu Anchors Handler
@@ -3870,23 +3698,67 @@ document.addEventListener('DOMContentLoaded', function () {
 
     "use strict";
 
-    $(document).on('lastudio-kit/init-tooltip', '.lakit--hint',function (){
-        let $that = $(this);
+    $(document).on('lastudio-kit/init-tooltip', '.lakit--hint', async function (){
+        $('.lakit--hint-tip-follow-cursor').remove();
+        const $that = $(this);
+        await LaStudioKit_WaitForInteraction();
         if(typeof $.fn.tooltip === "undefined" && !LaStudioKits.addedScripts.hasOwnProperty('bootstrap-tooltip')){
             LaStudioKits.addedAssetsPromises.push(LaStudioKits.loadScriptAsync('bootstrap-tooltip', LaStudioKitSettings.resources['bootstrap-tooltip'], '', true));
         }
-        Promise.all(LaStudioKits.addedAssetsPromises).then( () => {
+        await Promise.all(LaStudioKits.addedAssetsPromises)
+        if( $that.hasClass('lakit--hint-parent') ){
+            const $parent = $(this).parent();
+            const $hintContent = $('.lakit--hint_content', $parent);
+            let _pos = $that.attr('data-tip-pos');
+            if(_pos && _pos !== 'auto'){
+                _pos = `auto${_pos}`
+            }
+            else{
+                _pos = 'auto'
+            }
+
             $that.tooltip({
                 container: 'body',
-                placement: $that.attr('data-tip-pos') || 'top',
+                placement: _pos || 'auto',
+                html: true,
+                trigger: 'manual',
+                animation: false,
+                title: function (){
+                    return $hintContent.html()
+                }
+            });
+            const viewportWidth = $(window).width();
+            const tooltipInstance = $that.data('bs.tooltip')
+            $parent.on('mousemove', (e) => {
+                tooltipInstance.getPosition = () => {
+                    let bk_placement = tooltipInstance.options.placement;
+                    if (e.pageX + tooltipInstance.$tip.width() + 100 > viewportWidth) {
+                        if(bk_placement === 'autoright'){
+                            bk_placement = 'autoleft'
+                        }
+                        tooltipInstance.options.placement = bk_placement;
+                    }
+
+                    return {
+                        top: e.pageY,
+                        left: e.pageX,
+                        width: 1,
+                        height: 1
+                    }
+                };
+                tooltipInstance.show();
+            }).on('mouseleave', () => tooltipInstance.hide() )
+        }
+        else{
+            $that.tooltip({
+                container: 'body',
+                placement: $that.attr('data-tip-pos') || 'auto',
                 html: true,
                 title: function (){
                     return this.getAttribute('data-hint')
                 },
             });
-        }, ( reason ) => {
-            LaStudioKits.log('Tooltip error', reason)
-        } )
+        }
     });
 
     const LakitCountDownTimer = function ($el){
@@ -3975,6 +3847,15 @@ document.addEventListener('DOMContentLoaded', function () {
 
     $(window).on('elementor/frontend/init', function () {
         window.elementorFrontend.hooks.addAction('frontend/element_ready/lakit-wooproducts.default', function ($scope) {
+            $scope.find('.lakitp-zone').on('mouseenter mouseleave', function (event) {
+                if ('mouseenter' === event.type) {
+                    $(this).addClass('is-active');
+                }
+                if ('mouseleave' === event.type) {
+                    $(this).removeClass('is-active');
+                }
+            });
+            $('.lakit--hint.only-icon', $scope).trigger('lastudio-kit/init-tooltip');
             $scope.find('.product_item--countdown').trigger('lastudio-kit/products/init-countdown');
         });
         window.elementorFrontend.hooks.addAction('frontend/element_ready/lakit-countdown-timer.default', function ($scope) {
@@ -4021,12 +3902,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
     });
 
-    $( document ).on( 'elementor/popup/show', () => {
-        try{
-            wpcf7.init($(".wpcf7-form")[0]);
-        }catch (e){}
-    });
-
     $(window).on('load', function (){
         $('.elementor-motion-effects-element').trigger('resize');
     })
@@ -4034,7 +3909,7 @@ document.addEventListener('DOMContentLoaded', function () {
     /** Fix WC ajax add cart **/
     $(document.body).on('should_send_ajax_request.adding_to_cart', function ( e, $thisbutton ){
         let data = {},
-            ignoreKey = ['hint', 'tipClass', 'tooltip', 'originalTitle'];
+            ignoreKey = ['hint', 'tipClass', 'tooltip', 'originalTitle', 'bs.tooltip'];
 
         setTimeout(() => { $thisbutton.addClass('loading') }, 50)
 
@@ -4083,7 +3958,6 @@ document.addEventListener('DOMContentLoaded', function () {
     "use strict";
 
     const onThumbClick = (mainCarousel, thumbCarousel, index) => () => {
-        if (!thumbCarousel.clickAllowed()) return;
         mainCarousel.scrollTo(index);
     };
 
@@ -4095,14 +3969,53 @@ document.addEventListener('DOMContentLoaded', function () {
     const selectThumbBtn = (mainCarousel, thumbCarousel) => {
         const previous = mainCarousel.previousScrollSnap();
         const selected = mainCarousel.selectedScrollSnap();
-        thumbCarousel.slideNodes()[previous].classList.remove("is-selected");
-        thumbCarousel.slideNodes()[selected].classList.add("is-selected");
+        if(previous !== selected){
+            thumbCarousel.slideNodes()[previous].classList.remove('is-selected');
+        }
+        thumbCarousel.slideNodes()[selected].classList.add('is-selected');
     };
 
-    const setupPrevNextBtns = (prevBtn, nextBtn, embla) => {
-        prevBtn.addEventListener('click', embla.scrollPrev, false);
-        nextBtn.addEventListener('click', embla.scrollNext, false);
-    };
+    const setupDotsAndClickHandles = (embla, dotsNode) => {
+        if(!dotsNode){
+            return;
+        }
+        let dotNodes = []
+        const addDotBtnsWithClickHandlers = () => {
+            const _html = [];
+            embla.slideNodes().forEach( item => {
+                const _thumbURL = $(item).data('thumb')
+                const _dataType = $(item).data('media-attach-type') ?? ''
+                if(_thumbURL){
+                    _html.push(`<div class="embla__dot" data-type="${_dataType}" style="--thumbnail-url: url('${_thumbURL}')"><span><em><img src="${_thumbURL}" alt="" loading="lazy"/></em></span><span></span></div>`)
+                }
+                else{
+                    _html.push(`<div class="embla__dot" data-type="${_dataType}"><span></span><span></span></div>`)
+                }
+            })
+            dotsNode.innerHTML = _html.join('')
+            dotNodes = dotsNode.querySelectorAll('.embla__dot');
+            dotNodes.forEach((dotNode, idx) => {
+                dotNode.addEventListener('click', () => embla.scrollTo(idx), false)
+            })
+        }
+        const toggleDotButtonsActive = () => {
+            const previous = embla.previousScrollSnap()
+            const selected = embla.selectedScrollSnap()
+            dotNodes[previous].classList.remove('is-selected')
+            dotNodes[selected].classList.add('is-selected')
+            dotNodes[selected].scrollIntoView({
+                behavior: 'smooth',
+                inline: 'center',
+                block: 'nearest'
+            });
+        }
+        addDotBtnsWithClickHandlers()
+        toggleDotButtonsActive()
+        embla
+            .on('reInit', addDotBtnsWithClickHandlers)
+            .on('reInit', toggleDotButtonsActive)
+            .on('select', toggleDotButtonsActive)
+    }
 
     const disablePrevNextBtns = (prevBtn, nextBtn, embla) => {
         return () => {
@@ -4114,16 +4027,26 @@ document.addEventListener('DOMContentLoaded', function () {
         };
     };
 
+    const setupPrevNextBtns = (prevBtn, nextBtn, embla) => {
+        prevBtn.addEventListener('click', embla.scrollPrev, false);
+        nextBtn.addEventListener('click', embla.scrollNext, false);
+        const toggleDisableBtn = disablePrevNextBtns(prevBtn, nextBtn, embla)
+        embla.on('reInit', toggleDisableBtn);
+        embla.on('select', toggleDisableBtn);
+    };
+
     $(document).on('click', '.lakit-embla_wrap .lakit-embla__arrow, .lakit-embla_wrap .lakit-embla-thumb', function (e){
         e.preventDefault();
         return false;
     })
 
-    $(document).on('lastudio-kit/init-embla-slider', '.lakit-embla_wrap', function (){
+    $(document).on('lastudio-kit/init-embla-slider', '.lakit-embla_wrap', async function (){
         if( !$(this).hasClass('embla--inited') ){
             $(this).addClass('embla--inited');
 
             let isEmblaForProduct = $(this).hasClass('lakit-embla_wrap--products')
+
+            const dotsNode = $(this).find('.lakit-embla--dots').get(0)
 
             if( isEmblaForProduct && $('.lakit-embla-thumb .lakit-embla__slide', $(this)).length === 1){
                 $(this).addClass('no-embla');
@@ -4146,33 +4069,36 @@ document.addEventListener('DOMContentLoaded', function () {
                 LaStudioKits.addedAssetsPromises.push(LaStudioKits.loadScriptAsync('embla-carousel', LaStudioKitSettings.resources['embla-carousel'], '', true));
             }
 
-            Promise.all(LaStudioKits.addedAssetsPromises).then( () => {
-                const mainCarousel = new EmblaCarousel(mainCarouselView, {
-                    loop: true,
-                    skipSnaps: false
+            await Promise.all(LaStudioKits.addedAssetsPromises);
+
+            const oldEmbla = $(mainCarouselView).data('embla');
+            if (oldEmbla) {
+                oldEmbla.destroy();
+            }
+            const mainCarousel = new EmblaCarousel(mainCarouselView, {
+                loop: true,
+                align: 'start',
+                containScroll: 'trimSnaps'
+            });
+            $(mainCarouselView).data('embla', mainCarousel)
+            setupPrevNextBtns(prevBtn, nextBtn, mainCarousel);
+            setupDotsAndClickHandles(mainCarousel, dotsNode);
+            if(isEmblaForProduct){
+                const thumbCarousel = EmblaCarousel(thumbCarouselView, {
+                    containScroll: "keepSnaps",
+                    dragFree: true,
+                    loop: false,
+                    align: 'start'
                 });
-                setupPrevNextBtns(prevBtn, nextBtn, mainCarousel);
-                if(isEmblaForProduct){
-                    const thumbCarousel = EmblaCarousel(thumbCarouselView, {
-                        containScroll: "keepSnaps",
-                        dragFree: true,
-                        loop: false,
-                        align: 'start',
-                    });
-                    thumbCarousel.slideNodes().forEach((thumbNode, index) => {
-                        const onClick = onThumbClick(mainCarousel, thumbCarousel, index);
-                        thumbNode.addEventListener("click", onClick, false);
-                    });
-                    const syncThumbCarousel = followMainCarousel(mainCarousel, thumbCarousel);
-                    const disablePrevAndNextBtns = disablePrevNextBtns(prevBtn, nextBtn, thumbCarousel);
-                    mainCarousel.on("select", syncThumbCarousel);
-                    thumbCarousel.on("init", syncThumbCarousel);
-                    mainCarousel.on("select", disablePrevAndNextBtns);
-                    mainCarousel.on("init", disablePrevAndNextBtns);
-                }
-            }, ( reason ) => {
-                LaStudioKits.log('initEmblaCarousel error', reason)
-            } )
+                $(thumbCarouselView).data('embla', thumbCarousel)
+                thumbCarousel.slideNodes().forEach((thumbNode, index) => {
+                    const onClick = onThumbClick(mainCarousel, thumbCarousel, index);
+                    thumbNode.addEventListener("click", onClick, false);
+                });
+                const syncThumbCarousel = followMainCarousel(mainCarousel, thumbCarousel);
+                mainCarousel.on("select", syncThumbCarousel);
+                thumbCarousel.on("reInit", syncThumbCarousel);
+            }
         }
     });
 
@@ -4197,6 +4123,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 $(this).trigger('lastudio-kit/LazyloadSequenceEffects');
             }
         });
+        $('.lakit--hint.only-icon', data.parentContainer).trigger('lastudio-kit/init-tooltip');
         LaStudioKits.reInitMotionEffects(data.parentContainer)
     });
 
@@ -4379,9 +4306,7 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-
         $('.elementor-widget-image a[data-elementor-open-lightbox="yes"]').attr('data-elementor-lightbox-slideshow', 'gl' + Date.now());
-
         if(document.querySelector('input[name="lakit_recaptcha_response"]')){
             window.addEventListener('elementor/popup/show', grecaptchaExecute);
             const grecaptchaCallback = () => {
@@ -4484,26 +4409,34 @@ document.addEventListener('DOMContentLoaded', function () {
             }).sendData(LaStudioKits.serializeObject($frm))
         });
 
-        $(document).on('click', '.lakit--ajax-load-album:not([data-popupid="false"])', function (e){
-            e.preventDefault();
-            const $btn_instance = $(this);
 
+        const handleAlbumPlayerPopup = ( $btn, { popupId, albumId } ) => {
+            const $btn_instance = $btn;
             if($btn_instance.hasClass('is-loading')){
                 return;
             }
             $btn_instance.addClass('is-loading');
+            const _albumID = albumId;
+            const _templateID = popupId;
+            const checkTemplateExists = $(`.elementor-location-popup.elementor-${_templateID}`).length > 0
+            if(!checkTemplateExists){
+                const newDiv = $(`<div data-elementor-type="popup" data-elementor-id="${_templateID}" class="elementor elementor-${_templateID} elementor-location-popup" data-elementor-settings="{}"></div>`)
+                $('body').append(newDiv)
+                elementorFrontend.documentsManager.attachDocumentClass(newDiv)
+            }
 
-            let _albumID = $(this).data('albumid');
-            let _templateID = $(this).data('popupid');
             let _ajaxURL = LaStudioKits.addQueryArg(LaStudioKitSettings.templateApiUrl, 'id', _templateID);
             _ajaxURL = LaStudioKits.addQueryArg(_ajaxURL, 'dynamic_id', _albumID);
-            _ajaxURL = LaStudioKits.addQueryArg(_ajaxURL, 'dev', '1');
+            if(LaStudioKitSettings.isDebug){
+                _ajaxURL = LaStudioKits.addQueryArg(_ajaxURL, 'dev', '1');
+            }
             let _cache_key = `id_${_templateID}_dynamic_id_${_albumID}`;
             let browserCacheKey = LaStudioKits.localCache.cache_key + '_' + LaStudioKits.localCache.hashCode(_cache_key);
             let expiry = LaStudioKits.localCache.timeout;
-
-
-            const _showPopupCb = ( response ) => {
+            const _showPopupCb = async ( response ) => {
+                if( !window?.DialogsManager ){
+                    await elementorFrontend.utils.assetsLoader.load("script", "dialog")
+                }
                 $btn_instance.removeClass('is-loading');
                 let _divParent = $('<div>');
                 _divParent.html(response.template_content);
@@ -4541,11 +4474,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     LaStudioKits.log('Cannot setup browser cache', ajax_ex1);
                 }
             }
-
             try{
                 let browserCached = localStorage.getItem(browserCacheKey);
                 let browserWhenCached = localStorage.getItem(browserCacheKey + ':ts');
-
                 if (browserCached !== null && browserWhenCached !== null) {
                     let age = (Date.now() - browserWhenCached) / 1000;
                     if (age < expiry) {
@@ -4561,12 +4492,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }
                 LaStudioKits.log('run ajaxCalling() for ' + _cache_key);
-
-            }catch ( _ex ) {
+            }
+            catch ( _ex ) {
                 $btn_instance.removeClass('is-loading')
                 LaStudioKits.log( _ex )
             }
-
             ajaxManager('album_popup', {
                 url: _ajaxURL,
                 processData: false,
@@ -4583,10 +4513,36 @@ document.addEventListener('DOMContentLoaded', function () {
                 },
                 successCallback: _successCb
             }).send();
+        }
+
+        $(document).on('click', '.lakit--ajax-load-album:not([data-popupid="false"])', function (e){
+            e.preventDefault();
+            handleAlbumPlayerPopup(
+                $(this),
+                {
+                    popupId: $(this).data('popupid'),
+                    albumId: $(this).data('albumid')
+                }
+            )
         })
 
-    });
+        elementorFrontend.utils.urlActions.addAction('lakit_album_player:open', function (settings, evt){
+            let $btn = $(evt.target).closest('a')
+            const { album_id, popup_id } = settings
+            handleAlbumPlayerPopup(
+                $btn,
+                {
+                    popupId: popup_id,
+                    albumId: album_id
+                }
+            )
+            console.log({
+                $btn,
+                evt
+            })
+        });
 
+    });
 
     document.addEventListener('DOMContentLoaded', () => {
         window.addEventListener('elementor/frontend/init', () => {
@@ -4620,163 +4576,281 @@ document.addEventListener('DOMContentLoaded', function () {
 }(jQuery));
 
 (function ($) {
-    "use strict";
-
-    let shouldInjection = false;
-
-    Object.keys(LaStudioKitSettings.delayResources.js).forEach( js_delay_name => {
-        if(!LaStudioKits.addedScripts.hasOwnProperty(js_delay_name)){
-            LaStudioKits.addedAssetsPromises.push(LaStudioKits.loadScriptAsync(js_delay_name, LaStudioKitSettings.delayResources.js[js_delay_name], '', true));
-            shouldInjection = true;
-        }
-    })
-    if(shouldInjection){
-        Promise.all(LaStudioKits.addedAssetsPromises).then( () => {
-            console.log('Delay js loaded.')
-        }, ( reason ) => {
-            LaStudioKits.log('[LA-Studio Kit] Delay JS error', reason)
-        } )
+    'use strict';
+    const {
+        addedScripts,
+        addedAssetsPromises,
+        loadScriptAsync,
+        log
+    } = LaStudioKits;
+    const delayedScripts = Object.entries(LaStudioKitSettings.delayResources.js || {});
+    const needInjection = delayedScripts.some(([name]) => {
+        return !addedScripts.hasOwnProperty(name);
+    });
+    if (needInjection) {
+        LaStudioKit_WaitForInteraction().then(() => {
+            const promises = delayedScripts
+                .filter(([name]) => !addedScripts.hasOwnProperty(name))
+                .map(([name, url]) => {
+                    return loadScriptAsync(name, url, '', true);
+                });
+            addedAssetsPromises.push(...promises);
+            return Promise.all(promises);
+        })
+        .then(() => {
+            $(window).one('load', () => {
+                requestAnimationFrame( () => {
+                    $('.accordion-close-all.elementor-widget-accordion .elementor-tab-title.elementor-active').trigger('click');
+                } )
+            });
+        })
+        .catch(reason => {
+            log('Delay resources error', reason);
+        });
     }
-
-    $(window).on('load', () => {
-        setTimeout(()=> {
-            $('.accordion-close-all.elementor-widget-accordion .elementor-tab-title.elementor-active').trigger('click');
-        }, 100)
-    })
-
     $(window).on('elementor/frontend/init', () => {
-
-        $(document).on('lastudio-kit/ajax-loadmore/success lastudio-kit/ajax-pagination/success lastudio-kit/ajax-load-template/after lastudio-kit/carousel/init_success lastudio-kit/hamburger/after', function (e, data){
-            $('.lakitplayer', data.parentContainer).trigger('LaStudioKit:InitPlayers');
-            if(typeof Give !== "undefined"){
-                Give?.init()
-            }
-        })
-
-        $(document).on('lastudio-kit/hamburger/after', function (e, data){
-            $('.wpcf7.no-js .wpcf7-form', data.parentContainer).each( function (){
-                wpcf7.init(this);
-                $(this).closest('.wpcf7').removeClass('no-js').addClass('js');
-            })
-        })
-
-        elementorFrontend.hooks.addAction(`frontend/element_ready/lakit-banner-list.default`, function ($scope){
-            const setPositionCallback = () => {
-                if( !$scope.hasClass('lakit-thumbnail-mouseover') ){
-                    return;
+        $(document).on(
+            [
+                'lastudio-kit/ajax-loadmore/success',
+                'lastudio-kit/ajax-pagination/success',
+                'lastudio-kit/ajax-load-template/after',
+                'lastudio-kit/carousel/init_success',
+                'lastudio-kit/hamburger/after'
+            ].join(' '),
+            function (e, data) {
+                const $container = data?.parentContainer;
+                $('.lakitplayer', $container).trigger('LaStudioKit:InitPlayers');
+                if( typeof Give !== "undefined"){
+                    Give.init();
                 }
-                $('.lakit-bannerlist__image', $scope).each(function (){
-                    const $this = $(this);
-                    const elPos = $this.get(0).getBoundingClientRect();
-                    if(elPos.left < 20){
-                        $this.removeClass('ep_right').addClass('ep_left')
-                    }
-                    if(elPos.right > window.outerWidth){
-                        $this.removeClass('ep_left').addClass('ep_right')
-                    }
-                })
             }
-            setPositionCallback();
-            window.addEventListener('resize', setPositionCallback);
-
-            const maybeCloneItems = () => {
-                if( !$scope.hasClass('lakit--banner-duplicate') ){
-                    return;
-                }
-                const $all_item = $('.lakit-bannerlist__item', $scope);
-                const $list_div = $('.lakit-bannerlist__list', $scope);
-                const $clone_items = $all_item.clone(true, true);
-                $list_div.append($clone_items)
-                $list_div.trigger('lastudio-kit/LazyloadSequenceEffects')
+        );
+        $(document).on(
+            'lastudio-kit/hamburger/after',
+            function (e, data) {
+                $('.wpcf7.no-js .wpcf7-form', data.parentContainer).each(function () {
+                    if(typeof wpcf7 !== "undefined"){
+                        wpcf7.init(this);
+                    }
+                    $(this).closest('.wpcf7').removeClass('no-js').addClass('js');
+                });
             }
-            maybeCloneItems();
-        } )
+        );
+        elementorFrontend.hooks.addAction( 'frontend/element_ready/lakit-banner-list.default', function ($scope) {
+            if ($scope.hasClass('lakit-thumbnail-mouseover')) {
+                const setPosition = () => {
+                    $('.lakit-bannerlist__image', $scope).each(function () {
+                        const rect = this.getBoundingClientRect();
+                        $(this).toggleClass('ep_left', rect.left < 20).toggleClass('ep_right',rect.right > window.innerWidth);
+                    });
+                };
+                setPosition();
+                window.addEventListener('resize', setPosition, { passive: true });
+            }
+            const $list = $('.lakit-bannerlist__list', $scope);
+            if ($scope.hasClass('lakit--banner-duplicate')) {
+                const cloned = $('.lakit-bannerlist__item', $scope).clone();
+                $list.append(cloned).trigger('lastudio-kit/LazyloadSequenceEffects');
+            }
+            else{
+                $list.trigger('lastudio-kit/LazyloadSequenceEffects');
+            }
+        });
 
-        elementorFrontend.hooks.addFilter('lastudio-kit/carousel/options', function ( swiperOptions, $scope, carousel_id ){
+        elementorFrontend.hooks.addFilter('lastudio-kit/carousel/options', function (swiperOptions, $scope) {
             $('.elementor-background-video-hosted', $scope).removeAttr('autoplay');
             return swiperOptions;
-        })
+        });
 
-        elementorFrontend.hooks.addAction(`frontend/element_ready/heading.default`, function ($scope){
-            if($scope.hasClass('heading--marquee')){
-                const updateHeadingRepeat = () => {
-                    const headingEl = $scope.find('.elementor-heading-title').get(0)
-                    if (!headingEl.dataset.originalText) {
-                        headingEl.dataset.originalText = headingEl.innerHTML;
-                    }
-                    const originalText = headingEl.dataset.originalText;
-                    const spacedText = originalText + ' ';
-                    const span = document.createElement("span");
-                    span.style.visibility = "hidden";
-                    span.style.whiteSpace = "nowrap";
-                    span.style.position = "absolute";
-                    span.innerHTML = originalText;
-                    document.body.appendChild(span);
-
-                    const textWidth = span.offsetWidth;
-                    const targetWidth = 3 * window.innerWidth;
-                    if (textWidth < targetWidth) {
-                        const repeatCount = Math.round(targetWidth / textWidth);
-                        headingEl.innerHTML = spacedText.repeat(repeatCount).trim();
-                    } else {
-                        headingEl.innerHTML = originalText;
-                    }
-                    document.body.removeChild(span);
-                }
-                updateHeadingRepeat()
-                window.addEventListener('resize', updateHeadingRepeat);
+        elementorFrontend.hooks.addAction('frontend/element_ready/heading.default', function ($scope) {
+            if (!$scope.hasClass('heading--marquee')) {
+                return;
             }
-        } )
-    })
+            const headingEl = $scope.find('.elementor-heading-title')[0];
+            if (!headingEl) {
+                return;
+            }
+            const originalText = headingEl.dataset.originalText || headingEl.innerHTML;
+            headingEl.dataset.originalText = originalText;
+            const updateHeadingRepeat = () => {
+                const measure = document.createElement('span');
+                measure.style.cssText = `
+                    visibility:hidden;
+                    white-space:nowrap;
+                    position:absolute;
+                `;
+                measure.innerHTML = originalText;
+                document.body.appendChild(measure);
+                const textWidth = measure.offsetWidth;
+                document.body.removeChild(measure);
+                const targetWidth = window.innerWidth * 3;
+                headingEl.innerHTML = textWidth < targetWidth ? (`${originalText} `).repeat(Math.ceil(targetWidth / textWidth)) : originalText;
+            };
+            updateHeadingRepeat();
+            window.addEventListener( 'resize', updateHeadingRepeat, { passive: true } );
+        });
+    });
 
-    $( document ).on( 'elementor/popup/show', (evt, popup_id) => {
-        $(`.elementor-location-popup.elementor-${popup_id} .col-row`).trigger('lastudio-kit/LazyloadSequenceEffects')
+    $(document).on( 'elementor/popup/show', (evt, popupId) => {
+        $(`.elementor-location-popup.elementor-${popupId} .col-row`).trigger( 'lastudio-kit/LazyloadSequenceEffects');
+        if(typeof wpcf7 !== "undefined"){
+            wpcf7.init($(".wpcf7-form")[0]);
+        }
     });
 }(jQuery));
 
 (function ($) {
     'use strict';
-    $(function () {
 
-        const resizeProductGallery = function (){
-            $('.lakit--enabled .woocommerce-product-gallery').each(function (){
-                let _height = $('.woocommerce-product-gallery__wrapper', $(this)).height() + 'px';
-                $(this).css('--singleproduct-thumbs-height', _height);
-                $('.flex-viewport', $(this)).css('height', _height);
-            });
+    $(window).on('load', function (){
+        $('.embla--inited.lakit-woo-gallery-embla .lakit-embla__viewport').each(function(){
+            const emblaInstance = $(this).data('embla')
+            emblaInstance.reInit()
+        })
+    })
+
+    $(document).on('show_variation', 'form.variations_form', function (e, variation) {
+        if (!variation?.price_html) {
+            return;
         }
-
-        $('a[data-trigger-addcart]').on('click', function (e){
-            e.preventDefault();
-            $( 'form.cart', $(this).attr('data-trigger-addcart') ).trigger('submit');
-        })
-
-        $(window).on('load', function (){
-            resizeProductGallery();
-        })
-
-        $(document).on('lastudiokit/woocommerce/before_apply_swatches lastudiokit/woocommerce/apply_swatches', function ( evt, data ){
-            setTimeout(function (){
-                $('.zoomouter ~ img.zoomImg', $(data)).remove()
-            }, 200)
-        })
-        $('form.variations_form')
-            .on('show_variation', function(e, variation, purchasable ){
-                let $priceWrapper = $('.single-price-wrapper[data-product_id="'+$(this).data('product_id')+'"]');
-                if(variation.price_html !== '' && $priceWrapper.length){
-                    if($priceWrapper.data('oldValue') === undefined){
-                        $priceWrapper.data('oldValue', $('.price', $priceWrapper).prop('outerHTML'))
-                    }
-                    $priceWrapper.data('oldValue')
-                    $('.price', $priceWrapper).remove();
-                    $priceWrapper.append(variation.price_html);
-                }
-            })
-            .on('reset_data', function (e){
-                let $priceWrapper = $('.single-price-wrapper[data-product_id="'+$(this).data('product_id')+'"]');
-                if($priceWrapper.data('oldValue') !== undefined){
-                    $priceWrapper.html($priceWrapper.data('oldValue'))
-                }
-            })
+        const $priceWrapper = $(`.single-price-wrapper[data-product_id="${$(this).data('product_id')}"]`);
+        if (!$priceWrapper.length) {
+            return;
+        }
+        if ($priceWrapper.data('oldValue') === undefined) {
+            $priceWrapper.data('oldValue', $('.price', $priceWrapper).prop('outerHTML'));
+        }
+        $('.price', $priceWrapper).remove();
+        $priceWrapper.append(variation.price_html);
+    }).on('reset_data', 'form.variations_form', function () {
+        const $priceWrapper = $(`.single-price-wrapper[data-product_id="${$(this).data('product_id')}"]`);
+        const oldValue = $priceWrapper.data('oldValue');
+        if (oldValue !== undefined) {
+            $priceWrapper.html(oldValue);
+        }
     });
 })(jQuery);
+
+(function ($, elementorFrontend) {
+    "use strict";
+    class WooGallery extends elementorModules.frontend.handlers.Base {
+
+        onInit() {
+            super.onInit(...arguments);
+            this._zoomRAF = null;
+            this._lastEvent = null;
+            this._handleMouseMove = this._handleMouseMove.bind(this);
+            this._handleMouseLeave = this._handleMouseLeave.bind(this);
+            this.bindZoomEvents();
+        }
+        getDefaultSettings() {
+            return {
+                selectors: {
+                    image: '.woocommerce-product-gallery__image img'
+                }
+            };
+        }
+        getDefaultElements() {
+            const selectors = this.getSettings('selectors');
+            return {
+                $images: this.$element.find(selectors.image)
+            };
+        }
+        getZoomScale() {
+            const settings = this.getElementSettings();
+            return Math.max(parseFloat( settings?.zoom_scale?.size ?? 1.3), 1.0);
+        }
+        isZoomEnabled() {
+            const settings = this.getElementSettings();
+            return settings?.enable_zoom === 'yes';
+        }
+        isTouchDevice() {
+            return (
+                navigator.maxTouchPoints > 0 ||
+                window.matchMedia('(pointer: coarse)').matches
+            );
+        }
+        resetZoom(target) {
+            if (!target) {
+                return;
+            }
+            target.style.transform = '';
+            target.style.transformOrigin = '';
+            target.style.willChange = '';
+        }
+        updateZoom() {
+            if (!this._lastEvent) {
+                return;
+            }
+            const evt = this._lastEvent;
+            const target = evt.currentTarget || evt.target;
+            if (!target) {
+                return;
+            }
+            const rect = target.getBoundingClientRect();
+
+            const x = evt.clientX - rect.left;
+            const y = evt.clientY - rect.top;
+            const originX = (x / rect.width) * 100;
+            const originY = (y / rect.height) * 100;
+            target.style.willChange = 'transform';
+            target.style.transformOrigin = `${originX}% ${originY}%`;
+            target.style.transform = `scale(${this.getZoomScale()})`;
+            this._zoomRAF = null;
+        }
+        _handleMouseMove(evt) {
+            if (this.isTouchDevice()) {
+                return;
+            }
+            this._lastEvent = evt;
+            if (this._zoomRAF) {
+                return;
+            }
+            this._zoomRAF = requestAnimationFrame(() => {
+                this.updateZoom();
+            });
+        }
+        _handleMouseLeave(evt) {
+            const target = evt.currentTarget || evt.target;
+            if (this._zoomRAF) {
+                cancelAnimationFrame(this._zoomRAF);
+                this._zoomRAF = null;
+            }
+            this.resetZoom(target);
+        }
+        bindZoomEvents() {
+            const { $images } = this.elements;
+            if (!$images.length) {
+                return;
+            }
+            $images.off('.lakit_WooGalleryZoom');
+            if (!this.isZoomEnabled()) {
+                return;
+            }
+            $images.on('mousemove.lakit_WooGalleryZoom',this._handleMouseMove).on('mouseleave.lakit_WooGalleryZoom',this._handleMouseLeave);
+        }
+        onElementChange(propertyName) {
+            switch (propertyName) {
+                case 'enable_zoom':
+                case 'zoom_scale':
+                    this.bindZoomEvents();
+                    break;
+            }
+        }
+        onDestroy() {
+            if (this._zoomRAF) {
+                cancelAnimationFrame(this._zoomRAF);
+                this._zoomRAF = null;
+            }
+            const { $images } = this.elements;
+            if ($images?.length) {
+                $images.off('.lakit_WooGalleryZoom');
+            }
+            super.onDestroy();
+        }
+    }
+    $(window).on('elementor/frontend/init', () => {
+        elementorFrontend.hooks.addAction( 'frontend/element_ready/lakit-wooproduct-images.default', $element => elementorFrontend.elementsHandler.addHandler( WooGallery, { $element } ) );
+    });
+
+})(jQuery, window.elementorFrontend);

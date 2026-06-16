@@ -16,11 +16,20 @@ use Elementor\LaStudioKit_Base;
 
 class Player extends LaStudioKit_Base{
 
-	protected function enqueue_addon_resources(){
-		$this->add_script_depends('lastudio-kit-base');
-		$this->add_script_depends('lastudio-kit-player');
-		$this->add_style_depends('lastudio-kit-player');
-	}
+    protected function is_dynamic_content(): bool
+    {
+        return true;
+    }
+
+    public function get_script_depends()
+    {
+        return ['lastudio-kit-player'];
+    }
+
+    public function get_style_depends()
+    {
+        return ['lastudio-kit-player'];
+    }
 
 	public function get_name() {
 		return 'lakit-player';
@@ -60,6 +69,7 @@ class Player extends LaStudioKit_Base{
 				'track_item_info' => '.lakitplayer_playlist__item-info',
 				'track_item_title' => '.lakitplayer_playlist__item_title',
 				'track_item_artist' => '.lakitplayer_playlist__item_artist',
+				'track_item_lyric' => '.lakitplayer_playlist__item_lyric',
 				'track_item_control' => '.lakitplayer_playlist__item-controls',
 			)
 		);
@@ -124,6 +134,31 @@ class Player extends LaStudioKit_Base{
 				'default'      => '',
 			)
 		);
+		$this->_add_control(
+			'show_available_on',
+			array(
+				'type'         => Controls_Manager::SWITCHER,
+				'label'        => esc_html__( 'Show Available On', 'lastudio-kit' ),
+				'label_on'     => esc_html__( 'Yes', 'lastudio-kit' ),
+				'label_off'    => esc_html__( 'No', 'lastudio-kit' ),
+				'return_value' => 'yes',
+				'default'      => '',
+				'condition'   => [
+					'preset' => 'type-1',
+				]
+			)
+		);
+		$this->_add_control(
+			'available_on_text',
+			array(
+				'type'         => Controls_Manager::TEXT,
+				'label'        => esc_html__( 'Available On Text', 'lastudio-kit' ),
+				'default'      => 'Available On',
+				'condition'   => [
+					'show_available_on' => 'yes',
+				]
+			)
+		);
 
 		$this->end_controls_section();
 
@@ -135,6 +170,46 @@ class Player extends LaStudioKit_Base{
 				'tab'        => Controls_Manager::TAB_STYLE,
 				'show_label' => false,
 			)
+		);
+		$this->_add_icon_control(
+			'icon_play',
+			[
+				'label'       => __( 'Icon Play', 'lastudio-kit' ),
+				'type'        => Controls_Manager::ICON,
+				'file'        => '',
+				'skin'        => 'inline',
+				'label_block' => false,
+			]
+		);
+		$this->_add_icon_control(
+			'icon_pause',
+			[
+				'label'       => __( 'Icon Pause', 'lastudio-kit' ),
+				'type'        => Controls_Manager::ICON,
+				'file'        => '',
+				'skin'        => 'inline',
+				'label_block' => false,
+			]
+		);
+		$this->_add_icon_control(
+			'icon_prev',
+			[
+				'label'       => __( 'Icon Previous', 'lastudio-kit' ),
+				'type'        => Controls_Manager::ICON,
+				'file'        => '',
+				'skin'        => 'inline',
+				'label_block' => false,
+			]
+		);
+		$this->_add_icon_control(
+			'icon_next',
+			[
+				'label'       => __( 'Icon Next', 'lastudio-kit' ),
+				'type'        => Controls_Manager::ICON,
+				'file'        => '',
+				'skin'        => 'inline',
+				'label_block' => false,
+			]
 		);
 		$this->end_controls_section();
 
@@ -194,9 +269,20 @@ class Player extends LaStudioKit_Base{
 		);
 
 		$this->_add_control(
+			'controls_text_color',
+			array(
+				'label'     => esc_html__( 'Icon Color', 'lastudio-kit' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} ' . $css_schema['control_item'] => 'color: {{VALUE}}',
+				),
+			),
+			25
+		);
+		$this->_add_control(
 			'controls_box_color',
 			array(
-				'label'     => esc_html__( 'Color', 'lastudio-kit' ),
+				'label'     => esc_html__( 'Text Color', 'lastudio-kit' ),
 				'type'      => Controls_Manager::COLOR,
 				'selectors' => array(
 					'{{WRAPPER}} ' . $css_schema['controls'] => 'color: {{VALUE}}',
@@ -498,7 +584,22 @@ class Player extends LaStudioKit_Base{
 				'return_value' => 'yes',
 				'default'      => 'yes',
 				'selectors'    => [
-					'{{WRAPPER}} .lakitplayer_playlists .lakitplayer_playlist__item_artist' => 'display: none',
+					'{{WRAPPER}} ' . $css_schema['track_item_artist'] => 'display: none',
+				]
+			)
+		);
+
+		$this->_add_control(
+			'track_item_disable_lyric',
+			array(
+				'type'         => Controls_Manager::SWITCHER,
+				'label'        => esc_html__( 'Disable Lyric', 'lastudio-kit' ),
+				'label_on'     => esc_html__( 'Yes', 'lastudio-kit' ),
+				'label_off'    => esc_html__( 'No', 'lastudio-kit' ),
+				'return_value' => 'yes',
+				'default'      => 'yes',
+				'selectors'    => [
+					'{{WRAPPER}} ' . $css_schema['track_item_lyric'] => 'display: none',
 				]
 			)
 		);
@@ -516,7 +617,22 @@ class Player extends LaStudioKit_Base{
 			array(
 				'name'     => 'track_item_artist_typography',
 				'selector' => '{{WRAPPER}}  ' . $css_schema['track_item_artist'],
-				'label'     => esc_html__('Artist Typography', 'lastudio-kit')
+				'label'     => esc_html__('Artist Typography', 'lastudio-kit'),
+				'condition' => [
+					'track_item_disable_artist!' => 'yes'
+				]
+			),
+			50
+		);
+		$this->_add_group_control(
+			Group_Control_Typography::get_type(),
+			array(
+				'name'     => 'track_item_lyric_typography',
+				'selector' => '{{WRAPPER}}  ' . $css_schema['track_item_lyric'],
+				'label'     => esc_html__('Lyrics Typography', 'lastudio-kit'),
+				'condition' => [
+					'track_item_disable_lyric!' => 'yes'
+				]
 			),
 			50
 		);
@@ -597,6 +713,23 @@ class Player extends LaStudioKit_Base{
 				'selectors' => array(
 					'{{WRAPPER}} ' . $css_schema['track_item_artist'] => 'color: {{VALUE}}',
 				),
+				'condition' => [
+					'track_item_disable_artist!' => 'yes'
+				]
+			),
+			25
+		);
+		$this->_add_control(
+			'track_item_lyric_color',
+			array(
+				'label'     => esc_html__( 'Lyric Color', 'lastudio-kit' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} ' . $css_schema['track_item_lyric'] => 'color: {{VALUE}}',
+				),
+				'condition' => [
+					'track_item_disable_lyric!' => 'yes'
+				]
 			),
 			25
 		);
@@ -663,6 +796,25 @@ class Player extends LaStudioKit_Base{
 					'{{WRAPPER}} .lakitplayer_playlist__item.active-track ' . $css_schema['track_item_artist'] => 'color: {{VALUE}}',
 					'{{WRAPPER}} .lakitplayer_playlist__item:hover ' . $css_schema['track_item_artist'] => 'color: {{VALUE}}',
 				),
+				'condition' => [
+					'track_item_disable_artist!' => 'yes'
+				]
+			),
+			25
+		);
+
+		$this->_add_control(
+			'track_item_lyric_color_active',
+			array(
+				'label'     => esc_html__( 'Lyric Color', 'lastudio-kit' ),
+				'type'      => Controls_Manager::COLOR,
+				'selectors' => array(
+					'{{WRAPPER}} .lakitplayer_playlist__item.active-track ' . $css_schema['track_item_lyric'] => 'color: {{VALUE}}',
+					'{{WRAPPER}} .lakitplayer_playlist__item:hover ' . $css_schema['track_item_lyric'] => 'color: {{VALUE}}',
+				),
+				'condition' => [
+					'track_item_disable_lyric!' => 'yes'
+				]
 			),
 			25
 		);

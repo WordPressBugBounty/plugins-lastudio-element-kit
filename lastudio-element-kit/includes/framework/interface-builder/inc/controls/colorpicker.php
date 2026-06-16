@@ -39,8 +39,8 @@ if ( ! class_exists( 'CX_Control_Colorpicker' ) ) {
 				'cx-colorpicker-alpha',
 				$this->base_url . 'assets/lib/colorpicker/wp-color-picker-alpha.min.js',
 				array( 'wp-color-picker' ),
-				'1.0.0',
-				true
+				'3.0.0',
+                [ 'in_footer' => true]
 			);
 		}
 

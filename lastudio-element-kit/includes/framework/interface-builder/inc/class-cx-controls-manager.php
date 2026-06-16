@@ -47,9 +47,33 @@ if ( ! class_exists( 'CX_Controls_Manager' ) ) {
 		 * @return void
 		 */
 		public function load_controls() {
-			foreach ( glob( $this->base_path . 'inc/controls/*.php' ) as $file ) {
-				require $file;
-			}
+            $control_lists = [
+                'button',
+                'checkbox',
+                'checkbox-raw',
+                'colorpicker',
+                'dimensions',
+                'group',
+                'hidden',
+                'iconpicker',
+                'media',
+                'posts',
+                'radio',
+                'repeater',
+                'select',
+                'slider',
+                'stepper',
+                'switcher',
+                'text',
+                'textarea',
+                'wysiwyg'
+            ];
+            foreach ( $control_lists as $control ) {
+                $file = $this->base_path . 'inc/controls/' . $control . '.php';
+                if( is_readable( $file ) ) {
+                    require_once $file;
+                }
+            }
 		}
 
 		/**

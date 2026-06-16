@@ -2,7 +2,7 @@
 (function (exports, $) {
 
     $(function (){
-        $( '.customize-control-checkbox-multiple input[type="checkbox"]' ).on( 'change', function() {
+        $( '.customize-control-lakit_checkbox_multiple input[type="checkbox"]' ).on( 'change', function() {
 
                 var checkbox_values = $( this ).closest( '.customize-control' ).find( 'input[type="checkbox"]:checked' ).map(
                     function() {

@@ -97,9 +97,9 @@ class LaStudio_Kit_Nav_Walker extends Walker_Nav_Menu {
 
 		$settings = $this->get_settings( $item->ID );
 
-		$show_desc = isset( $args->widget_settings['show_items_desc'] ) ? filter_var( $args->widget_settings['show_items_desc'], FILTER_VALIDATE_BOOLEAN ) : false;
-		$show_megamenu = isset( $args->widget_settings['show_megamenu'] ) ? filter_var( $args->widget_settings['show_megamenu'], FILTER_VALIDATE_BOOLEAN ) : false;
-		$enable_ajax_megamenu = isset( $args->widget_settings['enable_ajax_megamenu'] ) ? filter_var( $args->widget_settings['enable_ajax_megamenu'], FILTER_VALIDATE_BOOLEAN ) : false;
+		$show_desc = isset($args->widget_settings['show_items_desc']) && filter_var($args->widget_settings['show_items_desc'], FILTER_VALIDATE_BOOLEAN);
+		$show_megamenu = isset($args->widget_settings['show_megamenu']) && filter_var($args->widget_settings['show_megamenu'], FILTER_VALIDATE_BOOLEAN);
+		$enable_ajax_megamenu = isset($args->widget_settings['enable_ajax_megamenu']) && filter_var($args->widget_settings['enable_ajax_megamenu'], FILTER_VALIDATE_BOOLEAN);
 
         if( $depth == 0 ) {
             $logo_position = !empty($args->widget_settings['logo_position']) ? absint($args->widget_settings['logo_position']) : 0;
@@ -235,7 +235,7 @@ class LaStudio_Kit_Nav_Walker extends Walker_Nav_Menu {
 		$dropdown_icon = '';
 
 
-		$icon_type = isset( $settings['menu_icon_type'] ) ? $settings['menu_icon_type'] : 'icon';
+		$icon_type = $settings['menu_icon_type'] ?? 'icon';
 
 		switch ( $icon_type ) {
 			case 'icon':
@@ -262,7 +262,7 @@ class LaStudio_Kit_Nav_Walker extends Walker_Nav_Menu {
 		}
 
 		if ( in_array( 'menu-item-has-children', $classes ) ) {
-			$arrow_icon = isset( $args->widget_settings['dropdown_icon'] ) ? $args->widget_settings['dropdown_icon'] : 'lastudioicon-down-arrow';
+			$arrow_icon = $args->widget_settings['dropdown_icon'] ?? 'lastudioicon-down-arrow';
 			if ( $arrow_icon ) {
 				$dropdown_icon = $this->get_dropdown_arrow_html( $arrow_icon );
 			}
@@ -298,7 +298,7 @@ class LaStudio_Kit_Nav_Walker extends Walker_Nav_Menu {
 
 		if(0 === $depth && $show_megamenu && $this->is_mega_enabled( $item->ID )){
 
-			$is_elementor_preview = ( isset( $_GET['elementor-preview'] ) ) ? true : false;
+			$is_elementor_preview = isset( $_GET['elementor-preview'] );
 
 			$template_content = apply_filters('lastudio-kit/module/menu/megamenu_content', '', $item->ID);
 

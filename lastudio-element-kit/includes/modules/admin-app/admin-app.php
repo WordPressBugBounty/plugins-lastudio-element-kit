@@ -84,7 +84,7 @@ class LaStudioKitThemeBuilder_AdminApp extends BaseApp
     {
         // If script didn't loaded, config is still relevant, enqueue without a file.
         if (!wp_script_is('lakit-elementor-app')) {
-            wp_register_script('lakit-elementor-app', false, [], lastudio_kit()->get_version(true), true);
+            wp_register_script('lakit-elementor-app', false, [], lastudio_kit()->get_version(true), [ 'in_footer' => true ]);
             wp_enqueue_script('lakit-elementor-app');
         }
 

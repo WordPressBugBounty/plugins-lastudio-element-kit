@@ -1,8 +1,5 @@
 (function ($) {
-
     "use strict";
-
-
     /**
      * Ajax Handlers
      */
@@ -309,6 +306,12 @@
             $agreementWrap = $('.lakit-subscribe-form__agreements', $target),
             requireFieldMessage = window.lakitSubscribeConfig.sys_messages.require_field;
 
+        if($target.hasClass('-initialized')){
+            return;
+        }
+
+        $target.addClass('-initialized');
+
         var lakitSubscribeFormAjax = new LakitAjaxHandler({
             handlerId: subscribeFormAjaxId,
 
@@ -463,5 +466,11 @@
             LakitSubscribeForm($scope);
         });
     });
+
+    if(LaStudioKits?.addedScripts?.hasOwnProperty('subscribeForm')){
+        $('.elementor-lakit-subscribe-form').each(function (){
+            LakitSubscribeForm($(this));
+        })
+    }
 
 }(jQuery));
