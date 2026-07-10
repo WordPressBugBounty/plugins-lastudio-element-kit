@@ -236,6 +236,7 @@ class LaStudioKit_Banner_List extends LaStudioKit_Base {
                 'type'    => Controls_Manager::SELECT,
                 'default' => 3,
                 'options' => lastudio_kit_helper()->get_select_range( 10 ),
+                'render_type' => 'template',
             )
         );
 

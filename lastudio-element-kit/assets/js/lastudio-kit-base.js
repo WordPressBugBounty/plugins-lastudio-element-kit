@@ -2932,6 +2932,14 @@ document.addEventListener('DOMContentLoaded', function () {
 
         window.elementorFrontend.hooks.addAction('frontend/element_ready/lakit-icon-box.default', function ($scope) {
             $('.lakit--hint', $scope).trigger('lastudio-kit/init-tooltip');
+            const $globalLink = $scope.find('.lakit-iconbox__global_link');
+            if(!LaStudioKits.isEditMode() && $globalLink.length){
+                $('.lakit-iconbox', $scope).on('click', function (e){
+                    if( !$(e.target).closest('a').length ){
+                        $globalLink.get(0).click()
+                    }
+                })
+            }
         });
     }
 

@@ -4,12 +4,12 @@ Tags: elementor addons, elementor extensions, header footer builder, widgets for
 Donate Link: https://paypal.me/dpv0990
 Requires at least: 6.0
 Tested up to: 7.0.0
-Stable tag: 1.6.1
+Stable tag: 1.6.2
 Requires PHP: 7.4
-WC tested up to: 10.8.1
+WC tested up to: 10.9.4
 Elementor tested up to: 4.1.5
 Elementor Pro tested up to: 4.1.5
-WooCommerce tested up to: 10.8.1
+WooCommerce tested up to: 10.9.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -47,9 +47,14 @@ LA-Studio Kit is an ultimate All in one addons for Elementor Page Builder, it wi
 
 == Changelog ==
 
+= 1.6.2 =
+* Add url helper for menu item #logout_url#, #login_url#
+* Fix nav menu dropdown style
+* Fix [CVE-2026-15338] Prevent Local File Inclusion
+
 = 1.6.1 =
 * Fix some performance-related issues.
-* Fixed security issue
+* Fixed security issue ( Thanks @Mike Gozdiskowski)
 
 = 1.5.6.4 =
 * Fixed element visibility condition logic

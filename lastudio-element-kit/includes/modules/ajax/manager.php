@@ -84,7 +84,6 @@ if (!class_exists('LaStudio_Kit_Ajax_Manager')) {
 
 		    add_action( 'init', array( __CLASS__, 'define_ajax' ), 0 );
 		    add_action( 'template_redirect', array( __CLASS__, 'do_lakit_ajax' ), 0 );
-
 		}
 
 	    /**

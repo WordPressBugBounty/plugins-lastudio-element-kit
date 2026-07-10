@@ -130,6 +130,7 @@ class LaStudioKit_Images_Layout extends LaStudioKit_Base {
                 'condition' => array(
                     'layout_type' => ['grid']
                 ),
+                'render_type' => 'template',
             )
         );
 

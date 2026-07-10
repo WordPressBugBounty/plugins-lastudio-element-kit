@@ -1,6 +1,7 @@
 .lakit-gmap{
 	--gmap-overlay-color: #000000;
-	--gmap-overlay-opacity: 0
+	--gmap-overlay-opacity: 0;
+    border-radius: inherit;
 }
 [data-widget_type="lakit-google-maps.default"] .lakit-gmap-message {
 	width: 100%;

@@ -233,3 +233,7 @@
     margin-bottom: var(--tooltip-image-mb);
     overflow: hidden;
 }
+a.lakit-iconbox__global_link {
+    position: absolute;
+    inset: 0;
+}

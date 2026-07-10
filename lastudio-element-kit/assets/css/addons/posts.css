@@ -192,7 +192,7 @@
 	counter-increment: pit;
 	content: counter(pit, decimal-leading-zero)
 }
-@media (max-width: 767px) {
+@media (max-width: 859px) {
 	.elementor-lakit-gposts:not(.lakit-keep-mbl-yes) .preset-list-1 .lakit-posts__inner-box, .elementor-lakit-gposts:not(.lakit-keep-mbl-yes) .preset-list-2 .lakit-posts__inner-box {
 		flex-flow: column wrap
 	}
@@ -290,14 +290,17 @@
 .lakit-posts.preset-grid-2 .lakit-posts__inner-content-inner {
 	pointer-events: initial
 }
-.lakit_fdt--type1 div span, .lakit_fdt--type2 div span {
+.lakit_fdt--type1 div span,
+.lakit_fdt--type2 div span,
+.lakit_fdt--type5 div span {
 	font-size: 1em
 }
-.lakit_fdt--type1 div .m-d, .lakit_fdt--type2 div .m-d {
-	font-size: 2.1em;
-	font-weight: 600
+.lakit_fdt--type1 div .m-d,
+.lakit_fdt--type2 div .m-d,
+.lakit_fdt--type5 div .m-d {
+	font-size: 2em;
 }
-.lakit_fdt--type2 div {
+.lakit_fdt--type2 div{
 	flex-direction: row;
 	text-align: inherit;
 	align-items: center;

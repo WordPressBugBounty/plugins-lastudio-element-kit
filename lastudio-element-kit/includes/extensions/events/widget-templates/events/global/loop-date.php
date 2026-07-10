@@ -38,6 +38,9 @@ switch($floating_date_style){
     case 'type4':
 		$date_html = date('d/m/y', $date_value);
         break;
+    case 'type5':
+        $date_html = sprintf('<span class="m-d">%1$s</span><span class="m-my">%2$s</span>', date('j', $date_value), date('M', $date_value));
+        break;
 
 	default:
 		$date_html = date(get_option( 'date_format', 'M j, Y'), $date_value);

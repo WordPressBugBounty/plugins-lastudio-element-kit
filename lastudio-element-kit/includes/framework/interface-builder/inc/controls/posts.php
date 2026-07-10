@@ -25,6 +25,7 @@ if ( ! class_exists( 'CX_Control_Posts' ) ) {
 			'id'           => 'cx-ui-select-id',
 			'name'         => 'cx-ui-select-name',
 			'size'         => 1,
+            'search_length'=> 3,
 			'inline_style' => '',
 			'value'        => '',
 			'post_type'    => 'post',
@@ -93,6 +94,7 @@ if ( ! class_exists( 'CX_Control_Posts' ) ) {
 
 			$action    = $this->settings['action'];
 			$post_type = $this->settings['post_type'];
+            $search_length = $this->settings['search_length'];
 
 			if ( ! is_array( $post_type ) ) {
 				$post_type = array( $post_type );
@@ -124,7 +126,7 @@ if ( ! class_exists( 'CX_Control_Posts' ) ) {
 						$stingify_values = '';
 					}
 
-					$html .= '<select id="' . esc_attr( $this->settings['id'] ) . '" class="cx-ui-select" name="' . esc_attr( $name ) . '" size="' . esc_attr( $this->settings['size'] ) . '" ' . $multi_state . ' data-filter="true" data-placeholder="' . esc_attr( $this->settings['placeholder'] ) . '" ' . $inline_style . ' data-post-type="' . esc_attr( $post_type ) . '" data-action="' . esc_attr( $action ) . '" data-exclude="' . $stingify_values . '">';
+					$html .= '<select id="' . esc_attr( $this->settings['id'] ) . '" class="cx-ui-select" name="' . esc_attr( $name ) . '" size="' . esc_attr( $this->settings['size'] ) . '" ' . $multi_state . ' data-filter="true" data-minimum-input-length="'.esc_attr($search_length).'" data-placeholder="' . esc_attr( $this->settings['placeholder'] ) . '" ' . $inline_style . ' data-post-type="' . esc_attr( $post_type ) . '" data-action="' . esc_attr( $action ) . '" data-exclude="' . $stingify_values . '">';
 
 						foreach ( $values as $value ) {
 

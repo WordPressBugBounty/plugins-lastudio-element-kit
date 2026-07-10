@@ -434,6 +434,7 @@ class LaStudioKit_Instagram_Feed extends LaStudioKit_Base {
                 'condition' => array(
                     'layout_type' => ['grid']
                 ),
+                'render_type' => 'template',
             )
         );
 

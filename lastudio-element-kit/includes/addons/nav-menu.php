@@ -2417,7 +2417,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
                     ),
                 ),
                 'selectors' => array(
-                    '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav-{{ID}}' => 'width: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav.lakit-nav-{{ID}}' => 'width: {{SIZE}}{{UNIT}};',
                     '{{WRAPPER}} .lakit-mobile-menu--full-width .lakit-nav-{{ID}}' => 'min-width: {{SIZE}}{{UNIT}};',
                 ),
                 'condition' => array(
@@ -2444,7 +2444,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
                     ),
                 ),
                 'selectors' => array(
-                    '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav-{{ID}}' => 'height: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav.lakit-nav-{{ID}}' => 'height: {{SIZE}}{{UNIT}};',
                 ),
                 'condition' => array(
                     'mobile_menu_layout' => 'full-width',
@@ -2470,7 +2470,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
                     ),
                 ),
                 'selectors' => array(
-                    '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav-{{ID}}' => 'max-height: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav.lakit-nav-{{ID}}' => 'max-height: {{SIZE}}{{UNIT}};',
                 ),
                 'condition' => array(
                     'mobile_menu_layout' => 'full-width',
@@ -2486,7 +2486,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
 			    'type'  => Controls_Manager::SLIDER,
 			    'size_units' => array( 'px', 'vh', 'custom' ),
 			    'selectors' => array(
-				    '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav-{{ID}}' => 'margin-top: {{SIZE}}{{UNIT}};',
+				    '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav.lakit-nav-{{ID}}' => 'margin-top: {{SIZE}}{{UNIT}};',
 			    ),
 			    'condition' => array(
 				    'mobile_menu_layout' => 'full-width',
@@ -2535,7 +2535,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
                 'type'       => Controls_Manager::DIMENSIONS,
                 'size_units' => array( 'px', '%' ),
                 'selectors'  => array(
-                    '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav-{{ID}}' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                    '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav.lakit-nav-{{ID}}' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
                 ),
             ),
             25
@@ -2546,7 +2546,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
                 'name'        => 'mobile_menu_border',
                 'label'       => esc_html__( 'Border', 'lastudio-kit' ),
                 'placeholder' => '1px',
-                'selector'    => '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav-{{ID}}',
+                'selector'    => '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav.lakit-nav-{{ID}}',
             ),
             75
         );
@@ -2575,7 +2575,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
                 'label' => esc_html__( 'Background color', 'lastudio-kit' ),
                 'type'  => Controls_Manager::COLOR,
                 'selectors' => array(
-                    '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav-{{ID}}' => 'background-color: {{VALUE}};',
+                    '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav.lakit-nav-{{ID}}' => 'background-color: {{VALUE}};',
                 ),
             ),
             25
@@ -3299,6 +3299,11 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
 
         $cache_data = wp_nav_menu( $args );
         echo str_replace(['{{lakit_mobile_extra_block_html_holder}}', '{{lakit_close_btn_holder}}'], [$mobile_extra_block_html, $close_btn], $cache_data ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+
+        if($breakpoint_value !== 'all'){
+            echo sprintf('<style>@media(max-width: %1$spx){body .lakit-mobile-menu.lakit-nav-wrap-%2$s:not(.lakit-active--mbmenu) .lakit-nav-menuwrap-%2$s{display:none}}</style>', esc_attr($breakpoint_value), esc_attr($this->get_id()));
+        }
+
         echo '</div>';
     }
 
@@ -3407,8 +3412,8 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
         );
 
         $image_data = ! empty( $image['id'] ) ? wp_get_attachment_image_src( $image['id'], 'full' ) : array();
-        $width      = isset( $image_data[1] ) ? $image_data[1] : false;
-        $height     = isset( $image_data[2] ) ? $image_data[2] : false;
+        $width      = $image_data[1] ?? false;
+        $height     = $image_data[2] ?? false;
 
         $width      = apply_filters('lastudio-kit/logo/attr/width', $width);
         $height      = apply_filters('lastudio-kit/logo/attr/height', $height);

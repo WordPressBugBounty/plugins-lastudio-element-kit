@@ -531,6 +531,75 @@ class LaStudioKit_Post_Navigation extends LaStudioKit_Base
             ]
         );
 
+        $this->add_responsive_control(
+            'arrow_gap',
+            [
+                'label' => __('Gap', 'lastudio-kit'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px', 'em'],
+                'selectors' => [
+                    '{{WRAPPER}} .elementor-post-navigation' => '--lakit-n-gap: {{SIZE}}{{UNIT}}',
+                ],
+                'range' => [
+                    'em' => [
+                        'min' => 0,
+                        'max' => 5,
+                    ],
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'arrow_size',
+            [
+                'label' => __('Size', 'lastudio-kit'),
+                'type' => Controls_Manager::SLIDER,
+                'size_units' => ['px', 'em'],
+                'range' => [
+                    'px' => [
+                            'min' => 6,
+                            'max' => 300,
+                    ],
+                ],
+                'selectors' => [
+                    '{{WRAPPER}} .post-navigation__arrow-wrapper' => 'font-size: {{SIZE}}{{UNIT}};',
+                ],
+            ]
+        );
+
+        $this->add_responsive_control(
+            'arrow_padding',
+            [
+                'label' => __('Padding', 'lastudio-kit'),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', '%', 'em' ],
+                'selectors' => [
+                    '{{WRAPPER}} .post-navigation__arrow-wrapper' => 'padding: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ]
+            ]
+        );
+
+        $this->_add_group_control(
+            Group_Control_Border::get_type(),
+            [
+                'name' => 'arrow_border',
+                'label' => esc_html__( 'Border', 'lastudio-kit' ),
+                'selector' => '{{WRAPPER}} .post-navigation__arrow-wrapper',
+            ]
+        );
+
+        $this->add_responsive_control(
+            'arrow_radius',
+            [
+                'label' => __('Border Radius', 'lastudio-kit'),
+                'type' => Controls_Manager::DIMENSIONS,
+                'size_units' => [ 'px', '%', 'em' ],
+                'selectors' => [
+                    '{{WRAPPER}} .post-navigation__arrow-wrapper' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ],
+            ]
+        );
+
         $this->start_controls_tabs('tabs_post_navigation_arrow_style');
 
         $this->start_controls_tab(
@@ -550,6 +619,16 @@ class LaStudioKit_Post_Navigation extends LaStudioKit_Base
                 ],
             ]
         );
+        $this->add_control(
+            'arrow_bgcolor',
+            [
+                'label' => __('Background Color', 'lastudio-kit'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .post-navigation__arrow-wrapper' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
 
         $this->end_controls_tab();
 
@@ -566,7 +645,27 @@ class LaStudioKit_Post_Navigation extends LaStudioKit_Base
                 'label' => __('Color', 'lastudio-kit'),
                 'type' => Controls_Manager::COLOR,
                 'selectors' => [
-                    '{{WRAPPER}} .post-navigation__arrow-wrapper:hover' => 'color: {{VALUE}};',
+                    '{{WRAPPER}} a:hover .post-navigation__arrow-wrapper' => 'color: {{VALUE}};',
+                ],
+            ]
+        );
+        $this->add_control(
+            'arrow_hover_bgcolor',
+            [
+                'label' => __('Background Color', 'lastudio-kit'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} a:hover .post-navigation__arrow-wrapper' => 'background-color: {{VALUE}};',
+                ],
+            ]
+        );
+        $this->add_control(
+            'arrow_hover_border_color',
+            [
+                'label' => __('Border Color', 'lastudio-kit'),
+                'type' => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} a:hover .post-navigation__arrow-wrapper' => 'border-color: {{VALUE}};',
                 ],
             ]
         );
@@ -574,40 +673,6 @@ class LaStudioKit_Post_Navigation extends LaStudioKit_Base
         $this->end_controls_tab();
 
         $this->end_controls_tabs();
-
-        $this->add_responsive_control(
-            'arrow_size',
-            [
-                'label' => __('Size', 'lastudio-kit'),
-                'type' => Controls_Manager::SLIDER,
-                'range' => [
-                    'px' => [
-                        'min' => 6,
-                        'max' => 300,
-                    ],
-                ],
-                'selectors' => [
-                    '{{WRAPPER}} .post-navigation__arrow-wrapper' => 'font-size: {{SIZE}}{{UNIT}};',
-                ],
-            ]
-        );
-
-        $this->add_responsive_control(
-            'arrow_padding',
-            [
-                'label' => __('Gap', 'lastudio-kit'),
-                'type' => Controls_Manager::SLIDER,
-                'selectors' => [
-                    '{{WRAPPER}} .elementor-post-navigation' => '--lakit-n-gap: {{SIZE}}{{UNIT}}',
-                ],
-                'range' => [
-                    'em' => [
-                        'min' => 0,
-                        'max' => 5,
-                    ],
-                ],
-            ]
-        );
 
         $this->end_controls_section();
 

@@ -139,8 +139,7 @@ abstract class LaStudioKit_Base extends Widget_Base
             return false;
         }
 
-        $name = wp_normalize_path($name);
-        $name = ltrim($name, '/');
+        $name = \LaStudio_Kit_Helper::sanitize_template_string($name);
 
         if ( pathinfo($name, PATHINFO_EXTENSION) !== 'php' ) {
             return false;
@@ -153,8 +152,6 @@ abstract class LaStudioKit_Base extends Widget_Base
         if ( empty($template) ) {
             $template = $this->set_template_output() . '/' . $name;
         }
-
-        $template = wp_normalize_path($template);
 
         if (
             ! empty($template)
@@ -175,8 +172,6 @@ abstract class LaStudioKit_Base extends Widget_Base
      */
     public function _get_global_template($name = null)
     {
-
-	    $name = $this->sanitize_file_name($name);
 
         $widget_name = str_replace(['lakit-', 'lastudio-kit-'], '', $this->get_name());
 
@@ -2476,16 +2471,16 @@ abstract class LaStudioKit_Base extends Widget_Base
         $carousel_direction_resp = lastudio_kit_helper()->get_attribute_with_all_breakpoints('carousel_direction', $settings);
 
         $carousel_direction = (!empty($settings['carousel_direction']) && $settings['carousel_direction'] == 'vertical') ? 'vertical' : 'horizontal';
-        if ($carousel_direction == 'vertical') {
+//        if ($carousel_direction == 'vertical') {
 //            $rows = lastudio_kit_helper()->get_attribute_with_all_breakpoints('carousel_rows', []);
-        }
+//        }
 
         $carousel_id = $this->get_settings_for_display('carousel_id');
         if (empty($carousel_id)) {
             $carousel_id = 'lakit_carousel_' . $widget_id;
         }
 
-        $carousel_autoheight = isset($settings['carousel_autoheight']) ? $settings['carousel_autoheight'] : false;
+        $carousel_autoheight = $settings['carousel_autoheight'] ?? false;
 
         $carousel_creative_translate = $this->get_settings_for_display('carousel_creative_translate');
         if(is_null($carousel_creative_translate)){
@@ -3531,34 +3526,6 @@ abstract class LaStudioKit_Base extends Widget_Base
 
 		return $element_config;
 	}
-
-    public function sanitize_file_name( $filename ){
-	    $filename = remove_accents($filename);
-	    $special_chars = array( '?', '[', ']', '\\', '=', '<', '>', ':', ';', ',', "'", '"', '&', '$', '#', '*', '(', ')', '|', '~', '`', '!', '{', '}', '%', '+', '’', '«', '»', '”', '“', chr( 0 ) );
-	    // Check for support for utf8 in the installed PCRE library once and store the result in a static.
-	    static $utf8_pcre = null;
-	    if ( ! isset( $utf8_pcre ) ) {
-		    // phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
-		    $utf8_pcre = @preg_match( '/^./u', 'a' );
-	    }
-        $callback_utf8 = function_exists('wp_is_valid_utf8') ? 'wp_is_valid_utf8' : 'seems_utf8';
-	    if ( ! $callback_utf8( $filename ) ) {
-		    $_ext     = pathinfo( $filename, PATHINFO_EXTENSION );
-		    $_name    = pathinfo( $filename, PATHINFO_FILENAME );
-		    $filename = sanitize_title_with_dashes( $_name ) . '.' . $_ext;
-	    }
-	    if ( $utf8_pcre ) {
-		    $filename = preg_replace( "#\x{00a0}#siu", ' ', $filename );
-	    }
-	    $filename = str_replace($special_chars, '', $filename);
-	    $filename = str_replace( array( '%20', '+' ), '-', $filename );
-	    $filename = preg_replace( '/\.{2,}/', '.', $filename );
-	    $filename = preg_replace( '/[\r\n\t -]+/', '-', $filename );
-	    $filename = preg_replace("/\/\.+/i", '', $filename);
-	    $filename = preg_replace("/(\/\/)+/i", '', $filename);
-	    $filename = trim( $filename, '.-_' );
-	    return $filename;
-    }
 
     protected function dotv2_register_pagination_controls( $conditions = [] ){
         $start_logical = is_rtl() ? 'right' : 'left';

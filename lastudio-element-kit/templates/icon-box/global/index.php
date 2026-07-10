@@ -16,7 +16,6 @@ $show_image_overlay = $this->get_settings_for_display('show_image_overlay');
 $info_box_hover_animation = $this->get_settings_for_display('info_box_hover_animation');
 $section_bg_hover_color_direction = $this->get_settings_for_display('section_bg_hover_color_direction');
 
-
 $enable_header_icon = $this->get_settings_for_display('enable_header_icon');
 $enable_tooltip = $this->get_settings_for_display('enable_tooltip');
 $tooltip_position = $this->get_settings_for_display('tooltip_position');
@@ -39,18 +38,6 @@ $this->add_render_attribute('infobox_wrapper', 'class', $box_classes);
 
 $title_tag = lastudio_kit_helper()->validate_html_tag( $this->get_settings_for_display('title_size') );
 
-if(filter_var($show_global_link, FILTER_VALIDATE_BOOLEAN)){
-    if(!empty($global_link['url'])){
-        $allowed_protocols = array_merge( wp_allowed_protocols(), [ 'skype', 'viber' ] );
-        $global_link['url'] = esc_url($global_link['url'], $allowed_protocols);
-        if(!empty($global_link['url'])){
-            $this->add_render_attribute( 'infobox_wrapper', [
-                'data-lakit-element-link' => wp_json_encode($global_link),
-                'style' => 'cursor: pointer'
-            ] );
-        }
-    }
-}
 $box_title = '';
 $move_divider_to_header = false;
 $move_subtitle_to_header = false;
@@ -78,7 +65,26 @@ if($badge_in_header){
 	$badge_header_html = $this->get_badge();
 }
 
+if(filter_var($show_global_link, FILTER_VALIDATE_BOOLEAN)){
+    $global_link_instance = 'global_link';
+    $this->add_link_attributes( $global_link_instance, $global_link );
+    $this->add_render_attribute( $global_link_instance, 'class', array(
+        'lakit-iconbox__global_link'
+    ));
+    $this->add_render_attribute( 'infobox_wrapper', [
+        'style' => 'cursor: pointer'
+    ]);
+}
+
 $this->print_var(sprintf('<div %1$s>', $this->get_render_attribute_string('infobox_wrapper') ));
+
+if(filter_var($show_global_link, FILTER_VALIDATE_BOOLEAN)){
+    echo sprintf(
+        '<a %1$s><div class="screen-reader-text">%2$s</div></a>',
+        $this->get_render_attribute_string($global_link_instance),
+        esc_html(strip_tags($this->get_settings_for_display('title_text')))
+    );
+}
 
     $this->print_var($this->get_overlay_image('<figure class="lakit-iconbox__image-hover">%s</figure>'));
 
@@ -124,7 +130,7 @@ $this->print_var(sprintf('<div %1$s>', $this->get_render_attribute_string('infob
 
         $btn_text = $this->get_button_icon('<span class="elementor-button-icon">%s</span>');
         $btn_text .= sprintf('<span class="elementor-button-text">%s</span>', $this->get_settings_for_display('btn_text'));
-        $this->print_var(sprintf('<a %1$s><span class="elementor-button-content-wrapper">%2$s</span></a>', $this->get_render_attribute_string('button'), $btn_text));
+        echo sprintf('<a %1$s><span class="elementor-button-content-wrapper">%2$s</span></a>', $this->get_render_attribute_string('button'), $btn_text);
         echo '</div>';
     }
     echo '</div>';
@@ -147,4 +153,6 @@ $this->print_var(sprintf('<div %1$s>', $this->get_render_attribute_string('infob
         }
         echo '</div>';
     }
+
+
 echo '</div>';

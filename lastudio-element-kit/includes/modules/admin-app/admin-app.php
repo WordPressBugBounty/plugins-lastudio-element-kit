@@ -78,6 +78,7 @@ class LaStudioKitThemeBuilder_AdminApp extends BaseApp
         );
 
         wp_set_script_translations('lakit-elementor-app', 'lastudio-kit');
+        $this->enqueue_config();
     }
 
     private function enqueue_config()
@@ -96,10 +97,6 @@ class LaStudioKitThemeBuilder_AdminApp extends BaseApp
         $this->add_component('site-editor', new SiteEditor());
 
         add_action('elementor/app/init', [$this, 'init']);
-
-        add_action('elementor/common/after_register_scripts', function () {
-            $this->enqueue_config();
-        });
 
         add_action('elementor/init', [$this, 'set_menu_url']);
     }

@@ -3,7 +3,7 @@
  * Plugin Name:       LA-Studio Element Kit for Elementor
  * Plugin URI:        https://la-studioweb.com/lastudio-element-kit/
  * Description:       Additional widgets for Elementor page builder. It has 60 highly customizable widgets
- * Version:           1.6.1
+ * Version:           1.6.2
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            LA-Studio
@@ -15,7 +15,7 @@
  *
  * Elementor tested up to: 4.1.5
  * Elementor Pro tested up to: 4.1.5
- * WooCommerce tested up to: 10.8.1
+ * WooCommerce tested up to: 10.9.4
  *
  * @package lastudio-kit
  * @author  LA-Studio
@@ -62,7 +62,7 @@ if(!class_exists('LaStudio_Kit')){
          *
          * @var string
          */
-        private $version = '1.6.1';
+        private $version = '1.6.2';
 
         /**
          * Framework component
@@ -136,7 +136,7 @@ if(!class_exists('LaStudio_Kit')){
 
             add_action('admin_enqueue_scripts', [ $this, 'admin_enqueue'] );
 
-            add_action( 'plugins_loaded', [ $this, 'plugins_loaded' ], 0 );
+            add_action( 'plugins_loaded', [ $this, 'plugins_loaded' ], 11 );
 
             // Register handle ajax global
 
@@ -433,8 +433,7 @@ if(!class_exists('LaStudio_Kit')){
                 return false;
             }
 
-            $name = wp_normalize_path($name);
-            $name = ltrim($name, '/');
+            $name = \LaStudio_Kit_Helper::sanitize_template_string($name);
 
             if ( pathinfo($name, PATHINFO_EXTENSION) !== 'php' ) {
                 return false;
@@ -447,8 +446,6 @@ if(!class_exists('LaStudio_Kit')){
             if ( empty($template) ) {
                 $template = $this->plugin_path('templates/' . $name);
             }
-
-            $template = wp_normalize_path($template);
 
             if (
                 ! empty($template)

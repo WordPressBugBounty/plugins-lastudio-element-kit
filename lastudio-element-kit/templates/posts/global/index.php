@@ -75,7 +75,6 @@ else{
 }
 
 $the_query = $this->the_query();
-
 ?>
 
 <div <?php $this->print_render_attribute_string( 'main-container' ); ?> <?php $this->render_variable($masonry_attr); ?>><?php

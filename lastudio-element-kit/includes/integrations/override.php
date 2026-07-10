@@ -641,3 +641,18 @@ add_filter('elementor/query/lakit_event_enddate_desc', function( $wp_query, $wid
     $wp_query->set( 'order', 'DESC' );
     return $wp_query;
 }, 20, 2);
+
+/* Helper login/logout URL in menu */
+add_filter('nav_menu_link_attributes', function ($atts) {
+    if(isset($atts['href'])){
+        switch ($atts['href']) {
+            case '#logout_url#':
+                $atts['href'] = wp_logout_url();
+                break;
+            case '#login_url#':
+                $atts['href'] = wp_login_url();
+                break;
+        }
+    }
+    return $atts;
+}, 20, 1);

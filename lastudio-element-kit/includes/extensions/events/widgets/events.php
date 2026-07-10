@@ -110,6 +110,7 @@ class Events extends LaStudioKit_Posts{
 					'type2' => esc_html__( 'Type 2', 'lastudio-kit' ),
 					'type3' => esc_html__( 'm/d/y', 'lastudio-kit' ),
 					'type4' => esc_html__( 'd/m/y', 'lastudio-kit' ),
+					'type5' => esc_html__( 'j M', 'lastudio-kit' ),
 				],
 				'default'   => '',
 				'condition' => [

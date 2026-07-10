@@ -1270,6 +1270,26 @@ if ( ! class_exists( 'LaStudio_Kit_Helper' ) ) {
             return $input;
         }
 
+        /**
+         * Cleanup for `Local File Inclusion` injection
+         * @param $path
+         * @return string
+         */
+        public static function sanitize_template_string( $path )
+        {
+            $path = (string) $path;
+            static $cache = array();
+            if ( isset( $cache[ $path ] ) ) {
+                return $cache[ $path ];
+            }
+            $filename = preg_replace('~[^A-Za-z0-9._/-]+~', '', $path);
+            $filename = preg_replace('~\.\.+~', '', $filename);
+            $filename = str_replace('./', '/', $filename);
+            $filename = preg_replace('~/+~', '/', $filename);
+            $cache[ $path ] = trim($filename, '/');
+            return $cache[ $path ];
+        }
+
 	}
 
 }

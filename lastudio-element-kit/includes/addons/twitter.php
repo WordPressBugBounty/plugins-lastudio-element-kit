@@ -89,7 +89,8 @@ class LaStudioKit_Twitter extends LaStudioKit_Base {
             'label'   => esc_html__( 'Columns', 'lastudio-kit' ),
             'type'    => Controls_Manager::SELECT,
             'default' => 1,
-            'options' => lastudio_kit_helper()->get_select_range( 6 )
+            'options' => lastudio_kit_helper()->get_select_range( 6 ),
+            'render_type' => 'template',
           )
         );
 

@@ -327,7 +327,7 @@ class LaStudioKit_Post_Info extends LaStudioKit_Base {
 			    'type'       => Controls_Manager::SLIDER,
 			    'size_units' => array( 'px', 'em' ),
 			    'selectors'  => array(
-				    '{{WRAPPER}} ' . $css_scheme['meta-item'] . ' .meta--icon' => 'margin-right: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}}' => '--lakit-meta1-icon-gap: {{SIZE}}{{UNIT}}'
 			    ),
 		    )
 	    );

@@ -117,6 +117,7 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
                 'selectors'  => array(
                     '{{WRAPPER}}' => '--e-c-col:{{VALUE}}',
                 ),
+                'render_type' => 'template',
             )
         );
 
@@ -2338,7 +2339,7 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
                 'type'       => Controls_Manager::SLIDER,
                 'size_units' => array( 'px', 'em' ),
                 'selectors'  => array(
-                    '{{WRAPPER}} ' . $css_scheme['meta1-item'] . ' .meta--icon' => 'font-size: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}} ' . $css_scheme['meta1-item'] . ' .meta--icon' => 'font-size: {{SIZE}}{{UNIT}}',
                 ),
             )
         );
@@ -2349,7 +2350,7 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
                 'type'       => Controls_Manager::SLIDER,
                 'size_units' => array( 'px', 'em' ),
                 'selectors'  => array(
-                    '{{WRAPPER}} ' . $css_scheme['meta1-item'] . ' .meta--icon' => 'margin-right: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}}' => '--lakit-meta1-icon-gap: {{SIZE}}{{UNIT}}'
                 ),
             )
         );
@@ -2578,7 +2579,7 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
                 'type'       => Controls_Manager::SLIDER,
                 'size_units' => array( 'px', 'em' ),
                 'selectors'  => array(
-                    '{{WRAPPER}} ' . $css_scheme['meta2-item'] . ' .meta--icon' => 'margin-right: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}}' => '--lakit-meta2-icon-gap: {{SIZE}}{{UNIT}}'
                 ),
             )
         );
