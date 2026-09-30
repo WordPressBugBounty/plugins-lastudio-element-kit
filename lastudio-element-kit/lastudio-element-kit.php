@@ -3,7 +3,7 @@
  * Plugin Name:       LA-Studio Element Kit for Elementor
  * Plugin URI:        https://la-studioweb.com/lastudio-element-kit/
  * Description:       Additional widgets for Elementor page builder. It has 60 highly customizable widgets
- * Version:           1.6.2
+ * Version:           1.6.3
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            LA-Studio
@@ -13,9 +13,9 @@
  * Text Domain:       lastudio-kit
  * Domain Path:       /languages
  *
- * Elementor tested up to: 4.1.5
- * Elementor Pro tested up to: 4.1.5
- * WooCommerce tested up to: 10.9.4
+ * Elementor tested up to: 4.3.2
+ * Elementor Pro tested up to: 4.3.0
+ * WooCommerce tested up to: 11.1.2
  *
  * @package lastudio-kit
  * @author  LA-Studio
@@ -62,7 +62,7 @@ if(!class_exists('LaStudio_Kit')){
          *
          * @var string
          */
-        private $version = '1.6.2';
+        private $version = '1.6.3';
 
         /**
          * Framework component

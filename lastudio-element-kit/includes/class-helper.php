@@ -1290,6 +1290,24 @@ if ( ! class_exists( 'LaStudio_Kit_Helper' ) ) {
             return $cache[ $path ];
         }
 
+        /**
+         * @param $id
+         * @return \Elementor\Core\Base\Document
+         * @throws Exception
+         */
+        public static function _unstable_get_document_for_edit( $id ) {
+            $document = lastudio_kit()->elementor()->documents->get( $id );
+
+            if ( ! $document ) {
+                throw new \Exception( 'Not found.' );
+            }
+
+            if ( ! $document->is_editable_by_current_user() ) {
+                throw new \Exception( 'Access denied.' );
+            }
+            return $document;
+        }
+
 	}
 
 }

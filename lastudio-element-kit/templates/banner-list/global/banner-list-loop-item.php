@@ -50,7 +50,7 @@ $this->add_render_attribute( $btn_instance, 'class', array(
 
 $this->add_render_attribute( $link_instance, 'class', array(
     'lakit-bannerlist__link'
-) );
+));
 
 if($_processed_item['link_click'] == 'button'){
     $link_tag = 'div';
@@ -60,6 +60,13 @@ else{
 }
 
 $item_instance = 'item-instance-' . $this->_processed_index;
+
+$subtitle = $this->_loop_item( ['subtitle'] );
+$title = $this->_loop_item( ['title'] );
+
+if(!empty($title)){
+    $this->add_render_attribute( $link_tag === 'a' ? $link_instance : $btn_instance, 'title', wp_strip_all_tags($title) );
+}
 
 $this->add_render_attribute( $item_instance, 'class', $col_class );
 $div_c_attributes = [];
@@ -75,11 +82,9 @@ $btn_icon =  $this->_get_icon_setting( $this->get_settings_for_display('selected
 $__image_html = $this->render_loop_image_item('<div class="lakit-bannerlist__image">%1$s</div>', false);
 $__content_html = $this->get_loop_icon('<div class="lakit-bannerlist__icon">%1$s</div>');
 
-$subtitle = $this->_loop_item( ['subtitle'] );
 if(!empty($subtitle)){
     $__content_html .= sprintf('<div class="lakit-bannerlist__subtitle" data-title="%2$s"><span>%1$s</span></div>', $subtitle, esc_attr(wp_strip_all_tags($subtitle)));
 }
-$title = $this->_loop_item( ['title'] );
 if(!empty($title)){
     $__content_html .= sprintf('<%3$s class="lakit-bannerlist__title" data-title="%2$s"><span>%1$s</span></%3$s>', $title, esc_attr(wp_strip_all_tags($title)), $title_tag);
 }
@@ -98,7 +103,11 @@ if(!empty($_bn_subdesc)) {
 
 $button_html = '';
 if(!empty($_processed_item['button_text']) || !empty($btn_icon)){
-    $button_html = sprintf('<div class="lakit-bannerlist__btn_wrap"><%1$s %2$s>%3$s%4$s</%1$s></div>', $btn_tag, $this->get_render_attribute_string($btn_instance), $_processed_item['button_text'], $btn_icon);
+    $btn_text = '';
+    if(!empty($_processed_item['button_text'])){
+        $btn_text = sprintf('<span class="btn-text">%1$s</span>', $_processed_item['button_text']);
+    }
+    $button_html = sprintf('<div class="lakit-bannerlist__btn_wrap"><%1$s %2$s>%3$s%4$s</%1$s></div>', $btn_tag, $this->get_render_attribute_string($btn_instance), $btn_text, $btn_icon);
 }
 
 if('flat02' !== $preset){

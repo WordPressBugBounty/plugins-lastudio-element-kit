@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class: LaStudioKit_Woo_Single_Product_AddToCart
+ * Class: LaStudioKit_Woo_Single_Product_Addtocart
  * Name: Product AddToCart
  * Slug: lakit-wooproduct-addtocart
  */
@@ -15,7 +15,7 @@ if (!defined('WPINC')) {
 /**
  * Woo Widget
  */
-class LaStudioKit_Woo_Single_Product_AddToCart extends LaStudioKit_Base
+class LaStudioKit_Woo_Single_Product_Addtocart extends LaStudioKit_Base
 {
 
     protected function is_dynamic_content(): bool

@@ -337,8 +337,8 @@ if ( ! class_exists( 'LaStudio_Kit_SVG_Manager' ) ) {
 			}
 
             try{
-                $request =   wp_remote_get($attachment_file);
-                $svg = wp_remote_retrieve_body( $request );
+                $request    =   wp_remote_get($attachment_file);
+                $svg        =   wp_remote_retrieve_body( $request );
             }
             catch (Exception $ex){
                 $svg = '';

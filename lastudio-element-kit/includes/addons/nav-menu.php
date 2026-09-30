@@ -25,7 +25,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
 
     public function get_style_depends()
     {
-        return ['lastudio-kit-dlmenu'];
+        return ['lakit-nav-menu', 'lastudio-kit-dlmenu'];
     }
 
 	public function get_name() {
@@ -975,6 +975,18 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
         ),
         75
       );
+        $this->_add_responsive_control(
+            'toggle_dropdown_radius',
+            array(
+                'label'      => esc_html__( 'Border Radius', 'lastudio-kit' ),
+                'type'       => Controls_Manager::DIMENSIONS,
+                'size_units' => array( 'px', '%' ),
+                'selectors'  => array(
+                    '{{WRAPPER}} .lakit-nav-wrap-{{ID}} > .lakit-nav' => 'border-radius: {{TOP}}{{UNIT}} {{RIGHT}}{{UNIT}} {{BOTTOM}}{{UNIT}} {{LEFT}}{{UNIT}};',
+                ),
+            ),
+            25
+        );
 
         $this->_add_group_control(
           Group_Control_Box_Shadow::get_type(),
@@ -1010,7 +1022,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
                     ),
                 ),
                 'selectors' => array(
-                    '{{WRAPPER}} .lakit-nav-wrap.lakit-nav-wrap-{{ID}}' => 'width: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}}' => '--enav_vtoggle_width: {{SIZE}}{{UNIT}};',
                 ),
                 'condition' => array(
                     'layout' => 'vertical',
@@ -1040,12 +1052,12 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
                     ),
                 ),
                 'selectors_dictionary' => array(
-                    'left'   => 'margin-left: 0; margin-right: auto;',
-                    'center' => 'margin-left: auto; margin-right: auto;',
-                    'right'  => 'margin-left: auto; margin-right: 0;',
+                    'left'   => '--enav_vtoggle_left: 0; --enav_vtoggle_right: auto',
+                    'center' => '--enav_vtoggle_left: auto; --enav_vtoggle_right: auto',
+                    'right'  => '--enav_vtoggle_left: auto; --enav_vtoggle_right: 0',
                 ),
                 'selectors' => array(
-                    '{{WRAPPER}} .lakit-nav-wrap.lakit-nav-wrap-{{ID}}' => '{{VALUE}}',
+                    '{{WRAPPER}}' => '{{VALUE}}',
                 ),
                 'condition'  => array(
                     'layout' => 'vertical',
@@ -3190,6 +3202,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
 
         $this->add_render_attribute( 'nav-wrapper', 'class', 'lakit-nav-wrap' );
         $this->add_render_attribute( 'nav-wrapper', 'class', 'lakit-nav-wrap-' . esc_attr($this->get_id()) );
+        $this->add_render_attribute( 'nav-wrapper', 'class', 'lakit-nav-layout--' . esc_attr( $layout) );
         $this->add_render_attribute( 'nav-wrapper', 'data-effect', $menu_effect );
         $this->add_render_attribute( 'nav-wrapper', 'data-dlconfig', wp_json_encode([
             'backtext' => sprintf('<span>%1$s</span>', $dlmenu_back_text),

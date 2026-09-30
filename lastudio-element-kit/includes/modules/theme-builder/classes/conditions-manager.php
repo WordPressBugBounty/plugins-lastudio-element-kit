@@ -94,7 +94,7 @@ class Conditions_Manager {
 
 		$doc_id = isset($request['editor_post_id']) ? wp_kses_post_deep( wp_unslash( $request['editor_post_id'] ) ) : 0;
 
-		$document = self::_unstable_get_document_for_edit( $doc_id );
+		$document = \LaStudio_Kit_Helper::_unstable_get_document_for_edit( $doc_id );
 
 		$condition = $request['condition'];
 
@@ -178,7 +178,7 @@ class Conditions_Manager {
 	public function ajax_save_theme_template_conditions( $request ) {
 		$doc_id = isset($request['editor_post_id']) ? wp_kses_post_deep( wp_unslash( $request['editor_post_id'] ) ) : 0;
 
-		$document = self::_unstable_get_document_for_edit( $doc_id );
+		$document = \LaStudio_Kit_Helper::_unstable_get_document_for_edit( $doc_id );
 
 		if ( ! isset( $request['conditions'] ) ) {
 			$request['conditions'] = [];
@@ -566,18 +566,5 @@ class Conditions_Manager {
 
 	public function clear_location_cache() {
 		$this->location_cache = [];
-	}
-
-	public static function _unstable_get_document_for_edit( $id ) {
-		$document = lastudio_kit()->elementor()->documents->get( $id );
-
-		if ( ! $document ) {
-			throw new \Exception( 'Not found.' );
-		}
-
-		if ( ! $document->is_editable_by_current_user() ) {
-			throw new \Exception( 'Access denied.' );
-		}
-		return $document;
 	}
 }

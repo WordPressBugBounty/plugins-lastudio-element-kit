@@ -2923,6 +2923,19 @@ class LaStudioKit_Posts extends LaStudioKit_Base {
                 ],
             ]
         );
+        $this->_add_control(
+            'pagination_link_border_color_hover',
+            [
+                'label'     => __( 'Border Color', 'lastudio-kit' ),
+                'type'      => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .lakit-pagination' => '--lakit-pagination-link-hover-border-color: {{VALUE}}',
+                ],
+                'condition' => [
+                    'paginate_as_loadmore!' => 'yes',
+                ],
+            ]
+        );
 
         $this->_end_controls_tab();
 

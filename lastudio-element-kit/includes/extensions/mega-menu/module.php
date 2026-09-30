@@ -97,6 +97,15 @@ class Module extends Module_Base {
             $this->version
         );
 
+        if(!lastudio_kit()->get_theme_support('elementor::lastudio-icon')){
+            wp_enqueue_style(
+                'lastudioicon',
+                lastudio_kit()->plugin_url('includes/extensions/elementor/assets/css/lastudioicon.css'),
+                null,
+                $this->version
+            );
+        }
+
         wp_enqueue_script(
             'lastudio-kit-menu-js',
             $this->url . 'assets/js/menu-admin.js',
@@ -125,6 +134,8 @@ class Module extends Module_Base {
                 'controlData'      => $this->default_nav_item_controls_data(),
                 'iconsFetchJson'   => lastudio_kit()->plugin_url( 'includes/extensions/elementor/assets/fonts/LaStudioIcons.json' ),
                 'itemsSettings'    => $this->get_menu_items_settings(),
+                'nonce_save'       => wp_create_nonce( 'lakit_nav_mega_save' ),
+                'nonce_get'        => wp_create_nonce( 'lakit_nav_mega_get' ),
             ) )
         );
 
@@ -277,13 +288,18 @@ class Module extends Module_Base {
      */
     public function get_nav_item_settings() {
 
+        check_ajax_referer(
+            'lakit_nav_mega_get',
+            'nonce'
+        );
+
         if ( ! current_user_can( 'manage_options' ) ) {
             wp_send_json_error( array(
                 'message' => esc_html__( 'You are not allowed to do this', 'lastudio-kit' ),
             ) );
         }
 
-        $data = isset( $_POST['data'] ) ? $_POST['data'] : false;
+        $data = $_POST['data'] ?? false;
 
         if ( ! $data ) {
             wp_send_json_error( array(
@@ -291,13 +307,22 @@ class Module extends Module_Base {
             ) );
         }
 
-        $default_settings = array();
+        $item_id = absint( $data['itemId'] );
 
-        foreach ( $this->default_nav_item_controls_data() as $key => $value ) {
-            $default_settings[ $key ] = $value['value'];
+        if ( 'nav_menu_item' !== get_post_type( $item_id ) ) {
+            wp_send_json_error(
+                array(
+                    'message' => 'Invalid menu item.',
+                ),
+                400
+            );
         }
 
-        $current_settings = $this->get_item_settings( absint( $data['itemId'] ) );
+        $default_settings = array_map(function ($value) {
+            return $value['value'];
+        }, $this->default_nav_item_controls_data());
+
+        $current_settings = $this->get_item_settings( $item_id );
 
         $current_settings = wp_parse_args( $current_settings, $default_settings );
 
@@ -312,14 +337,17 @@ class Module extends Module_Base {
      * @return [type] [description]
      */
     public function save_nav_item_settings() {
-
+        check_ajax_referer(
+            'lakit_nav_mega_save',
+            'nonce'
+        );
         if ( ! current_user_can( 'manage_options' ) ) {
             wp_send_json_error( array(
                 'message' => esc_html__( 'You are not allowed to do this', 'lastudio-kit' ),
-            ) );
+            ));
         }
 
-        $data = isset( $_POST['data'] ) ? $_POST['data'] : false;
+        $data = $_POST['data'] ?? false;
 
         if ( ! $data ) {
             wp_send_json_error( array(
@@ -327,7 +355,17 @@ class Module extends Module_Base {
             ) );
         }
 
-        $item_id = $data['itemId'];
+        $item_id = absint( $data['itemId'] );
+
+        if ( 'nav_menu_item' !== get_post_type( $item_id ) ) {
+            wp_send_json_error(
+                array(
+                    'message' => 'Invalid menu item.',
+                ),
+                400
+            );
+        }
+
         $settings = $data['itemSettings'];
 
         $sanitized_settings = array();
@@ -380,14 +418,16 @@ class Module extends Module_Base {
      * @param  [type] $value [description]
      * @return [type]        [description]
      */
+
     public function sanitize_field( $key, $value ) {
 
         $specific_callbacks = apply_filters( 'lastudio-kit/module/menu/nav-item-settings/sanitize-callbacks', array(
             'icon_size'    => 'absint',
-            'menu_badge'   => 'wp_kses_post',
+            'menu_badge'   => 'sanitize_text_field',
+            'menu_icon'    => 'sanitize_html_class',
         ) );
 
-        $callback = isset( $specific_callbacks[ $key ] ) ? $specific_callbacks[ $key ] : false;
+        $callback = $specific_callbacks[$key] ?? 'sanitize_text_field';
 
         if ( ! $callback ) {
             return $value;
@@ -399,7 +439,6 @@ class Module extends Module_Base {
     /**
      * Get the current menu ID.
      *
-     * @author Tom Hemsley (https://wordpress.org/plugins/megamenu/)
      * @return int
      */
     public function get_selected_menu_id() {
@@ -411,13 +450,13 @@ class Module extends Module_Base {
         $nav_menus            = wp_get_nav_menus( array('orderby' => 'name') );
         $menu_count           = count( $nav_menus );
         $nav_menu_selected_id = isset( $_REQUEST['menu'] ) ? (int) $_REQUEST['menu'] : 0;
-        $add_new_screen       = ( isset( $_GET['menu'] ) && 0 == $_GET['menu'] ) ? true : false;
+        $add_new_screen       = isset( $_GET['menu'] ) && 0 === $_GET['menu'];
 
         $this->current_menu_id = $nav_menu_selected_id;
 
         // If we have one theme location, and zero menus, we take them right into editing their first menu
         $page_count = wp_count_posts( 'page' );
-        $one_theme_location_no_menus = ( 1 == count( get_registered_nav_menus() ) && ! $add_new_screen && empty( $nav_menus ) && ! empty( $page_count->publish ) ) ? true : false;
+        $one_theme_location_no_menus = 1 === count( get_registered_nav_menus() ) && ! $add_new_screen && empty( $nav_menus ) && ! empty( $page_count->publish );
 
         // Get recently edited nav menu
         $recently_edited = absint( get_user_option( 'nav_menu_recently_edited' ) );

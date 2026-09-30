@@ -239,23 +239,23 @@ class LaStudio_Kit_Nav_Walker extends Walker_Nav_Menu {
 
 		switch ( $icon_type ) {
 			case 'icon':
-				$icon = ! empty( $settings['menu_icon'] ) ? sprintf('<span class="lakit-nav-item-icon"><i class="%1$s"></i></span>', $settings['menu_icon']) : '';
+				$icon = ! empty( $settings['menu_icon'] ) ? sprintf('<span class="lakit-nav-item-icon"><i class="%1$s"></i></span>', esc_attr( $settings['menu_icon'] ) ) : '';
 				break;
 
 			case 'svg':
-				$icon = ! empty( $settings['menu_svg'] ) ? $this->get_svg_icon_html( $settings['menu_svg'] ) : '';
+				$icon = ! empty( $settings['menu_svg'] ) ? $this->get_svg_icon_html( absint( $settings['menu_svg'] ) ) : '';
 				break;
 		}
 
 		if ( ! empty( $item->description ) && $show_desc ) {
 			$desc = sprintf(
 				'<span class="lakit-nav-item-desc %2$s">%1$s</span>',
-				$item->description,
+				esc_html( $item->description ),
 				( 0 === $depth ) ? 'top-level-desc'  : 'sub-level-desc'
 			);
 		}
 
-		$title = sprintf('<span class="menu-text">%1$s</span>', $title);
+		$title = sprintf('<span class="menu-text">%1$s</span>', esc_html( $title ) );
 
 		if ( $hide_item_text ) {
 			$title = '';
@@ -288,7 +288,7 @@ class LaStudio_Kit_Nav_Walker extends Walker_Nav_Menu {
 		}
 
 		$inline_styles_html = join(';', $inline_styles);
-		$title_wrapper_html = sprintf( '<span class="lakit-nav-link-inner" style="%6$s"><span class="lakit-nav-link-text">%5$s%1$s</span>%3$s%4$s</span>%2$s', $title, $dropdown_icon, $badge, $desc, $icon, $inline_styles_html );
+		$title_wrapper_html = sprintf( '<span class="lakit-nav-link-inner" style="%6$s"><span class="lakit-nav-link-text">%5$s%1$s</span>%3$s%4$s</span>%2$s', $title, $dropdown_icon, $badge, $desc, $icon, esc_attr($inline_styles_html) );
 
 		$item_output = $args->before;
 		$item_output .= '<a'. $attributes .'>';
@@ -315,7 +315,7 @@ class LaStudio_Kit_Nav_Walker extends Walker_Nav_Menu {
 			if(!empty($template_content)){
 				$position = ( !empty( $settings['custom_mega_menu_position'] ) && 'default' !== $settings['custom_mega_menu_position'] ) ? 'relative' : 'default';
 				$sub_width = !empty( $settings['custom_mega_menu_width'] ) ? absint($settings['custom_mega_menu_width']) . 'px' : 'auto';
-				$item_output .= sprintf('<div class="lakit-nav__sub lakit-nav__sub-mega lakit-nav-depth-%3$s" data-position="%2$s" data-max-width="%4$s" style="--mm-sub-width:%4$s">%1$s</div>', $template_content, $position, $depth, $sub_width);
+				$item_output .= sprintf('<div class="lakit-nav__sub lakit-nav__sub-mega lakit-nav-depth-%3$s" data-position="%2$s" data-max-width="%4$s" style="--mm-sub-width:%4$s">%1$s</div>', $template_content, esc_attr($position), esc_attr($depth), esc_attr($sub_width));
 			}
 		}
 

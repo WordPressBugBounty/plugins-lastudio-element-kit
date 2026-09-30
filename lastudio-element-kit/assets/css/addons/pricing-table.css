@@ -65,3 +65,18 @@
 .lpt-icontop-yes .lakit-pricing-feature__inner {
     flex-direction: column;
 }
+.lakit-pricing-table__icon-box,
+.lakit-pricing-table__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+.lakit-pricing-table__icon-box svg{
+    width: 1em;
+    height: auto;
+}
+.lakit-pricing-table__icon-box img{
+    width: 100%;
+    height: auto;
+}

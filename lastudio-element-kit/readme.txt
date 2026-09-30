@@ -3,13 +3,13 @@ Contributors: lastudioweb, choijun
 Tags: elementor addons, elementor extensions, header footer builder, widgets for elementor, elementor widgets
 Donate Link: https://paypal.me/dpv0990
 Requires at least: 6.0
-Tested up to: 7.0.0
-Stable tag: 1.6.2
+Tested up to: 7.1.2
+Stable tag: 1.6.3
 Requires PHP: 7.4
-WC tested up to: 10.9.4
-Elementor tested up to: 4.1.5
-Elementor Pro tested up to: 4.1.5
-WooCommerce tested up to: 10.9.4
+WC tested up to: 11.1.2
+Elementor tested up to: 4.3.2
+Elementor Pro tested up to: 4.3.0
+WooCommerce tested up to: 11.1.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -47,6 +47,11 @@ LA-Studio Kit is an ultimate All in one addons for Elementor Page Builder, it wi
 
 == Changelog ==
 
+= 1.6.3 =
+* Fix security issue
+* Fix pricing table issue
+* Fully compatible with WordPress 7.x.x, WooCommerce 11.x.x, Elementor 4.3.x
+
 = 1.6.2 =
 * Add url helper for menu item #logout_url#, #login_url#
 * Fix nav menu dropdown style
@@ -54,14 +59,14 @@ LA-Studio Kit is an ultimate All in one addons for Elementor Page Builder, it wi
 
 = 1.6.1 =
 * Fix some performance-related issues.
-* Fixed security issue ( Thanks @Mike Gozdiskowski)
+* Fix security issue ( Thanks @Mike Gozdiskowski)
 
 = 1.5.6.4 =
-* Fixed element visibility condition logic
-* Fixed security issue
+* Fix element visibility condition logic
+* Fix security issue
 
 = 1.5.6.3 =
-* Fixed security issue
+* Fix security issue
 
 = 1.5.6.2 =
 * Fix product gallery flickering
@@ -69,8 +74,8 @@ LA-Studio Kit is an ultimate All in one addons for Elementor Page Builder, it wi
 
 = 1.5.6 =
 * Fix Advanced carousel displaying issue
-* Fixed variation image issue
-* Fixed security issue
+* Fix variation image issue
+* Fix security issue
 
 = 1.5.5 =
 * Fig bug
@@ -79,13 +84,13 @@ LA-Studio Kit is an ultimate All in one addons for Elementor Page Builder, it wi
 * Compatible with GiveWP
 
 = 1.5.3 =
-* Fixed caching issue
+* Fix caching issue
 * Fix instagram feed issue
 * Improving TTFB
 
 
 = 1.5.2 =
-* Fixed security issue
+* Fix security issue
 
 = 1.5.1 =
 * Support buy now button
@@ -113,12 +118,12 @@ LA-Studio Kit is an ultimate All in one addons for Elementor Page Builder, it wi
 * Compatible with LaStudio Core
 
 = 1.4.3 =
-* Fixed security issue
+* Fix security issue
 * Compatible with Elementor 3.26.x
 
 = 1.4.2 =
 * Fix motion & sticky issue
-* Fixed security issue
+* Fix security issue
 
 = 1.4.1 =
 * Fix assets loading issue
@@ -128,35 +133,35 @@ LA-Studio Kit is an ultimate All in one addons for Elementor Page Builder, it wi
 * Fix motion & header sticky issue
 
 = 1.3.9.8 =
-* Fixed Mobile menu issue
+* Fix Mobile menu issue
 
 = 1.3.9.7 =
-* Fixed security issue
+* Fix security issue
 
 = 1.3.9.3 =
-* Fixed security issue
+* Fix security issue
 
 = 1.3.9.2 =
-* Fixed template loader issue.
-* Fixed custom code issue
-* Fixed Elementor Control Stack issue.
+* Fix template loader issue.
+* Fix custom code issue
+* Fix Elementor Control Stack issue.
 
 = 1.3.9 =
-* Fixed security issue
+* Fix security issue
 
 = 1.3.8.1 =
-* Fixed box-shadow issue
+* Fix box-shadow issue
 
 = 1.3.8 =
-* Fixed security issue
+* Fix security issue
 
 = 1.3.7.6 =
-* Fixed security issue
+* Fix security issue
 
 = 1.3.7.5 =
-* Fixed Header Transparency issue
-* Fixed security issue
-* Fixed dynamic tag issue
+* Fix Header Transparency issue
+* Fix security issue
+* Fix dynamic tag issue
 * Compatible With Elementor 3.20.*
 * Compatible With Elementor Pro 3.20.*
 * Compatible With PHP 8.3
@@ -177,13 +182,13 @@ LA-Studio Kit is an ultimate All in one addons for Elementor Page Builder, it wi
 * Added many features
 
 = 1.1.6 =
-* Fixed PHP error issue [#20568](https://github.com/elementor/elementor/issues/20568)
+* Fix PHP error issue [#20568](https://github.com/elementor/elementor/issues/20568)
 * Added Ajax Login/Register
 * Added WooCommerce Filters
 
 
 = 1.1.5 =
-* Fixed flex container issue
+* Fix flex container issue
 
 = 1.1.4.4 =
 * Allows to manage the number of posts displayed for each context ( Tags, Category, Post Type Archive )

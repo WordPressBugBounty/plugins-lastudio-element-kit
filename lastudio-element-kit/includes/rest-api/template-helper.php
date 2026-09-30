@@ -86,7 +86,7 @@ class Template_Helper {
 
 	    $rest_allow_types = apply_filters('lastudio-kit/rest/elmenetor/allow_types', ['elementor_library', 'nav_menu_item']);
 
-        if( !in_array(get_post_type($template_id), $rest_allow_types) || get_post_status($template_id) !== 'publish' ){
+        if( !in_array(get_post_type($template_id), $rest_allow_types) || get_post_status($template_id) !== 'publish' || post_password_required($template_id) ){
 	        $template_data = $default;
 	        return $type == 'rest' ? rest_ensure_response( $template_data ) : $template_data;
         }
@@ -94,6 +94,9 @@ class Template_Helper {
 		if(!empty($dynamic_id)){
 			global $post;
 			$post = get_post($dynamic_id);
+            if( get_post_status($post) !== 'publish' || post_password_required($post)){
+                return $type == 'rest' ? rest_ensure_response( $default ) : $default;
+            }
 		}
 
         $transient_key = md5( sprintf( 'lakit_doc_%1$s_dynamic_%2$s', $template_id, $dynamic_id ) );
@@ -484,7 +487,7 @@ class Template_Helper {
 	        return $type == 'rest' ? rest_ensure_response( $default_response ) : $default_response;
         }
 
-	    if( false === get_post_type($template_id) || 'publish' !== get_post_status($template_id) ){
+	    if( false === get_post_type($template_id) || 'publish' !== get_post_status($template_id) || post_password_required($template_id) ){
 		    return $type == 'rest' ? rest_ensure_response( $default_response ) : $default_response;
 	    }
 

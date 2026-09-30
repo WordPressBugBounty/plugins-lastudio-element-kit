@@ -18,7 +18,7 @@ if (!defined('WPINC')) {
  */
 class LaStudioKit_Pricing_Table extends LaStudioKit_Base {
 
-    public function get_script_depends()
+    public function get_style_depends()
     {
         return ['lakit-pricing-table'];
     }
@@ -786,7 +786,7 @@ class LaStudioKit_Pricing_Table extends LaStudioKit_Base {
             array(
                 'name'           => 'icon_style',
                 'label'          => esc_html__( 'Icon Style', 'lastudio-kit' ),
-                'selector'       => '{{WRAPPER}} ' . $css_scheme['icon']
+                'selector'       => '{{WRAPPER}} ' . $css_scheme['icon_box']
             )
         );
 
@@ -824,19 +824,19 @@ class LaStudioKit_Pricing_Table extends LaStudioKit_Base {
                 'options' => array(
                     'left'    => array(
                         'title' => esc_html__( 'Left', 'lastudio-kit' ),
-                        'icon'  => 'eicon-text-align-left',
+                        'icon'  => 'eicon-h-align-left',
                     ),
                     'center' => array(
                         'title' => esc_html__( 'Center', 'lastudio-kit' ),
-                        'icon'  => 'eicon-text-align-center',
+                        'icon'  => 'eicon-h-align-center',
                     ),
                     'right' => array(
                         'title' => esc_html__( 'Right', 'lastudio-kit' ),
-                        'icon'  => 'eicon-text-align-right',
+                        'icon'  => 'eicon-h-align-right',
                     ),
                 ),
                 'selectors'  => array(
-                    '{{WRAPPER}} ' . $css_scheme['icon_wrap'] => 'text-align: {{VALUE}};',
+                    '{{WRAPPER}} ' . $css_scheme['icon_box'] => 'justify-content: {{VALUE}};',
                 ),
             )
         );
@@ -2177,6 +2177,9 @@ class LaStudioKit_Pricing_Table extends LaStudioKit_Base {
         $image    = $this->get_settings_for_display('featured_badge');
 
         if ( ! $image ) {
+            return;
+        }
+        if(empty($image['url']) || empty($image['id'])){
             return;
         }
         if ( !empty( $image['id'] ) ) {

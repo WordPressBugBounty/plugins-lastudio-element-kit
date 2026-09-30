@@ -31,7 +31,7 @@ class Module extends Module_Base {
 	 */
 	public function get_proxy_data( $url ) {
 
-		$response = wp_remote_get( mb_convert_encoding($url, 'ISO-8859-1', 'UTF-8') );
+        $response = wp_safe_remote_get( utf8_decode( $url ) );
 
 		if ( is_wp_error( $response ) ) {
 			return '';
@@ -57,6 +57,10 @@ class Module extends Module_Base {
 			return false;
 		}
 
+        if ( ! $this->can_user_manage_screenshots( $data['post_id'] ) ) {
+            return false;
+        }
+
 		$screenshot = new Screenshot( $data['post_id'], $data['screenshot'] );
 
 		$screenshot
@@ -81,6 +85,10 @@ class Module extends Module_Base {
 			return false;
 		}
 
+        if ( ! $this->can_user_manage_screenshots( $data['post_id'] ) ) {
+            return false;
+        }
+
 		$screenshot = new Screenshot( $data['post_id'] );
 
 		$screenshot
@@ -99,11 +107,14 @@ class Module extends Module_Base {
 	 * @return bool
 	 */
 	public function ajax_screenshot_failed( $data ) {
-		if ( empty( $data['post_id'] ) ) {
-			return false;
-		}
+        if ( empty( $data['post_id'] ) ) {
+            return false;
+        }
 
-		$screenshot = new Screenshot( $data['post_id'] );
+        if ( ! $this->can_user_manage_screenshots( $data['post_id'] ) ) {
+            return false;
+        }
+        $screenshot = new Screenshot( $data['post_id'] );
 
 		$screenshot->mark_as_failed();
 
@@ -148,27 +159,33 @@ class Module extends Module_Base {
 	 * @param \WP_Query $query
 	 */
 	public function filter_screenshots_from_attachments_query( \WP_Query $query ) {
-		global $pagenow, $typenow;
+        global $pagenow, $typenow;
 
-		if ( 'upload.php' !== $pagenow || 'attachment' !== $typenow ) {
-			return;
-		}
+        if ( 'upload.php' !== $pagenow || 'attachment' !== $typenow ) {
+            return;
+        }
 
-		$query->query_vars['meta_query'] = [
-			[
-				'key' => Screenshot::IS_SCREENSHOT_POST_META_KEY,
-				'compare' => 'NOT EXISTS',
-			],
-		];
+        if ( empty( $query->query_vars['meta_query'] ) ) {
+            $query->query_vars['meta_query'] = [];
+        }
+
+        $query->query_vars['meta_query'][] = [
+            'key' => Screenshot::IS_SCREENSHOT_POST_META_KEY,
+            'compare' => 'NOT EXISTS',
+        ];
 	}
 
 	public function filter_screenshots_from_ajax_attachments_query( $query ) {
-		$query['meta_query'][] = [
-			'key' => Screenshot::IS_SCREENSHOT_POST_META_KEY,
-			'compare' => 'NOT EXISTS',
-		];
+        if ( empty( $query['meta_query'] ) ) {
+            $query['meta_query'] = [];
+        }
 
-		return $query;
+        $query['meta_query'][] = [
+            'key' => Screenshot::IS_SCREENSHOT_POST_META_KEY,
+            'compare' => 'NOT EXISTS',
+        ];
+
+        return $query;
 	}
 
 	/**
@@ -191,44 +208,57 @@ class Module extends Module_Base {
 		$manager->register_render_mode( Render_Mode_Screenshot::class );
 	}
 
-	/**
-	 * Check and validate proxy mode.
-	 *
-	 * @param array $query_params
-	 *
-	 * @return bool
-	 * @throws \Requests_Exception_HTTP_400
-	 * @throws \Requests_Exception_HTTP_403
-	 */
-	protected function is_screenshot_proxy_mode( array $query_params ) {
-		$is_proxy = isset( $query_params['screenshot_proxy'] );
+    /**
+     * Check and validate proxy mode.
+     *
+     * @param array $query_params
+     *
+     * @return bool
+     * @throws \Requests_Exception_HTTP_400
+     * @throws \Requests_Exception_HTTP_403
+     * @throws Status400
+     * @throws Status403
+     */
+    protected function is_screenshot_proxy_mode( array $query_params ) {
+        $is_proxy = isset( $query_params['screenshot_proxy'] );
 
-		if ( $is_proxy ) {
-			if ( ! wp_verify_nonce( $query_params['nonce'], self::SCREENSHOT_PROXY_NONCE_ACTION ) ) {
-				throw new \Requests_Exception_HTTP_403();
-			}
+        if ( $is_proxy ) {
+            if ( ! wp_verify_nonce( $query_params['nonce'], self::SCREENSHOT_PROXY_NONCE_ACTION ) ) {
+                // WP >= 6.2-alpha
+                if ( class_exists( '\WpOrg\Requests\Exception\Http\Status403' ) ) {
+                    throw new \WpOrg\Requests\Exception\Http\Status403();
+                } else {
+                    throw new \Requests_Exception_HTTP_403();
+                }
+            }
 
-			if ( ! $query_params['href'] ) {
-				throw new \Requests_Exception_HTTP_400();
-			}
-		}
-
-		return $is_proxy;
-	}
-
-	public function save_posts( $instance ) {
-        if( $instance instanceof Theme_Document ) {
-            $this->ajax_delete( [
-                'post_id' => $instance->get_main_id()
-            ]);
+            if ( ! $query_params['href'] ) {
+                // WP >= 6.2-alpha
+                if ( class_exists( '\WpOrg\Requests\Exception\Http\Status400' ) ) {
+                    throw new \WpOrg\Requests\Exception\Http\Status400();
+                } else {
+                    throw new \Requests_Exception_HTTP_400();
+                }
+            }
         }
+
+        return $is_proxy;
+    }
+
+    /**
+     * @param $post_id
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    private function can_user_manage_screenshots( $post_id )
+    {
+        return \LaStudio_Kit_Helper::_unstable_get_document_for_edit( $post_id ) && current_user_can( 'upload_files' );
     }
 
 	/**
 	 * Module constructor.
 	 *
-	 * @throws \Requests_Exception_HTTP_400
-	 * @throws \Requests_Exception_HTTP_403
 	 */
 	public function __construct() {
 		parent::__construct();
@@ -243,7 +273,5 @@ class Module extends Module_Base {
 		add_action( 'parse_query', [ $this, 'filter_screenshots_from_attachments_query' ] );
 		add_filter( 'ajax_query_attachments_args', [ $this, 'filter_screenshots_from_ajax_attachments_query' ] );
 		add_filter( 'lastudio-kit/site-editor/data/template', [ $this, 'extend_templates_json_structure' ] );
-
-        add_action( 'elementor/document/before_save', [ $this, 'save_posts' ], 20);
 	}
 }

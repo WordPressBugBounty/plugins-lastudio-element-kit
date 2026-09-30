@@ -1,7 +1,7 @@
 <?php
 
 /**
- * Class: LaStudioKit_Woo_Single_Product_ShortDescription
+ * Class: LaStudioKit_Woo_Single_Product_Shortdescription
  * Name: Product Short Description
  * Slug: lakit-wooproduct-shortdescription
  */
@@ -15,7 +15,7 @@ if (!defined('WPINC')) {
 /**
  * Woo Widget
  */
-class LaStudioKit_Woo_Single_Product_ShortDescription extends LaStudioKit_Base {
+class LaStudioKit_Woo_Single_Product_Shortdescription extends LaStudioKit_Base {
     protected function is_dynamic_content(): bool
     {
         return true;

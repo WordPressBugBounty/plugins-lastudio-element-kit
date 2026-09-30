@@ -27,16 +27,6 @@ abstract class LaStudioKit_Base extends Widget_Base
     public function __construct($data = [], $args = null)
     {
         parent::__construct($data, $args);
-
-        $this->_load_level = (int)lastudio_kit_settings()->get('widgets_load_level', 100);
-
-        $widget_name = $this->get_name();
-
-        $this->_include_controls = apply_filters("lastudio-kit/editor/{$widget_name}/include-controls", [], $widget_name, $this);
-
-        $this->_exclude_controls = apply_filters("lastudio-kit/editor/{$widget_name}/exclude-controls", [], $widget_name, $this);
-
-        $this->enqueue_addon_resources();
     }
 
     protected function is_dynamic_content(): bool
@@ -53,8 +43,6 @@ abstract class LaStudioKit_Base extends Widget_Base
     {
         return ['lastudio-kit-base'];
     }
-
-    protected function enqueue_addon_resources() { }
 
     public function has_widget_inner_wrapper(): bool {
       return false;
@@ -4016,4 +4004,10 @@ abstract class LaStudioKit_Base extends Widget_Base
 			return $params;
 		}
 	}
+
+    protected function parse_text_editor( $content )
+    {
+        $rawContent = parent::parse_text_editor( $content );
+        return wp_kses_post($rawContent);
+    }
 }

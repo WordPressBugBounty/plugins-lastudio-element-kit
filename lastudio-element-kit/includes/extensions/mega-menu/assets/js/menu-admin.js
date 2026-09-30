@@ -139,6 +139,7 @@
                             dataType: 'json',
                             data: {
                                 action: 'lakit_get_nav_item_settings',
+                                nonce: navSettingsConfig.nonce_get,
                                 data: {
                                     itemId: self.itemId,
                                     itemDepth: self.itemDepth,
@@ -176,6 +177,7 @@
                             dataType: 'json',
                             data: {
                                 action: 'lakit_save_nav_item_settings',
+                                nonce: navSettingsConfig.nonce_save,
                                 data: {
                                     itemId: self.itemId,
                                     itemDepth: self.itemDepth,

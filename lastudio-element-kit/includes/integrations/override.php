@@ -472,7 +472,7 @@ add_action('elementor/element/spacer/section_spacer/before_section_end', functio
  */
 add_action('elementor/element/image-box/section_style_box/before_section_end', function ( \Elementor\Controls_Stack $element){
     $element->update_responsive_control('position', [
-        'prefix_class' => '',
+        'prefix_class' => 'e-position-',
         'selectors_dictionary' => [
             'left' => '--e-imb-direction: row;',
             'top' => '--e-imb-direction: column;',
@@ -483,7 +483,7 @@ add_action('elementor/element/image-box/section_style_box/before_section_end', f
         ],
     ]);
     $element->update_responsive_control('content_vertical_alignment', [
-        'prefix_class' => '',
+        'prefix_class' => 'e-vertical-align-',
         'selectors_dictionary' => [
             'top' => '--e-imb-align-items: flex-start;',
             'middle' => '--e-imb-align-items: center;',
@@ -498,14 +498,14 @@ add_action('elementor/element/image-box/section_style_box/before_section_end', f
             '{{WRAPPER}}' => '--e-imb-gap: {{SIZE}}{{UNIT}}',
         ],
     ]);
-});
+}, 20);
 add_action('elementor/element/image-box/section_style_image/before_section_end', function ( \Elementor\Controls_Stack $element){
     $element->update_responsive_control('image_size', [
         'selectors' => [
             '{{WRAPPER}} .elementor-image-box-wrapper .elementor-image-box-img' => 'width: {{SIZE}}{{UNIT}}; flex: 0 0 {{SIZE}}{{UNIT}};',
         ],
     ]);
-});
+}, 20);
 add_action('elementor/element/image-box/section_style_content/before_section_end', function ( $element ){
 	$element->add_control(
 		'description_hover_color',

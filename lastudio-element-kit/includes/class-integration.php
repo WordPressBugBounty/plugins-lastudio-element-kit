@@ -166,9 +166,9 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
             foreach ( $registry as $slug => $widget ) {
                 $enabled = $available_widgets[ $slug ] ?? false;
                 if ( filter_var( $enabled, FILTER_VALIDATE_BOOLEAN ) || empty( $available_widgets ) ) {
-                    $file = lastudio_kit()->plugin_path( 'includes/addons/' . $widget['file'] );
-                    if ( is_readable( $file ) ) {
-                        $this->register_addon( $file, $widgets_manager );
+                    $class = 'Elementor\\' . $widget['class'];
+                    if(class_exists($class)){
+                        $widgets_manager->register(new $class());
                     }
                 }
             }
@@ -191,105 +191,71 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
                 'lastudio-kit/allowed-vendor-widgets',
                 array(
                     'woo_products' => array(
-                        'file' => lastudio_kit()->plugin_path(
-                            'includes/addons/woo-products.php'
-                        ),
+                        'class' => 'Elementor\\LaStudioKit_Woo_Products',
                         'conditional' => $woo_conditional,
                     ),
                     'woo_menu_cart' => array(
-                        'file' => lastudio_kit()->plugin_path(
-                            'includes/addons/woo-menu-cart.php'
-                        ),
+                        'class' => 'Elementor\\LaStudioKit_Woo_Menu_Cart',
                         'conditional' => $woo_conditional,
                     ),
                     'woo_pages' => array(
-                        'file' => lastudio_kit()->plugin_path(
-                            'includes/addons/woo-pages.php'
-                        ),
+                        'class' => 'Elementor\\LaStudioKit_Woo_Pages',
                         'conditional' => $woo_conditional,
                     ),
                     'woo_add_to_cart' => array(
-                        'file' => lastudio_kit()->plugin_path(
-                            'includes/addons/woo-add-to-cart.php'
-                        ),
+                        'class' => 'Elementor\\LaStudioKit_Woo_Add_To_Cart',
                         'conditional' => $woo_conditional,
                     ),
                     'woo_single_product_title' => array(
-                        'file' => lastudio_kit()->plugin_path(
-                            'includes/addons/woo-single-product-title.php'
-                        ),
+                        'class' => 'Elementor\\LaStudioKit_Woo_Single_Product_Title',
                         'conditional' => $woo_conditional,
                     ),
                     'woo_single_product_images' => array(
-                        'file' => lastudio_kit()->plugin_path(
-                            'includes/addons/woo-single-product-images.php'
-                        ),
+                        'class' => 'Elementor\\LaStudioKit_Woo_Single_Product_Images',
                         'conditional' => $woo_conditional,
                     ),
                     'woo_single_product_price' => array(
-                        'file' => lastudio_kit()->plugin_path(
-                            'includes/addons/woo-single-product-price.php'
-                        ),
+                        'class' => 'Elementor\\LaStudioKit_Woo_Single_Product_Price',
                         'conditional' => $woo_conditional,
                     ),
                     'woo_single_product_addtocart' => array(
-                        'file' => lastudio_kit()->plugin_path(
-                            'includes/addons/woo-single-product-addtocart.php'
-                        ),
+                        'class' => 'Elementor\\LaStudioKit_Woo_Single_Product_Addtocart',
                         'conditional' => $woo_conditional,
                     ),
                     'woo_single_product_rating' => array(
-                        'file' => lastudio_kit()->plugin_path(
-                            'includes/addons/woo-single-product-rating.php'
-                        ),
+                        'class' => 'Elementor\\LaStudioKit_Woo_Single_Product_Rating',
                         'conditional' => $woo_conditional,
                     ),
                     'woo_single_product_stock' => array(
-                        'file' => lastudio_kit()->plugin_path(
-                            'includes/addons/woo-single-product-stock.php'
-                        ),
+                        'class' => 'Elementor\\LaStudioKit_Woo_Single_Product_Stock',
                         'conditional' => $woo_conditional,
                     ),
                     'woo_single_product_meta' => array(
-                        'file' => lastudio_kit()->plugin_path(
-                            'includes/addons/woo-single-product-meta.php'
-                        ),
+                        'class' => 'Elementor\\LaStudioKit_Woo_Single_Product_Meta',
                         'conditional' => $woo_conditional,
                     ),
                     'woo_single_product_shortdescription' => array(
-                        'file' => lastudio_kit()->plugin_path(
-                            'includes/addons/woo-single-product-shortdescription.php'
-                        ),
+                        'class' => 'Elementor\\LaStudioKit_Woo_Single_Product_Shortdescription',
                         'conditional' => $woo_conditional,
                     ),
                     'woo_single_product_content' => array(
-                        'file' => lastudio_kit()->plugin_path(
-                            'includes/addons/woo-single-product-content.php'
-                        ),
+                        'class' => 'Elementor\\LaStudioKit_Woo_Single_Product_Content',
                         'conditional' => $woo_conditional,
                     ),
                     'woo_single_product_datatabs' => array(
-                        'file' => lastudio_kit()->plugin_path(
-                            'includes/addons/woo-single-product-datatabs.php'
-                        ),
+                        'class' => 'Elementor\\LaStudioKit_Woo_Single_Product_Datatabs',
                         'conditional' => $woo_conditional,
                     ),
                     'woo_single_product_additional_information' => array(
-                        'file' => lastudio_kit()->plugin_path(
-                            'includes/addons/woo-single-product-additional-information.php'
-                        ),
+                        'class' => 'Elementor\\LaStudioKit_Woo_Single_Product_Additional_Information',
                         'conditional' => $woo_conditional,
                     ),
                     'woo_wishlist_compare' => array(
-                        'file' => lastudio_kit()->plugin_path(
-                            'includes/addons/woo-wishlist-compare.php'
-                        ),
+                        'class' => 'Elementor\\LaStudioKit_Woo_Wishlist_Compare',
                         'conditional' => $woo_conditional,
                     ),
                     'contact_form7' => array(
-                        'file' => lastudio_kit()->plugin_path(
-                            'includes/addons/contact-form7.php'
-                        ),
+                        'class' => 'Elementor\\LaStudioKit_Contact_Form7',
                         'conditional' => [
                             'cb'  => 'class_exists',
                             'arg' => 'WPCF7',
@@ -299,16 +265,28 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
             );
 
             foreach ( $allowed_vendors as $vendor ) {
-                if ( is_callable( $vendor['conditional']['cb'] )
-                    && true === call_user_func( $vendor['conditional']['cb'], $vendor['conditional']['arg'], false ) ) {
-                    $this->register_addon( $vendor['file'], $widgets_manager );
+                if (
+                    is_callable( $vendor['conditional']['cb'] ) &&
+                    true === call_user_func( $vendor['conditional']['cb'], $vendor['conditional']['arg'], false )
+                )
+                {
+                    if(isset($vendor['file'])){
+                        $this->register_addon( $vendor['file'], $widgets_manager );
+                    }
+                    else{
+                        $class = $vendor['class'];
+                        if(class_exists($class)){
+                            $widgets_manager->register(new $class());
+                        }
+                    }
+
                 }
             }
-
             if( lastudio_kit()->get_theme_support('elementor::product-grid-v2') && class_exists('WooCommerce', false) ){
-                $this->register_addon( lastudio_kit()->plugin_path(
-                    'includes/addons/woo-filters.php'
-                ), $widgets_manager );
+                $class = 'Elementor\\LaStudioKit_Woo_Filters';
+                if(class_exists($class)){
+                    $widgets_manager->register(new $class());
+                }
             }
 		}
 
@@ -319,18 +297,18 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 		 * @param  object $widgets_manager Widgets manager instance.
 		 * @return void
 		 */
-		public function register_addon( $file, $widgets_manager ) {
-
-			$base  = basename( str_replace( '.php', '', $file ) );
-			$class = ucwords( str_replace( '-', ' ', $base ) );
-			$class = str_replace( ' ', '_', $class );
-            $class = 'LaStudioKit_' . $class;
-			$class = sprintf( 'Elementor\%s', $class );
-
-			if ( class_exists( $class ) ) {
-				$widgets_manager->register( new $class );
-			}
-		}
+        public function register_addon( string $file, $widgets_manager ): void
+        {
+            static $classCache = [];
+            if (!isset($classCache[$file])) {
+                $classCache[$file] = 'Elementor\\LaStudioKit_' . str_replace(' ','_',ucwords(str_replace('-', ' ', pathinfo($file, PATHINFO_FILENAME))));
+            }
+            $class = $classCache[$file];
+            if (!class_exists($class)) {
+                return;
+            }
+            $widgets_manager->register(new $class());
+        }
 
 		/**
 		 * Register cherry category for elementor if not exists
@@ -429,6 +407,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
                 'lakit-instagram-feed' => 'assets/css/addons/instagram-feed.min.css',
                 'lakit-login-frm' => 'assets/css/addons/login.min.css',
                 'lastudio-kit-dlmenu' => 'assets/css/lastudio-dlmenu.min.css',
+                'lakit-nav-menu' => 'assets/css/addons/nav-menu.min.css',
                 'lakit-post-navigation' => 'assets/css/addons/post-navigation.min.css',
                 'lakit-posts' => 'assets/css/addons/posts.min.css',
                 'lakit-price-list' => 'assets/css/addons/price-list.min.css',
@@ -1243,7 +1222,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
             if(!empty($_GET)){
                 foreach ($_GET as $key => $value){
                     $_tmp_key = strtolower($key);
-                    if(strpos($_tmp_key, 'filter_') !== false){
+                    if(str_contains($_tmp_key, 'filter_')){
                         $wc_filters[$_tmp_key] = $value;
                     }
                 }

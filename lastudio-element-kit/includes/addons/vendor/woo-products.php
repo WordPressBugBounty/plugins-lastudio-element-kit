@@ -406,6 +406,19 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
                 ],
             ]
         );
+        $this->_add_control(
+            'pagination_link_border_color_hover',
+            [
+                'label'     => __( 'Border Color', 'lastudio-kit' ),
+                'type'      => Controls_Manager::COLOR,
+                'selectors' => [
+                    '{{WRAPPER}} .lakit-pagination' => '--lakit-pagination-link-hover-border-color: {{VALUE}}',
+                ],
+                'condition' => [
+                    'paginate_as_loadmore!' => 'yes',
+                ],
+            ]
+        );
 
         $this->_end_controls_tab();
 
@@ -500,7 +513,10 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
                 'min' => 1,
                 'max' => 10,
                 'default' => Products_Renderer::DEFAULT_COLUMNS_AND_ROWS,
-                'render_type' => 'template'
+                'render_type' => 'template',
+                'selectors'  => array(
+                    '{{WRAPPER}} .swiper-wrapper' => '--e-c-col:{{VALUE}}',
+                ),
             ]
         );
 
@@ -1752,7 +1768,10 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
                 'min' => 1,
                 'max' => 10,
                 'default' => Products_Renderer::DEFAULT_COLUMNS_AND_ROWS,
-                'render_type' => 'template'
+                'render_type' => 'template',
+                'selectors'  => array(
+                    '{{WRAPPER}} .swiper-wrapper' => '--e-c-col:{{VALUE}}',
+                ),
             ]
         );
         $this->_add_control(

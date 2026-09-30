@@ -806,7 +806,7 @@ abstract class Base_Products_Renderer extends \WC_Shortcode_Products {
             sprintf(
                 '<a href="%1$s" data-quantity="%2$s" class="lakit-btn la-addcart %3$s" %4$s data-hint="%5$s">%7$s<span class="lakit-btn--text">%6$s</span></a>',
                 esc_url( $product->add_to_cart_url() ),
-                esc_attr( isset( $args['quantity'] ) ? $args['quantity'] : 1 ),
+                esc_attr($args['quantity'] ?? 1),
                 esc_attr( $button_class ),
                 isset( $args['attributes'] ) ? wc_implode_html_attributes( $args['attributes'] ) : '',
                 esc_attr($button_text),
