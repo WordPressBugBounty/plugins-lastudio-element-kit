@@ -1155,7 +1155,7 @@
             let $targetElement;
 
             try {
-                $targetElement = jQuery(this.getTriggerSetting('selector'));
+                $targetElement = jQuery(document).find(this.getTriggerSetting('selector'));
             } catch (e) {
                 return;
             }
@@ -1172,7 +1172,7 @@
 
         destroy() {
             if (this.scrollObserver) {
-                this.scrollObserver.unobserve(jQuery(this.getTriggerSetting('selector')).get(0))
+                this.scrollObserver.unobserve(jQuery(document).find(this.getTriggerSetting('selector')).get(0))
             }
         }
 

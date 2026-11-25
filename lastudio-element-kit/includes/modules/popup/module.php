@@ -83,9 +83,26 @@ class Module extends \Elementor\Core\Base\Module {
 	}
 
 	public function save_display_settings( $data ) {
+		if ( empty( $data['editor_post_id'] ) ) {
+			throw new \Exception( 'Missing post id.' );
+		}
+
+		$post_id = absint( $data['editor_post_id'] );
+
+		if ( ! current_user_can( 'edit_post', $post_id ) ) {
+			throw new \Exception( 'Access denied.' );
+		}
+
 		/** @var Document $popup_document */
-		$popup_document = lastudio_kit()->elementor()->documents->get( $data['editor_post_id'] );
-		$popup_document->save_display_settings_data( $data['settings'] );
+		$popup_document = \LaStudio_Kit_Helper::_unstable_get_document_for_edit( $post_id );
+
+		if ( ! $popup_document instanceof Document ) {
+			throw new \Exception( 'Invalid document.' );
+		}
+
+		$settings = isset( $data['settings'] ) && is_array( $data['settings'] ) ? $data['settings'] : [];
+
+		$popup_document->save_display_settings_data( $popup_document->sanitize_display_settings_data( $settings ) );
 	}
 
 	/**

@@ -742,7 +742,7 @@ class LaStudioKit_Hamburger_Panel extends LaStudioKit_Base {
         $toggle_label_html = '';
 
         if ( ! empty( $panel_settings['panel_toggle_label'] ) ) {
-          $toggle_label_html .= sprintf( '<div class="lakit-hamburger-panel__toggle-label"><span>%1$s</span></div>', $panel_settings['panel_toggle_label'] );
+          $toggle_label_html .= sprintf( '<div class="lakit-hamburger-panel__toggle-label"><span>%1$s</span></div>', $this->kses_text( $panel_settings['panel_toggle_label'] ) );
         }
 
         $toggle_html = sprintf( '<div class="lakit-hamburger-panel__toggle main-color">%1$s%2$s</div>', $toggle_control_html, $toggle_label_html );
@@ -779,7 +779,7 @@ class LaStudioKit_Hamburger_Panel extends LaStudioKit_Base {
               if($template_id == get_queried_object_id()){
                   $content_html .= '<span class="lakit-css-loader"></span>';
               }
-              else if ( ! empty( $template_id ) && ( !$ajax_template || Plugin::instance()->editor->is_edit_mode() ) ) {
+              else if ( ! empty( $template_id ) && \LaStudio_Kit_Helper::can_render_template( $template_id ) && ( !$ajax_template || Plugin::instance()->editor->is_edit_mode() ) ) {
                   ob_start();
                   if(Plugin::instance()->editor->is_edit_mode()){
                       $css_file = Post_CSS::create( $template_id );

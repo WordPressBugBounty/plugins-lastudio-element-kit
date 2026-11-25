@@ -1,15 +1,15 @@
 === LA-Studio Element Kit for Elementor ===
 Contributors: lastudioweb, choijun
-Tags: elementor addons, elementor extensions, header footer builder, widgets for elementor, elementor widgets
+Tags: elementor addons, elementor extensions, header footer builder, widgets for elementor, elementor widgets, atomic elements
 Donate Link: https://paypal.me/dpv0990
 Requires at least: 6.0
 Tested up to: 7.1.2
-Stable tag: 1.6.3
+Stable tag: 1.6.4
 Requires PHP: 7.4
 WC tested up to: 11.1.2
-Elementor tested up to: 4.3.2
-Elementor Pro tested up to: 4.3.0
-WooCommerce tested up to: 11.1.2
+Elementor tested up to: 4.4.2
+Elementor Pro tested up to: 4.4.2
+WooCommerce tested up to: 11.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.txt
 
@@ -46,6 +46,13 @@ LA-Studio Kit is an ultimate All in one addons for Elementor Page Builder, it wi
 4. Add New Conditions
 
 == Changelog ==
+
+= 1.6.4 =
+* Fix security issue
+* Add Loop Grid, Loop Carousel widgets
+* Add Display Conditions for V3 and V4
+* Add Atomic Loop, Atomic Custom CSS, Atomic size variables, Atomic Interactions
+* Fully compatible with WordPress 7.1.x, WooCommerce 11.3.x, Elementor 4.4.x
 
 = 1.6.3 =
 * Fix security issue

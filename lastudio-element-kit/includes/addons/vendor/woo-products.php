@@ -6182,8 +6182,8 @@ class LaStudioKit_Woo_Products extends LaStudioKit_Base {
                 $carousel_dot_html = '<div class="lakit-carousel__dots lakit-carousel__dots_'.$unique_id.' swiper-pagination"></div>';
             }
             if (filter_var($this->get_settings_for_display('carousel_arrows'), FILTER_VALIDATE_BOOLEAN)) {
-                $carousel_arrow_html = sprintf('<div class="lakit-carousel__prev-arrow-%s lakit-arrow prev-arrow">%s</div>', $unique_id, $this->_render_icon('carousel_prev_arrow', '%s', '', false));
-                $carousel_arrow_html .= sprintf('<div class="lakit-carousel__next-arrow-%s lakit-arrow next-arrow">%s</div>', $unique_id, $this->_render_icon('carousel_next_arrow', '%s', '', false));
+                $carousel_arrow_html = sprintf('<div class="lakit-carousel__prev-arrow-%s lakit-arrow prev-arrow">%s</div>', $unique_id, $this->_render_icon(is_rtl() ? 'carousel_next_arrow' : 'carousel_prev_arrow', '%s', '', false));
+                $carousel_arrow_html .= sprintf('<div class="lakit-carousel__next-arrow-%s lakit-arrow next-arrow">%s</div>', $unique_id, $this->_render_icon(is_rtl() ? 'carousel_prev_arrow' :'carousel_next_arrow', '%s', '', false));
             }
             if (filter_var($this->get_settings_for_display('carousel_scrollbar'), FILTER_VALIDATE_BOOLEAN)) {
 	            $carousel_scrollbar_html = sprintf('<div class="lakit-carousel__scrollbar swiper-scrollbar lakit-carousel__scrollbar_%1$s"></div>', $unique_id);

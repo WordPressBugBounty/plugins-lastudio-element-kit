@@ -16,7 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Site Editor Module
  *
- * Responsible for initializing Elementor Pro App functionality
  */
 class Module extends BaseModule {
 	/**

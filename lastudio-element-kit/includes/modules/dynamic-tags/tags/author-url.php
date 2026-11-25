@@ -2,14 +2,14 @@
 namespace LaStudioKitThemeBuilder\Modules\DynamicTags\Tags;
 
 use Elementor\Controls_Manager;
-use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Data_Tag;
+use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Pro_Data_Tag;
 use LaStudioKitThemeBuilder\Modules\DynamicTags\Module;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Author_URL extends Data_Tag {
+class Author_URL extends Pro_Data_Tag {
 
 	public function get_name() {
 		return 'author-url';

@@ -134,7 +134,7 @@
                 $activeControl.addClass('active-tab');
 
                 if($ddControlsTmp.length){
-                    $ddControlsTmp.find('.lakit-tabs__controls__text').html($activeControl.find('.lakit-tabs__label-text').text());
+                    $ddControlsTmp.find('.lakit-tabs__controls__text').text($activeControl.find('.lakit-tabs__label-text').text());
                 }
 
                 if ('click' === settings['event'] && !isInPopup) {

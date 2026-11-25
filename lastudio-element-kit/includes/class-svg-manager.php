@@ -48,10 +48,41 @@ if ( ! class_exists( 'LaStudio_Kit_SVG_Manager' ) ) {
 			}
 
 			add_filter( 'upload_mimes', array( $this, 'allow_svg' ) );
+			add_filter( 'wp_handle_upload_prefilter', array( $this, 'sanitize_svg_upload' ) );
 			add_action( 'admin_head', array( $this, 'fix_svg_thumb_display' ) );
 			add_filter( 'wp_generate_attachment_metadata', array( $this, 'generate_svg_media_files_metadata' ), 10, 2 );
 			add_filter( 'wp_prepare_attachment_for_js', array( $this, 'wp_prepare_attachment_for_js' ), 10, 3 );
-            add_filter( 'elementor/files/allow_unfiltered_upload', '__return_true' );
+            add_filter( 'elementor/files/allow_unfiltered_upload', function( $enabled ) {
+                return $enabled || current_user_can( 'unfiltered_html' );
+            } );
+		}
+
+		/**
+		 * Strip scripts / event handlers from SVG files uploaded by users without `unfiltered_html`.
+		 *
+		 * @param array $file
+		 * @return array
+		 */
+		public function sanitize_svg_upload( $file ) {
+			if ( empty( $file['tmp_name'] ) || empty( $file['name'] ) ) {
+				return $file;
+			}
+			$ext = strtolower( pathinfo( $file['name'], PATHINFO_EXTENSION ) );
+			if ( ! in_array( $ext, [ 'svg', 'svgz' ], true ) ) {
+				return $file;
+			}
+			if ( current_user_can( 'unfiltered_html' ) ) {
+				return $file;
+			}
+			if ( 'svgz' === $ext || ! class_exists( '\Elementor\Core\Utils\Svg\Svg_Sanitizer' ) ) {
+				$file['error'] = esc_html__( 'Sorry, you are not allowed to upload this file type.', 'lastudio-kit' );
+				return $file;
+			}
+			$sanitizer = new \Elementor\Core\Utils\Svg\Svg_Sanitizer();
+			if ( ! $sanitizer->sanitize_file( $file['tmp_name'] ) ) {
+				$file['error'] = esc_html__( 'This SVG file could not be sanitized.', 'lastudio-kit' );
+			}
+			return $file;
 		}
 
 		/**

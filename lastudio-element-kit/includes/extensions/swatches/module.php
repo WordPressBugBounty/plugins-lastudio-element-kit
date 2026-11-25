@@ -233,9 +233,9 @@ class Module extends Module_Base {
         $product_id = isset($request['product_id']) ? $request['product_id'] : false;
         $product_type_array = array('variable', 'variable-subscription');
 
-        $product = wc_get_product($product_id);
+        $product = wc_get_product( absint( $product_id ) );
 
-        if( !$product ){
+        if( !$product || ! $this->is_product_readable( $product ) ){
             return $response;
         }
 
@@ -724,11 +724,18 @@ class Module extends Module_Base {
 
     public function ajax_get_product_variations( $request ){
         $product_id = isset($request['product_id']) ? $request['product_id'] : false;
-        $product = wc_get_product($product_id);
-        if( !$product ){
+        $product = wc_get_product( absint( $product_id ) );
+        if( !$product || ! $this->is_product_readable( $product ) ){
             return [];
         }
         return $this->get_available_variations( $product );
+    }
+
+    private function is_product_readable( $product ){
+        if ( 'publish' === $product->get_status() ) {
+            return true;
+        }
+        return current_user_can( 'read_post', $product->get_id() );
     }
 
     private function get_all_variation_image_ids( $variation_id ){
@@ -889,7 +896,7 @@ class Module extends Module_Base {
     }
 
     public function flush_all_gallery_cache(){
-        if(isset($_GET['lakit-clear-swatches-caches'])){
+        if(isset($_GET['lakit-clear-swatches-caches']) && current_user_can( 'manage_woocommerce' )){
             $this->flush_variation_gallery_cache(false, true);
             $current_url = add_query_arg(null, null);
             $current_url = remove_query_arg('lakit-clear-swatches-caches', $current_url);

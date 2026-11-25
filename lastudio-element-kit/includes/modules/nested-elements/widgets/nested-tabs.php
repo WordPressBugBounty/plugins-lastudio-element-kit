@@ -2222,7 +2222,7 @@ class Nested_Tabs extends Widget_Nested_Base {
 		$tabs_title_html = '';
 		$mobile_tabs_title_html = '';
         $first_item = '';
-        $animationClass = $settings['hover_animation']  ? 'elementor-animation-'. $settings['hover_animation'] : '';
+        $animationClass = $settings['hover_animation']  ? 'elementor-animation-'. sanitize_html_class( $settings['hover_animation'] ) : '';
 
 		$toggle_icon = self::try_get_icon_html( $this->get_settings_for_display('toggle_icon') , [ 'aria-hidden' => 'true' ]);
 		$toggle_icon_active = self::try_get_icon_html( $this->get_settings_for_display('toggle_icon_active') , [ 'aria-hidden' => 'true' ]);

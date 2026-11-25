@@ -1,14 +1,13 @@
 <?php
 namespace LaStudioKitThemeBuilder\Modules\DynamicTags\ACF\Tags;
 
-use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Tag;
 use LaStudioKitThemeBuilder\Modules\DynamicTags\ACF\Module;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class ACF_Number extends Tag {
+class ACF_Number extends Base_ACF_Rendered_Tag {
 
 	public function get_name() {
 		return 'acf-number';

@@ -133,6 +133,10 @@ class Module extends Module_Base {
         $settings           = json_decode($setting_raw, true);
         $lakitSettings      = $settings['lakitSettings'] ?? [];
         $customContent      = $lakitSettings['customContent'] ?? '';
+        $customContent      = is_string( $customContent ) ? $customContent : '';
+        if ( ! current_user_can( 'unfiltered_html' ) ) {
+            $customContent = wp_kses_post( $customContent );
+        }
         $enableElementor    = filter_var($lakitSettings['enableElementor'] ?? false, FILTER_VALIDATE_BOOLEAN);
         $donationFormId     = $form->id;
         give()->form_meta->update_meta($donationFormId, '_lakit_custom_content', $customContent);

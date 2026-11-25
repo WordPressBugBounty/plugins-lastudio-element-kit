@@ -1659,7 +1659,7 @@ class LaStudioKit_Woo_Filters extends LaStudioKit_Base {
         $filters = $this->get_settings_for_display('filters');
         $this->_processed_item = false;
         if(!empty($filters)){
-            echo sprintf('<div class="lakit-woofilters lakit-woofilters--layout_%1$s lakit-woofilters--type_%2$s %3$s">', $layout, $type, $item_as_dropdown);
+            echo sprintf('<div class="lakit-woofilters lakit-woofilters--layout_%1$s lakit-woofilters--type_%2$s %3$s">', esc_attr( $layout ), esc_attr( $type ), esc_attr( $item_as_dropdown ));
             if($layout != 'default'){
                 echo sprintf('<div class="lakit-woofilters_block_label"><span class="woofilter-litem">%1$s%2$s</span></div>', $filters_label, $filters_icon);
             }

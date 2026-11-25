@@ -1,14 +1,15 @@
 <?php
 namespace LaStudioKitThemeBuilder\Modules\DynamicTags\Tags;
 
-use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Data_Tag;
+use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Pro_Data_Tag;
+use LaStudioKitThemeBuilder\Modules\DynamicTags\Classes\Pro_Utils as Utils;
 use LaStudioKitThemeBuilder\Modules\DynamicTags\Module;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Archive_URL extends Data_Tag {
+class Archive_URL extends Pro_Data_Tag {
 
 	public function get_name() {
 		return 'archive-url';
@@ -31,7 +32,7 @@ class Archive_URL extends Data_Tag {
 	}
 
 	public function get_value( array $options = [] ) {
-		return lastudio_kit_helper()->get_the_archive_url();
+		return Utils::get_the_archive_url();
 	}
 }
 

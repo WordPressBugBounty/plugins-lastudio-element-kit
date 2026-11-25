@@ -3339,3 +3339,12 @@ body .elementor-widget-lakit-hotspots.elementor-widget-empty {
 .elementor-button.is-loading span {
     opacity: .5
 }
+html[dir="rtl"],
+body.rtl {
+    direction: rtl;
+    unicode-bidi: embed;
+    text-align: right;
+}
+body .elementor-edit-area-active .elementor-inline-editing {
+    min-height: 1em;
+}

@@ -1722,10 +1722,10 @@ class LaStudioKit_Tabs extends LaStudioKit_Base {
           $title_label_html = '';
 
           if ( ! empty( $item['item_sublabel'] ) ) {
-            $title_label_html .= sprintf( '<div class="lakit-tabs__sublabel-text">%1$s</div>', $item['item_sublabel'] );
+            $title_label_html .= sprintf( '<div class="lakit-tabs__sublabel-text">%1$s</div>', $this->kses_text( $item['item_sublabel'] ) );
           }
           if ( ! empty( $item['item_label'] ) ) {
-            $title_label_html .= sprintf( '<div class="lakit-tabs__label-text">%1$s</div>', $item['item_label'] );
+            $title_label_html .= sprintf( '<div class="lakit-tabs__label-text">%1$s</div>', $this->kses_text( $item['item_label'] ) );
           }
           if ( ! empty( $title_label_html ) ) {
             $title_label_html = sprintf( '<div class="lakit-tabs__label">%1$s</div>', wp_kses($title_label_html, \LaStudio_Kit_Helper::kses_allowed_tags()) );
@@ -1801,8 +1801,11 @@ class LaStudioKit_Tabs extends LaStudioKit_Base {
                     $template_content = '<div data-lakit_ajax_loadtemplate="true" data-template-id="' . esc_attr( $item['item_template_id'] ) . '"><span class="lakit-css-loader"></span></div>';
                   } else {
 
+                      if ( ! \LaStudio_Kit_Helper::can_render_template( $item['item_template_id'] ) ) {
+                          $item['item_template_id'] = 0;
+                      }
                       ob_start();
-                      if(Plugin::instance()->editor->is_edit_mode()){
+                      if(!empty($item['item_template_id']) && Plugin::instance()->editor->is_edit_mode()){
                           $css_file = Post_CSS::create( $item['item_template_id'] );
                           echo sprintf('<link rel="stylesheet" id="elementor-post-%1$s-css" href="%2$s" type="text/css" media="all" />', esc_attr($item['item_template_id']), esc_url($css_file->get_url()) );
                       }

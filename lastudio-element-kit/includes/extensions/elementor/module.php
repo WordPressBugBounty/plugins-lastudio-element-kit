@@ -113,7 +113,19 @@ class Module extends Module_Base {
 
         $controls_manager->register( new Controls\Control_Query() );
         $controls_manager->register( new Controls\Control_Search() );
+        $controls_manager->register( new Controls\Control_Template_Query() );
+        $controls_manager->add_group_control( Controls\Group_Control_Taxonomy::get_type(), new Controls\Group_Control_Taxonomy() );
 
+
+        /**
+         * Register `query` control type (used by Display Conditions) when nothing else did.
+         */
+        if(!lastudio_kit()->has_elementor_pro()){
+            if ( $controls_manager->get_control( Controls\Control_Query_Compat::COMPAT_CONTROL_ID ) ) {
+                return;
+            }
+            $controls_manager->register( new Controls\Control_Query_Compat() );
+        }
     }
 
     /**
@@ -150,7 +162,7 @@ class Module extends Module_Base {
             'lastudio-kit-ext-editor',
             lastudio_kit()->plugin_url('includes/extensions/elementor/assets/js/editor.js'),
             array( 'jquery' ),
-            lastudio_kit()->get_version(true),
+            lastudio_kit()->get_version(true) . '.' . filemtime( lastudio_kit()->plugin_path('includes/extensions/elementor/assets/js/editor.js') ),
             true
         );
     }

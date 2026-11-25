@@ -42,7 +42,7 @@ if (filter_var($show_metadata, FILTER_VALIDATE_BOOLEAN) && !empty($metadata)) {
                 break;
             case 'custom_field':
                 if(!empty($meta['custom_field_key'])){
-                    $meta_value = get_post_meta(get_the_ID(), $meta['custom_field_key'], true);
+                    $meta_value = \LaStudio_Kit_Helper::get_public_post_meta( get_the_ID(), $meta['custom_field_key'] );
                     $item_type_class = 'post__custom_field';
                 }
                 break;

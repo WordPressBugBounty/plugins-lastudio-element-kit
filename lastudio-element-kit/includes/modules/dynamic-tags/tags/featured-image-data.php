@@ -2,14 +2,14 @@
 namespace LaStudioKitThemeBuilder\Modules\DynamicTags\Tags;
 
 use Elementor\Controls_Manager;
-use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Tag;
+use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Pro_Tag;
 use LaStudioKitThemeBuilder\Modules\DynamicTags\Module;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Featured_Image_Data extends Tag {
+class Featured_Image_Data extends Pro_Tag {
 
 	public function get_name() {
 		return 'featured-image-data';
@@ -29,6 +29,30 @@ class Featured_Image_Data extends Tag {
 
 	public function get_title() {
 		return esc_html__( 'Featured Image Data', 'lastudio-kit' );
+	}
+
+	public function get_editor_config() {
+		$config = parent::get_editor_config();
+
+		$config['display_conditions'] = [
+			'featured_image_data_title' => [
+				'label' => esc_html__( 'Image Title', 'lastudio-kit' ),
+				'settings' => [ 'attachment_data' => 'title' ],
+				'group' => 'featured_image',
+			],
+			'featured_image_data_alt' => [
+				'label' => esc_html__( 'Image Alt', 'lastudio-kit' ),
+				'settings' => [ 'attachment_data' => 'alt' ],
+				'group' => 'featured_image',
+			],
+			'featured_image_data_caption' => [
+				'label' => esc_html__( 'Image Caption', 'lastudio-kit' ),
+				'settings' => [ 'attachment_data' => 'caption' ],
+				'group' => 'featured_image',
+			],
+		];
+
+		return $config;
 	}
 
 	private function get_attacment() {

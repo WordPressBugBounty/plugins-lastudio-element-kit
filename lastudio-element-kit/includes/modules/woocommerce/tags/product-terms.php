@@ -2,7 +2,6 @@
 namespace LaStudioKitThemeBuilder\Modules\Woocommerce\Tags;
 
 use Elementor\Controls_Manager;
-use LaStudioKitThemeBuilder\Modules\Woocommerce\Tags\Traits\Tag_Product_Id;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -42,6 +41,20 @@ class Product_Terms extends Base_Tag {
 			$options[ $taxonomy ] = $object->label;
 		}
 
+		// The controls may be registered before WooCommerce registers its taxonomies (init, priority 5).
+		if ( empty( $options ) ) {
+			$options = [
+				'product_cat' => esc_html__( 'Product categories', 'lastudio-kit' ),
+				'product_tag' => esc_html__( 'Product tags', 'lastudio-kit' ),
+			];
+
+			if ( function_exists( 'wc_get_attribute_taxonomies' ) ) {
+				foreach ( wc_get_attribute_taxonomies() as $attribute ) {
+					$options[ wc_attribute_taxonomy_name( $attribute->attribute_name ) ] = $attribute->attribute_label;
+				}
+			}
+		}
+
 		$this->add_control(
 			'taxonomy',
 			[
@@ -65,9 +78,10 @@ class Product_Terms extends Base_Tag {
 	}
 
 	public function render() {
-		$settings = $this->get_settings();
+		$settings = $this->get_settings_for_display();
 
-		$product = wc_get_product( $settings['product_id'] );
+		$product = $this->get_product( $settings['product_id'] );
+
 		if ( ! $product ) {
 			return;
 		}

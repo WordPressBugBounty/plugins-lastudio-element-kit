@@ -2,14 +2,15 @@
 namespace LaStudioKitThemeBuilder\Modules\DynamicTags\Tags;
 
 use Elementor\Controls_Manager;
-use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Tag;
+use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Pro_Tag;
 use LaStudioKitThemeBuilder\Modules\DynamicTags\Module;
+use LaStudioKitThemeBuilder\Modules\DynamicTags\Classes\Pro_Utils as Utils;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Post_Terms extends Tag {
+class Post_Terms extends Pro_Tag {
 	public function get_name() {
 		return 'post-terms';
 	}
@@ -29,8 +30,16 @@ class Post_Terms extends Tag {
 	protected function register_controls() {
 		$taxonomy_filter_args = [
 			'show_in_nav_menus' => true,
-			'object_type' => [ get_post_type() ],
 		];
+
+		// Controls can be registered before the current post is set up (e.g. when the editor builds the
+		// dynamic tags config), in which case `get_post_type()` is false and no taxonomy would be listed.
+		// Without a post type, list every public taxonomy (also needed inside loops of other post types).
+		$current_post_type = get_post_type();
+
+		if ( $current_post_type ) {
+			$taxonomy_filter_args['object_type'] = [ $current_post_type ];
+		}
 
 		/**
 		 * Dynamic tags taxonomy args.
@@ -44,9 +53,9 @@ class Post_Terms extends Tag {
 		 *                                    match against the taxonomy objects inside
 		 *                                    the `get_taxonomies()` function.
 		 */
-		$taxonomy_filter_args = apply_filters( 'lastudio-kit/dynamic_tags/post_terms/taxonomy_args', $taxonomy_filter_args );
+		$taxonomy_filter_args = apply_filters( 'elementor_pro/dynamic_tags/post_terms/taxonomy_args', $taxonomy_filter_args );
 
-		$taxonomies = lastudio_kit_helper()->get_taxonomies( $taxonomy_filter_args, 'objects' );
+		$taxonomies = Utils::get_taxonomies( $taxonomy_filter_args, 'objects' );
 
 		$options = [];
 
@@ -70,6 +79,9 @@ class Post_Terms extends Tag {
 				'label' => esc_html__( 'Separator', 'lastudio-kit' ),
 				'type' => Controls_Manager::TEXT,
 				'default' => ', ',
+				'ai' => [
+					'active' => false,
+				],
 			]
 		);
 
@@ -86,11 +98,7 @@ class Post_Terms extends Tag {
 	public function render() {
 		$settings = $this->get_settings();
 
-        if(!taxonomy_exists($settings['taxonomy'])){
-            return '';
-        }
-
-		if ( 'yes' === $settings['link'] ) {
+		if ( 'yes' === $settings['link'] || true === $settings['link'] ) {
 			$value = get_the_term_list( get_the_ID(), $settings['taxonomy'], '', $settings['separator'] );
 		} else {
 			$terms = get_the_terms( get_the_ID(), $settings['taxonomy'] );

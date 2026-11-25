@@ -742,7 +742,7 @@ class LaStudioKit_Countdown_Timer extends LaStudioKit_Base {
             '<div class="lakit-countdown-timer__separator">%s</div>'
         );
 
-        return sprintf( $format, $separator );
+        return sprintf( $format, $this->kses_text( $separator ) );
     }
 
     protected function render() {

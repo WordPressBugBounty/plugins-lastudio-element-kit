@@ -1206,7 +1206,7 @@ class LaStudioKit_Instagram_Feed extends LaStudioKit_Base {
                     $item_html = sprintf( $link_format, esc_url( $link ), $item_html, $attr );
                 }
 
-                $html .= sprintf( '<div class="lakit-instagram-feed__item %s"><div class="lakit-instagram-feed__inner">%s</div></div>', $col_class, $item_html );
+                $html .= sprintf( '<div class="lakit-instagram-feed__item %s"><div class="lakit-instagram-feed__inner">%s</div></div>', esc_attr( $col_class ), $item_html );
             }
 
         } else {
@@ -1334,7 +1334,7 @@ class LaStudioKit_Instagram_Feed extends LaStudioKit_Base {
         if ( $this->config['post_comments_count'] ) {
             $meta_html .= sprintf(
                 '<div class="lakit-instagram-feed__meta-item lakit-instagram-feed__comments-count"><span class="lakit-instagram-feed__comments-icon lakit-instagram-feed__meta-icon"><i class="%s"></i></span><span class="lakit-instagram-feed__comments-label lakit-instagram-feed__meta-label">%s</span></div>',
-                $this->get_settings_for_display( 'comments_icon' ),
+                esc_attr( $this->get_settings_for_display( 'comments_icon' ) ),
                 $item['comments']
             );
         }
@@ -1342,7 +1342,7 @@ class LaStudioKit_Instagram_Feed extends LaStudioKit_Base {
         if ( $this->config['post_likes_count'] ) {
             $meta_html .= sprintf(
                 '<div class="lakit-instagram-feed__meta-item lakit-instagram-feed__likes-count"><span class="lakit-instagram-feed__likes-icon lakit-instagram-feed__meta-icon"><i class="%s"></i></span><span class="lakit-instagram-feed__likes-label lakit-instagram-feed__meta-label">%s</span></div>',
-                $this->get_settings_for_display( 'likes_icon' ),
+                esc_attr( $this->get_settings_for_display( 'likes_icon' ) ),
                 $item['likes']
             );
         }

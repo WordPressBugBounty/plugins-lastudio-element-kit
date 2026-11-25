@@ -112,6 +112,62 @@ class Document extends Theme_Section_Document {
 		$this->update_main_meta( self::DISPLAY_SETTINGS_META_KEY, $display_settings_data );
 	}
 
+	/**
+	 * Keep only registered trigger/timing controls and sanitize every value by control type.
+	 *
+	 * @param array $data
+	 * @return array
+	 */
+	public function sanitize_display_settings_data( $data ) {
+		$id = $this->get_main_id();
+		$stacks = [
+			'triggers' => new Triggers( [ 'id' => $id, 'settings' => [] ] ),
+			'timing' => new Timing( [ 'id' => $id, 'settings' => [] ] ),
+		];
+
+		$clean = [];
+
+		foreach ( $stacks as $group => $stack ) {
+			$clean[ $group ] = [];
+			$values = isset( $data[ $group ] ) && is_array( $data[ $group ] ) ? $data[ $group ] : [];
+
+			foreach ( $stack->get_controls() as $control_id => $control ) {
+				if ( ! array_key_exists( $control_id, $values ) ) {
+					continue;
+				}
+				$value = $values[ $control_id ];
+				$options = isset( $control['options'] ) && is_array( $control['options'] ) ? array_map( 'strval', array_keys( $control['options'] ) ) : [];
+
+				switch ( $control['type'] ) {
+					case Controls_Manager::SWITCHER:
+						$value = 'yes' === $value ? 'yes' : '';
+						break;
+					case Controls_Manager::NUMBER:
+						$value = is_numeric( $value ) ? $value + 0 : '';
+						break;
+					case Controls_Manager::SELECT:
+						$value = is_scalar( $value ) && in_array( (string) $value, $options, true ) ? (string) $value : ( $control['default'] ?? '' );
+						break;
+					case Controls_Manager::SELECT2:
+						$value = array_values( array_filter( (array) $value, function( $v ) use ( $options ) {
+							return is_scalar( $v ) && in_array( (string) $v, $options, true );
+						} ) );
+						break;
+					case Controls_Manager::TEXT:
+						$value = is_scalar( $value ) ? sanitize_text_field( (string) $value ) : '';
+						break;
+					default:
+						// Headings and other non-value controls are not stored.
+						continue 2;
+				}
+
+				$clean[ $group ][ $control_id ] = $value;
+			}
+		}
+
+		return $clean;
+	}
+
 	public function get_frontend_settings() {
 		$settings = parent::get_frontend_settings();
 

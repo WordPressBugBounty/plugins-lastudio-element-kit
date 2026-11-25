@@ -70,7 +70,7 @@ class LaStudioKit_Template extends LaStudioKit_Base {
 
     $template_id = apply_filters('wpml_object_id', $template_id, 'elementor_library', true);
 
-    $is_valid = !empty($template_id) && 'publish' === get_post_status( $template_id );
+    $is_valid = !empty($template_id) && 'publish' === get_post_status( $template_id ) && \LaStudio_Kit_Helper::can_render_template( $template_id );
 
     if ( $is_valid ) {
         ob_start();

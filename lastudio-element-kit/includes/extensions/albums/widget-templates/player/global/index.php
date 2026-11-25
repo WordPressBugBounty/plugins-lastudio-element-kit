@@ -5,6 +5,9 @@ $show_player = $this->get_settings_for_display('show_player');
 $show_playlist = $this->get_settings_for_display('show_playlist');
 
 $preset = $this->get_settings_for_display('preset');
+if ( ! in_array( $preset, [ 'type-1', 'type-2', 'type-3' ], true ) ) {
+	$preset = 'type-1';
+}
 
 $configs = apply_filters('lastudio-kit/playlists/get_config', [], $album_ids);
 $playlist_source = !empty($configs['sources']) ? $configs['sources'] : [];

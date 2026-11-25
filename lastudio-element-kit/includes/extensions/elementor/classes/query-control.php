@@ -68,6 +68,8 @@ class Query_Control {
      */
     public function ajax_posts_filter_autocomplete( array $data ) {
 
+        self::check_permission();
+
         if(!empty($data['autocomplete'])){
             return $this->ajax_posts_filter_autocomplete_new($data);
         }
@@ -147,7 +149,7 @@ class Query_Control {
 
             case 'author':
                 $query_params = [
-                    'who' => 'authors',
+                    'capability' => [ 'edit_posts' ],
                     'has_published_posts' => true,
                     'fields' => [
                         'ID',
@@ -276,6 +278,8 @@ class Query_Control {
 
     public function ajax_posts_control_value_titles( $request ) {
 
+        self::check_permission();
+
         if(!empty($request['get_titles'])){
             return $this->ajax_posts_control_value_titles_new($request);
         }
@@ -331,7 +335,7 @@ class Query_Control {
 
             case 'author':
                 $query_params = [
-                    'who' => 'authors',
+                    'capability' => [ 'edit_posts' ],
                     'has_published_posts' => true,
                     'fields' => [
                         'ID',
@@ -414,6 +418,96 @@ class Query_Control {
         return $results;
     }
 
+    /**
+     * Only users who can edit posts may use the query control endpoints.
+     *
+     * @throws \Exception
+     */
+    public static function check_permission() {
+        if ( ! current_user_can( 'edit_posts' ) ) {
+            throw new \Exception( 'Access denied.' );
+        }
+    }
+
+    /**
+     * Reduce a client supplied query array to a safe subset of keys.
+     *
+     * @param mixed $query
+     * @return array
+     */
+    private function sanitize_client_query( $query ) {
+        $query = is_array( $query ) ? $query : [];
+        $clean = [];
+
+        if ( ! empty( $query['post_type'] ) ) {
+            $clean['post_type'] = is_array( $query['post_type'] ) ? array_map( 'sanitize_key', $query['post_type'] ) : sanitize_key( $query['post_type'] );
+        }
+
+        if ( ! empty( $query['taxonomy'] ) ) {
+            $clean['taxonomy'] = is_array( $query['taxonomy'] ) ? array_map( 'sanitize_key', $query['taxonomy'] ) : sanitize_key( $query['taxonomy'] );
+        }
+
+        if ( current_user_can( 'edit_others_posts' ) && ! empty( $query['post_status'] ) ) {
+            $clean['post_status'] = is_array( $query['post_status'] ) ? array_map( 'sanitize_key', $query['post_status'] ) : sanitize_key( $query['post_status'] );
+        }
+        else {
+            $clean['post_status'] = 'publish';
+        }
+
+        // Taxonomy filters (e.g. only "simple" products), limited to taxonomy / field / terms / operator.
+        if ( ! empty( $query['tax_query'] ) && is_array( $query['tax_query'] ) ) {
+            $tax_query = [];
+            foreach ( $query['tax_query'] as $k => $clause ) {
+                if ( 'relation' === $k && is_string( $clause ) ) {
+                    $tax_query['relation'] = 'OR' === strtoupper( $clause ) ? 'OR' : 'AND';
+                    continue;
+                }
+                if ( ! is_array( $clause ) || empty( $clause['taxonomy'] ) || ! is_string( $clause['taxonomy'] ) || ! taxonomy_exists( $clause['taxonomy'] ) || ! isset( $clause['terms'] ) ) {
+                    continue;
+                }
+                $item = [
+                    'taxonomy' => sanitize_key( $clause['taxonomy'] ),
+                    'field'    => isset( $clause['field'] ) && in_array( $clause['field'], [ 'term_id', 'slug', 'name', 'term_taxonomy_id' ], true ) ? $clause['field'] : 'term_id',
+                    'terms'    => is_array( $clause['terms'] ) ? array_map( 'sanitize_text_field', $clause['terms'] ) : sanitize_text_field( $clause['terms'] ),
+                ];
+                if ( isset( $clause['operator'] ) && in_array( strtoupper( $clause['operator'] ), [ 'IN', 'NOT IN', 'AND', 'EXISTS', 'NOT EXISTS' ], true ) ) {
+                    $item['operator'] = strtoupper( $clause['operator'] );
+                }
+                $tax_query[] = $item;
+            }
+            if ( ! empty( $tax_query ) ) {
+                $clean['tax_query'] = $tax_query;
+            }
+        }
+
+        // Allow Elementor's own template meta filters only.
+        if ( ! empty( $query['meta_query'] ) && is_array( $query['meta_query'] ) ) {
+            $meta_query = [];
+            foreach ( $query['meta_query'] as $k => $clause ) {
+                if ( 'relation' === $k && is_string( $clause ) ) {
+                    $meta_query['relation'] = 'OR' === strtoupper( $clause ) ? 'OR' : 'AND';
+                    continue;
+                }
+                if ( ! is_array( $clause ) || empty( $clause['key'] ) || ! is_string( $clause['key'] ) || 0 !== strpos( $clause['key'], '_elementor_' ) ) {
+                    continue;
+                }
+                $item = [ 'key' => sanitize_key( $clause['key'] ) ];
+                if ( isset( $clause['value'] ) ) {
+                    $item['value'] = is_array( $clause['value'] ) ? array_map( 'sanitize_text_field', $clause['value'] ) : sanitize_text_field( $clause['value'] );
+                }
+                if ( isset( $clause['compare'] ) && in_array( strtoupper( $clause['compare'] ), [ '=', '!=', 'IN', 'NOT IN', 'EXISTS', 'NOT EXISTS' ], true ) ) {
+                    $item['compare'] = strtoupper( $clause['compare'] );
+                }
+                $meta_query[] = $item;
+            }
+            if ( ! empty( $meta_query ) ) {
+                $clean['meta_query'] = $meta_query;
+            }
+        }
+
+        return $clean;
+    }
+
     private function get_titles_query_data( $data ) {
         if ( empty( $data['get_titles'] ) || empty( $data['id'] ) || empty( $data['get_titles']['object'] ) ) {
             return new \WP_Error( self::GET_TITLES_ERROR_CODE, 'Empty or incomplete data' );
@@ -441,7 +535,8 @@ class Query_Control {
     }
 
     private function get_titles_query_for_post( $data ) {
-        $query = isset($data['get_titles']['query']) ? $data['get_titles']['query'] : [];
+        $query = $this->sanitize_client_query( $data['get_titles']['query'] ?? [] );
+        unset( $query['taxonomy'] );
         if ( empty( $query['post_type'] ) ) {
             $query['post_type'] = 'any';
         }
@@ -460,7 +555,10 @@ class Query_Control {
     }
 
     private function get_titles_query_for_tax( $data ) {
-        $by_field = empty( $data['get_titles']['by_field'] ) ? 'term_taxonomy_id' : $data['get_titles']['by_field'];
+        $by_field = ( ! empty( $data['get_titles']['by_field'] ) && in_array( $data['get_titles']['by_field'], [ 'term_taxonomy_id', 'term_id', 'slug', 'name' ], true ) ) ? $data['get_titles']['by_field'] : 'term_taxonomy_id';
+        if ( 'term_id' === $by_field ) {
+            $by_field = 'include';
+        }
         return [
             $by_field => (array) $data['id'],
             'hide_empty' => false,
@@ -469,7 +567,9 @@ class Query_Control {
 
 
     private function get_titles_query_for_library_template( $data ) {
-        $query = isset($data['get_titles']['query']) ? $data['get_titles']['query'] : [];
+        $query = $this->sanitize_client_query( $data['get_titles']['query'] ?? [] );
+        unset( $query['taxonomy'] );
+        $query['post__in'] = array_map( 'absint', (array) $data['id'] );
 
         $query['post_type'] = \Elementor\TemplateLibrary\Source_Local::CPT;
         $query['orderby'] = 'meta_value';
@@ -484,23 +584,21 @@ class Query_Control {
 
     private function get_titles_query_for_author( $data ) {
         $query = $this->get_titles_query_for_user( $data );
-        $query['who'] = 'authors';
+        $query['capability'] = [ 'edit_posts' ];
         $query['has_published_posts'] = true;
         return $query;
     }
 
     private function get_titles_query_for_user( $data ) {
-        if(!empty($data['get_titles']['query'])){
-            return $data['get_titles']['query'];
-        }
+        // Never use a client supplied WP_User_Query.
         $query = [
             'fields' => [
                 'ID',
                 'display_name',
             ],
-            'include' => (array) $data['id'],
+            'include' => array_map( 'absint', (array) $data['id'] ),
         ];
-        if ( isset($data['get_titles']['display'] ) && 'detailed' === $data['get_titles']['display'] ) {
+        if ( isset($data['get_titles']['display'] ) && 'detailed' === $data['get_titles']['display'] && current_user_can( 'list_users' ) ) {
             $query['fields'][] = 'user_email';
         }
         return $query;
@@ -635,18 +733,20 @@ class Query_Control {
         if ( ! isset( $data['autocomplete']['query'] ) ) {
             return new \WP_Error( self::AUTOCOMPLETE_ERROR_CODE, 'Missing autocomplete[`query`] data' );
         }
-        $query = $data['autocomplete']['query'];
+        $query = $this->sanitize_client_query( $data['autocomplete']['query'] );
+        unset( $query['taxonomy'] );
         if ( empty( $query['post_type'] ) ) {
             $query['post_type'] = 'any';
         }
         $query['posts_per_page'] = -1;
-        $query['s'] = $data['q'];
+        $query['s'] = sanitize_text_field( $data['q'] );
 
         return $query;
     }
 
     private function autocomplete_query_for_library_template( $data ) {
-        $query = $data['autocomplete']['query'];
+        $query = $this->sanitize_client_query( $data['autocomplete']['query'] ?? [] );
+        unset( $query['taxonomy'] );
 
         $query['post_type'] = \Elementor\TemplateLibrary\Source_Local::CPT;
         $query['orderby'] = 'meta_value';
@@ -655,7 +755,7 @@ class Query_Control {
         if ( empty( $query['posts_per_page'] ) ) {
             $query['posts_per_page'] = -1;
         }
-        $query['s'] = $data['q'];
+        $query['s'] = sanitize_text_field( $data['q'] );
 
         return $query;
     }
@@ -672,12 +772,14 @@ class Query_Control {
     }
 
     private function autocomplete_query_for_tax( $data ) {
-        $query = $data['autocomplete']['query'];
+        $query = $this->sanitize_client_query( $data['autocomplete']['query'] ?? [] );
+        unset( $query['post_status'], $query['meta_query'], $query['tax_query'] );
 
         if ( empty( $query['taxonomy'] ) && ! empty( $query['post_type'] ) ) {
             $query['taxonomy'] = get_object_taxonomies( $query['post_type'] );
         }
-        $query['search'] = $data['q'];
+        unset( $query['post_type'] );
+        $query['search'] = sanitize_text_field( $data['q'] );
         $query['hide_empty'] = false;
         return $query;
     }
@@ -687,28 +789,25 @@ class Query_Control {
         if ( is_wp_error( $query ) ) {
             return $query;
         }
-        $query['who'] = 'authors';
+        $query['capability'] = [ 'edit_posts' ];
         return $query;
     }
 
     private function autocomplete_query_for_user( $data ) {
 
-        if(!empty($data['autocomplete']['query'])){
-            return $data['autocomplete']['query'];
-        }
-
+        // Never use a client supplied WP_User_Query.
         $query = [
             'fields' => [
                 'ID',
                 'display_name',
             ],
-            'search' => '*' . $data['q'] . '*',
+            'search' => '*' . sanitize_text_field( $data['q'] ) . '*',
             'search_columns' => [
                 'user_login',
                 'user_nicename',
             ],
         ];
-        if ( isset($data['autocomplete']['display'] ) && 'detailed' === $data['autocomplete']['display'] ) {
+        if ( isset($data['autocomplete']['display'] ) && 'detailed' === $data['autocomplete']['display'] && current_user_can( 'list_users' ) ) {
             $query['fields'][] = 'user_email';
         }
         return $query;
@@ -753,14 +852,17 @@ class Query_Control {
                 $text = $user->display_name;
                 break;
             case 'detailed':
-                $text = sprintf( '%s (%s)', $user->display_name, $user->user_email );
+                $text = ! empty( $user->user_email ) ? sprintf( '%s (%s)', $user->display_name, $user->user_email ) : $user->display_name;
                 break;
             default:
-                $text = apply_filters( "elementor/query/{$filter_name}/display/{$display}", $user, $data );
+                $text = apply_filters( "elementor/query/{$filter_name}/display/{$display}", $user->display_name, $user, $data );
+                if ( ! is_scalar( $text ) ) {
+                    $text = $user->display_name;
+                }
                 break;
         }
 
-        return $text;
+        return esc_html( (string) $text );
     }
 
     private function get_term_name( $term, $display, $request, $filter_name = 'get_autocomplete' ) {

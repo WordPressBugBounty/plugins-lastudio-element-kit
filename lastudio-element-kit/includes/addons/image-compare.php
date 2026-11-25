@@ -586,7 +586,7 @@ class LaStudioKit_Image_Compare extends LaStudioKit_Base {
 				'after'     => $after_title,
 			],
 			'controlType' => $this->get_settings_for_display('control_type')
-		]);
+		], JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT);
 	}
 
 }

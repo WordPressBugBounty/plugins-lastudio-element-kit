@@ -1,9 +1,9 @@
-.lakitdl-menuwrapper {
-    -webkit-perspective: 1000px;
-    perspective: 1000px;
-    -webkit-perspective-origin: 50% 200%;
-    perspective-origin: 50% 200%
-}
+/*.lakitdl-menuwrapper {*/
+/*    -webkit-perspective: 1000px;*/
+/*    perspective: 1000px;*/
+/*    -webkit-perspective-origin: 50% 200%;*/
+/*    perspective-origin: 50% 200%*/
+/*}*/
 .lakitdl-menu {
     max-width: var(--lakit-section-width, 100vw)
 }
@@ -368,3 +368,5 @@ button.trigger-dlmenu {
     padding-top: 10px;
     margin-bottom: -10px
 }
+.lakitdl-back{margin-bottom:.5rem}
+.lakitdl-back span {font-size:.75em}

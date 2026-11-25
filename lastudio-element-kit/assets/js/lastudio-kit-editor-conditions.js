@@ -2863,7 +2863,7 @@
 
       var _stringify = _interopRequireDefault(__webpack_require__(/*! @babel/runtime-corejs2/core-js/json/stringify */ "../node_modules/@babel/runtime-corejs2/core-js/json/stringify.js"));
 
-      var ElementEditorModule = __webpack_require__(/*! elementor-pro/editor/element-editor-module */ "../assets/dev/js/editor/element-editor-module.js");
+      var ElementEditorModule = __webpack_require__(/*! lakit/editor/element-editor-module */ "../assets/dev/js/editor/element-editor-module.js");
 
       module.exports = ElementEditorModule.extend({
         __construct: function __construct() {
@@ -5199,7 +5199,7 @@
       "use strict";
 
 
-      var inlineControlsStack = __webpack_require__(/*! elementor-pro/editor/inline-controls-stack.js */ "../assets/dev/js/editor/inline-controls-stack.js");
+      var inlineControlsStack = __webpack_require__(/*! lakit/editor/inline-controls-stack.js */ "../assets/dev/js/editor/inline-controls-stack.js");
 
       module.exports = inlineControlsStack.extend({
         id: 'elementor-theme-builder-conditions-view',

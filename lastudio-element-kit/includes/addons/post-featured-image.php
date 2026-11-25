@@ -402,7 +402,7 @@ class LaStudioKit_Post_Featured_Image extends LaStudioKit_Base {
         $target = $settings['link']['is_external'] ? 'target="_blank"' : '';
         $a_atts[] = $target;
 
-        $animation_class = ! empty( $settings['hover_animation'] ) ? 'elementor-animation-' . $settings['hover_animation'] : '';
+        $animation_class = ! empty( $settings['hover_animation'] ) ? 'elementor-animation-' . sanitize_html_class( $settings['hover_animation'] ) : '';
 
         $html = '<div class="lakit-post-featured-image ' . $animation_class . '">';
         if ( $link ) {

@@ -2,14 +2,13 @@
 namespace LaStudioKitThemeBuilder\Modules\DynamicTags\ACF\Tags;
 
 use Elementor\Controls_Manager;
-use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Data_Tag;
 use LaStudioKitThemeBuilder\Modules\DynamicTags\ACF\Module;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class ACF_Image extends Data_Tag {
+class ACF_Image extends Base_ACF_Tag {
 
 	public function get_name() {
 		return 'acf-image';

@@ -2,7 +2,7 @@
 namespace LaStudioKitThemeBuilder\Modules\DynamicTags\Tags;
 
 use Elementor\Controls_Manager;
-use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Data_Tag;
+use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Pro_Data_Tag;
 use LaStudioKitThemeBuilder\Modules\DynamicTags\Module;
 use LaStudioKitExtensions\Elementor\Controls\Control_Query as QueryModule;
 
@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Internal_URL extends Data_Tag {
+class Internal_URL extends Pro_Data_Tag {
 
 	public function get_name() {
 		return 'internal-url';
@@ -30,6 +30,20 @@ class Internal_URL extends Data_Tag {
 
 	public function get_panel_template() {
 		return ' ({{ url }})';
+	}
+
+	/**
+	 * @since 3.6.0
+	 * @deprecated 3.8.0 Use `On_Import_Trait::on_import_update_dynamic_content()` instead.
+	 *
+	 * Remove in the future.
+	 */
+	public static function on_import_replace_dynamic_content( $config, $map_old_new_post_ids ) {
+		if ( isset( $config['settings']['post_id'] ) ) {
+			$config['settings']['post_id'] = $map_old_new_post_ids[ $config['settings']['post_id'] ];
+		}
+
+		return $config;
 	}
 
 	public function get_value( array $options = [] ) {
@@ -69,7 +83,7 @@ class Internal_URL extends Data_Tag {
 
 		$this->add_control( 'post_id', [
 			'label' => esc_html__( 'Search & Select', 'lastudio-kit' ),
-			'type' => QueryModule::QUERY_CONTROL_ID,
+			'type' => \LaStudioKitThemeBuilder\Modules\DynamicTags\Module::get_query_control_type(),
 			'options' => [],
 			'label_block' => true,
 			'autocomplete' => [
@@ -86,7 +100,7 @@ class Internal_URL extends Data_Tag {
 
 		$this->add_control( 'taxonomy_id', [
 			'label' => esc_html__( 'Search & Select', 'lastudio-kit' ),
-			'type' => QueryModule::QUERY_CONTROL_ID,
+			'type' => \LaStudioKitThemeBuilder\Modules\DynamicTags\Module::get_query_control_type(),
 			'options' => [],
 			'label_block' => true,
 			'autocomplete' => [
@@ -100,7 +114,7 @@ class Internal_URL extends Data_Tag {
 
 		$this->add_control( 'attachment_id', [
 			'label' => esc_html__( 'Search & Select', 'lastudio-kit' ),
-			'type' => QueryModule::QUERY_CONTROL_ID,
+			'type' => \LaStudioKitThemeBuilder\Modules\DynamicTags\Module::get_query_control_type(),
 			'options' => [],
 			'label_block' => true,
 			'autocomplete' => [
@@ -114,7 +128,7 @@ class Internal_URL extends Data_Tag {
 
 		$this->add_control( 'author_id', [
 			'label' => esc_html__( 'Search & Select', 'lastudio-kit' ),
-			'type' => QueryModule::QUERY_CONTROL_ID,
+			'type' => \LaStudioKitThemeBuilder\Modules\DynamicTags\Module::get_query_control_type(),
 			'options' => [],
 			'label_block' => true,
 			'autocomplete' => [

@@ -396,7 +396,7 @@ class LaStudioKit_Post_Meta extends LaStudioKit_Base {
                     case 'custom_field':
                         if( !empty($meta['item_ckey']) ){
                             $ckey = $meta['item_ckey'];
-                            $meta_value = get_post_meta( $post->ID, $meta['item_ckey'], true );
+                            $meta_value = \LaStudio_Kit_Helper::get_public_post_meta( $post->ID, $meta['item_ckey'] );
                             if( $post_type === 'la_event' && in_array($ckey, ['event_start_date', 'event_end_date'])){
                                 if( lastudio_kit_helper()->validate_date($meta_value, 'Y-m-d') ){
                                     $meta_value = date(get_option( 'date_format', 'M j, Y'), strtotime($meta_value));
@@ -428,7 +428,7 @@ class LaStudioKit_Post_Meta extends LaStudioKit_Base {
                 }
 
                 if (!empty($meta_value)) {
-                    $output .= sprintf('<div class="lakit-pf-meta__item lakit-pf-meta__item--%4$s %5$s">%1$s%2$s%3$s</div>', $meta_icon, $meta_label, $meta_value, $item_type, $item_type_class);
+                    $output .= sprintf('<div class="lakit-pf-meta__item lakit-pf-meta__item--%4$s %5$s">%1$s%2$s%3$s</div>', $meta_icon, $meta_label, $meta_value, esc_attr( $item_type ), esc_attr( $item_type_class ));
                 }
 
             }

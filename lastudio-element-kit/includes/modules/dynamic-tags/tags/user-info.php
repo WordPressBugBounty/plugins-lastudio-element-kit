@@ -2,14 +2,14 @@
 namespace LaStudioKitThemeBuilder\Modules\DynamicTags\Tags;
 
 use Elementor\Controls_Manager;
-use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Tag;
+use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Pro_Tag;
 use LaStudioKitThemeBuilder\Modules\DynamicTags\Module;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class User_Info extends Tag {
+class User_Info extends Pro_Tag {
 
 	public function get_name() {
 		return 'user-info';
@@ -94,6 +94,9 @@ class User_Info extends Tag {
 				'label' => esc_html__( 'Meta Key', 'lastudio-kit' ),
 				'condition' => [
 					'type' => 'meta',
+				],
+				'ai' => [
+					'active' => false,
 				],
 			]
 		);

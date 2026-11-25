@@ -21,6 +21,68 @@ class Element_Visibility {
         add_filter( 'elementor/frontend/container/should_render', [ $this, 'item_should_render' ], 10, 2 );
 
         add_filter('elementor/element/is_dynamic_content', [ $this, 'filter_check_e_cache' ], 10, 3);
+
+        // Elements restricted by Visibility Logic must not leak into post_content (excerpts, feeds, REST).
+        add_action( 'elementor/db/before_save', [ $this, 'prepare_plain_text_filter' ] );
+    }
+
+    public function prepare_plain_text_filter() {
+        add_filter( 'wp_insert_post_data', [ $this, 'strip_hidden_from_plain_text' ], 99, 2 );
+    }
+
+    public function strip_hidden_from_plain_text( $data, $postarr ) {
+        // Only the very next post update (Elementor's save_plain_text) is affected.
+        remove_filter( 'wp_insert_post_data', [ $this, 'strip_hidden_from_plain_text' ], 99 );
+
+        $post_id = ! empty( $postarr['ID'] ) ? absint( $postarr['ID'] ) : 0;
+        if ( ! $post_id ) {
+            return $data;
+        }
+
+        $document = \Elementor\Plugin::$instance->documents->get( $post_id, false );
+        $elements = $document ? $document->get_elements_data() : [];
+
+        if ( empty( $elements ) || ! $this->has_restricted_elements( $elements ) ) {
+            return $data;
+        }
+
+        $elements = $this->remove_restricted_elements( $elements );
+        $data['post_content'] = wp_slash( \Elementor\Plugin::$instance->db->get_plain_text_from_data( $elements ) );
+
+        return $data;
+    }
+
+    private function is_restricted_element( $element ) {
+        return ! empty( $element['settings']['lakit_vlogic_enabled'] ) && 'yes' === $element['settings']['lakit_vlogic_enabled'];
+    }
+
+    private function has_restricted_elements( $elements ) {
+        foreach ( (array) $elements as $element ) {
+            if ( ! is_array( $element ) ) {
+                continue;
+            }
+            if ( $this->is_restricted_element( $element ) ) {
+                return true;
+            }
+            if ( ! empty( $element['elements'] ) && $this->has_restricted_elements( $element['elements'] ) ) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function remove_restricted_elements( $elements ) {
+        $result = [];
+        foreach ( (array) $elements as $element ) {
+            if ( ! is_array( $element ) || $this->is_restricted_element( $element ) ) {
+                continue;
+            }
+            if ( ! empty( $element['elements'] ) ) {
+                $element['elements'] = $this->remove_restricted_elements( $element['elements'] );
+            }
+            $result[] = $element;
+        }
+        return $result;
     }
 
     private function get_roles() {

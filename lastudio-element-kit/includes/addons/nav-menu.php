@@ -2429,8 +2429,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
                     ),
                 ),
                 'selectors' => array(
-                    '{{WRAPPER}} .lakit-active--mbmenu .lakit-nav.lakit-nav-{{ID}}' => 'width: {{SIZE}}{{UNIT}};',
-                    '{{WRAPPER}} .lakit-mobile-menu--full-width .lakit-nav-{{ID}}' => 'min-width: {{SIZE}}{{UNIT}};',
+                    '{{WRAPPER}}' => '--enav_menumobile_width: {{SIZE}}{{UNIT}};'
                 ),
                 'condition' => array(
                     'mobile_menu_layout!' => 'default'
@@ -3205,7 +3204,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
         $this->add_render_attribute( 'nav-wrapper', 'class', 'lakit-nav-layout--' . esc_attr( $layout) );
         $this->add_render_attribute( 'nav-wrapper', 'data-effect', $menu_effect );
         $this->add_render_attribute( 'nav-wrapper', 'data-dlconfig', wp_json_encode([
-            'backtext' => sprintf('<span>%1$s</span>', $dlmenu_back_text),
+            'backtext' => sprintf('<span>%1$s</span>', esc_html( wp_strip_all_tags( wp_specialchars_decode( (string) $dlmenu_back_text, ENT_QUOTES ) ) )),
             'backicon' => $dlmenu_back_icon,
             'triggericon' => $dlmenu_trigger_icon,
         ]));
@@ -3242,7 +3241,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
 		        $mobile_extra_block_html = '<div class="lakit-nav-custom-block-after" data-template-id="'.esc_attr($mobile_after_template_id).'"><span class="lakit-css-loader"></span></div>';
 	        }
             else{
-	            if(Plugin::instance()->editor->is_edit_mode()){
+	            if(Plugin::instance()->editor->is_edit_mode() && \LaStudio_Kit_Helper::can_render_template( $mobile_after_template_id )){
 		            ob_start();
 		            $css_file = Post_CSS::create( $mobile_after_template_id );
 		            echo sprintf('<link rel="stylesheet" id="elementor-post-%1$s-css" href="%2$s" type="text/css" media="all" />', esc_attr($mobile_after_template_id), esc_url($css_file->get_url()) );
@@ -3300,7 +3299,7 @@ class LaStudioKit_Nav_Menu extends LaStudioKit_Base {
                 echo $this->_get_icon('toggle_icon', '<span class="nav-toggle-icon">%s</span>'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                 echo $this->_get_html('toggle_text', '<span class="nav-toggle-text">%s</span>'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                 if(!empty($dropdown_icon)){
-                    echo sprintf('<span class="nav-toggle-icondrop"><i class="%1$s"></i></span>', $dropdown_icon); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+                    echo sprintf('<span class="nav-toggle-icondrop"><i class="%1$s"></i></span>', esc_attr( $dropdown_icon )); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
                 }
             ?></button>
             <?php

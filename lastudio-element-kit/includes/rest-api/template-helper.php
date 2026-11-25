@@ -58,13 +58,6 @@ class Template_Helper {
 
     public function callback( $args, $type = 'rest' ) {
 
-        if($type !== 'rest'){
-            $passed_rate_limit = self::apply_rate_limit();
-            if(!$passed_rate_limit){
-                return $passed_rate_limit;
-            }
-        }
-
         $default = [
             'template_content' => '',
             'template_scripts' => [],
@@ -86,17 +79,26 @@ class Template_Helper {
 
 	    $rest_allow_types = apply_filters('lastudio-kit/rest/elmenetor/allow_types', ['elementor_library', 'nav_menu_item']);
 
-        if( !in_array(get_post_type($template_id), $rest_allow_types) || get_post_status($template_id) !== 'publish' || post_password_required($template_id) ){
+	    // Resolve to the real post before anything else: "228", "0228" and "228abc" all load
+	    // post 228, so using the raw value in the cache key below would mint a separate cache
+	    // entry for every spelling of the same ID.
+	    $template_post = get_post( absint( $template_id ) );
+
+        if( ! $template_post || !in_array($template_post->post_type, $rest_allow_types, true) || $template_post->post_status !== 'publish' || post_password_required($template_post) ){
 	        $template_data = $default;
 	        return $type == 'rest' ? rest_ensure_response( $template_data ) : $template_data;
         }
 
+	    $template_id = $template_post->ID;
+
 		if(!empty($dynamic_id)){
+			$dynamic_post = get_post( absint( $dynamic_id ) );
+			if( ! self::is_post_readable( $dynamic_post ) ){
+				return $type == 'rest' ? rest_ensure_response( $default ) : $default;
+			}
+			$dynamic_id = $dynamic_post->ID;
 			global $post;
-			$post = get_post($dynamic_id);
-            if( get_post_status($post) !== 'publish' || post_password_required($post)){
-                return $type == 'rest' ? rest_ensure_response( $default ) : $default;
-            }
+			$post = $dynamic_post;
 		}
 
         $transient_key = md5( sprintf( 'lakit_doc_%1$s_dynamic_%2$s', $template_id, $dynamic_id ) );
@@ -108,6 +110,14 @@ class Template_Helper {
                 $template_data['template_metadata'] = [];
             }
             return $type == 'rest' ? rest_ensure_response( $template_data ) : $template_data;
+        }
+
+        // Cached responses are cheap; only throttle requests that trigger a real render.
+        if($type !== 'rest'){
+            $passed_rate_limit = self::apply_rate_limit();
+            if( is_wp_error( $passed_rate_limit ) ){
+                return $passed_rate_limit;
+            }
         }
 
         $plugin = lastudio_kit()->elementor();
@@ -371,15 +381,51 @@ class Template_Helper {
     }
 
 
+    /**
+     * Hard cap on how many cache keys are tracked per type in the key-map option.
+     *
+     * Without a cap the map grows for every distinct cache key ever created and, because
+     * it used to be autoloaded, its whole contents were unserialized on every request.
+     */
+    const TRANSIENT_KEY_LIMIT = 500;
+
     public static function set_transient_key( $type, $id, $key ){
 
         $transient_manager = get_option('LaStudioKitAPI_transient_manager', []);
 
-        if(!isset($transient_manager[$type])){
+        if(!is_array($transient_manager)){
+            $transient_manager = [];
+        }
+
+        if(!isset($transient_manager[$type]) || !is_array($transient_manager[$type])){
             $transient_manager[$type] = [];
         }
+
+        // Already tracked for this object: nothing to write.
+        if(isset($transient_manager[$type][$key]) && $transient_manager[$type][$key] === $id){
+            return;
+        }
+
         $transient_manager[$type][$key] = $id;
-        update_option('LaStudioKitAPI_transient_manager', $transient_manager);
+
+        $limit = (int) apply_filters('lastudio-kit/transient-manager/key-limit', self::TRANSIENT_KEY_LIMIT, $type);
+
+        if($limit > 0 && count($transient_manager[$type]) > $limit){
+            // Keys are inserted in creation order, so the oldest ones come first.
+            $overflow = count($transient_manager[$type]) - $limit;
+            $old_keys = array_slice(array_keys($transient_manager[$type]), 0, $overflow);
+            foreach ($old_keys as $old_key){
+                if($old_key === $key){
+                    continue;
+                }
+                delete_transient($old_key);
+                unset($transient_manager[$type][$old_key]);
+            }
+        }
+
+        // autoload = false: this map is only read by the cache-clearing routines, never
+        // on a normal page load.
+        update_option('LaStudioKitAPI_transient_manager', $transient_manager, false);
     }
 
     public function clear_transient_for_menu($menu_id){
@@ -395,7 +441,7 @@ class Template_Helper {
             }
         }
         if($need_update){
-            update_option('LaStudioKitAPI_transient_manager', $all_transient);
+            update_option('LaStudioKitAPI_transient_manager', $all_transient, false);
         }
     }
 
@@ -413,7 +459,7 @@ class Template_Helper {
             }
         }
         if($need_update){
-            update_option('LaStudioKitAPI_transient_manager', $all_transient);
+            update_option('LaStudioKitAPI_transient_manager', $all_transient, false);
         }
     }
 
@@ -426,7 +472,26 @@ class Template_Helper {
                 }
             }
         }
-        update_option('LaStudioKitAPI_transient_manager', []);
+        update_option('LaStudioKitAPI_transient_manager', [], false);
+    }
+
+    /**
+     * Whether the current visitor may read the given post (public post type + publicly viewable, or read_post capability).
+     *
+     * @param \WP_Post|null $post
+     * @return bool
+     */
+    public static function is_post_readable( $post ) {
+        if ( ! $post instanceof \WP_Post ) {
+            return false;
+        }
+        if ( post_password_required( $post ) ) {
+            return false;
+        }
+        if ( is_post_type_viewable( $post->post_type ) && is_post_publicly_viewable( $post ) ) {
+            return true;
+        }
+        return is_user_logged_in() && current_user_can( 'read_post', $post->ID );
     }
 
     public function render_elementor_template_via_ajax( $request_args, $error ){
@@ -459,13 +524,6 @@ class Template_Helper {
 
     public function widget_callback( $args, $type = 'rest' ) {
 
-        if($type !== 'rest'){
-            $passed_rate_limit = self::apply_rate_limit();
-            if(!$passed_rate_limit){
-                return $passed_rate_limit;
-            }
-        }
-
         $default_response = [ 'template_content' => '' ];
 
         $template_id = ! empty( $args['template_id'] ) ? $args['template_id'] : false;
@@ -477,7 +535,20 @@ class Template_Helper {
 
         $custom_paged_key = $_REQUEST['lakitpagedkey'] ?? false;
 
-        $paged_key = (!empty($custom_paged_key) && isset($_REQUEST[$custom_paged_key])) ? $_REQUEST[$custom_paged_key] : 0;
+        // Accept only a plain parameter name, and keep its original spelling so the lookup
+        // below still matches what the front end sent.
+        if( ! is_string( $custom_paged_key ) || ! preg_match( '/^[A-Za-z0-9_\-]{1,64}$/', $custom_paged_key ) ){
+            $custom_paged_key = false;
+        }
+
+        // The client picks both the parameter name and its value, so the value is clamped to
+        // a plain integer in a sane range: it is part of the cache key and must not be able
+        // to mint an unbounded number of distinct keys.
+        $paged_key = 0;
+        if(!empty($custom_paged_key) && isset($_REQUEST[$custom_paged_key]) && is_scalar($_REQUEST[$custom_paged_key])){
+            $max_paged = (int) apply_filters('lastudio-kit/rest/max-paged', 500);
+            $paged_key = min( absint( $_REQUEST[$custom_paged_key] ), $max_paged );
+        }
 
         if(!empty($custom_paged_key) && !empty($paged_key)){
             $cache_timeout = 5 * MINUTE_IN_SECONDS;
@@ -487,9 +558,12 @@ class Template_Helper {
 	        return $type == 'rest' ? rest_ensure_response( $default_response ) : $default_response;
         }
 
-	    if( false === get_post_type($template_id) || 'publish' !== get_post_status($template_id) || post_password_required($template_id) ){
+	    $widget_allow_types = apply_filters('lastudio-kit/rest/elmenetor/allow_types', ['elementor_library', 'nav_menu_item']);
+	    $template_post = get_post( absint( $template_id ) );
+	    if( ! $template_post || ( ! in_array( $template_post->post_type, $widget_allow_types, true ) && ! self::is_post_readable( $template_post ) ) || 'publish' !== $template_post->post_status || post_password_required( $template_post ) ){
 		    return $type == 'rest' ? rest_ensure_response( $default_response ) : $default_response;
 	    }
+	    $template_id = $template_post->ID;
 
 	    $cache_name = sprintf( 'lakit_doc_%1$s_widget_%2$s_paged_%3$s', $template_id, $widget_id, $paged_key );
 		if(!empty($widget_args)){
@@ -502,6 +576,14 @@ class Template_Helper {
 
         if ( !empty( $template_data ) && !$is_dev ) {
 	        return $type == 'rest' ? rest_ensure_response( $template_data ) : $template_data;
+        }
+
+        // Cached responses are cheap; only throttle requests that trigger a real render.
+        if($type !== 'rest'){
+            $passed_rate_limit = self::apply_rate_limit();
+            if( is_wp_error( $passed_rate_limit ) ){
+                return $passed_rate_limit;
+            }
         }
 
         $doc_meta = get_post_meta( $template_id, '_elementor_data', true );
@@ -581,27 +663,96 @@ class Template_Helper {
      * @param string $key_prefix
      * @return true|\WP_Error
      */
-    public static function apply_rate_limit( $key_prefix = 'lakit_rl_rest_' ){
-        $user_ip = $_SERVER['REMOTE_ADDR'];
-        $key = $key_prefix . md5($user_ip);
-        $limit = 30;
-        $time = MINUTE_IN_SECONDS;
-        $data = get_transient($key);
-        if (!$data) {
-            $data = ['count' => 1, 'start' => time()];
-            set_transient($key, $data, $time);
-        }
-        else {
-            $data['count']++;
-            if ($data['count'] > $limit) {
-                return new \WP_Error(
-                    'rate_limited',
-                    'Too many requests. Please wait a moment.',
-                    ['status' => 429]
-                );
+    /**
+     * Visitor address the rate limiter counts against.
+     *
+     * REMOTE_ADDR by default. Behind a reverse proxy or a CDN that address is the proxy's,
+     * so every visitor shares one bucket and a single visitor can rate-limit the whole site.
+     * A site that really sits behind one can name the header carrying the visitor address:
+     *
+     *     define( 'LAKIT_TRUSTED_PROXY_HEADER', 'HTTP_CF_CONNECTING_IP' );
+     *
+     * Set it ONLY where the proxy always overwrites that header on the way in. On a site
+     * reachable directly, any visitor can forge the header and walk around the limit.
+     *
+     * @return string Validated IP address, or '' when there is none (CLI, cron).
+     */
+    public static function get_client_ip(){
+
+        $ip = isset($_SERVER['REMOTE_ADDR']) ? (string) $_SERVER['REMOTE_ADDR'] : '';
+
+        $header = defined('LAKIT_TRUSTED_PROXY_HEADER') ? (string) LAKIT_TRUSTED_PROXY_HEADER : '';
+        $header = (string) apply_filters('lastudio-kit/rate-limit/trusted-proxy-header', $header);
+
+        if ( '' !== $header && ! empty( $_SERVER[ $header ] ) ) {
+            // X-Forwarded-For style headers hold a list; the left-most entry is the client.
+            $forwarded = explode( ',', (string) $_SERVER[ $header ] );
+            $candidate = trim( $forwarded[0] );
+            if ( filter_var( $candidate, FILTER_VALIDATE_IP ) ) {
+                $ip = $candidate;
             }
-            set_transient($key, $data, $time - (time() - $data['start']));
         }
+
+        $ip = (string) apply_filters('lastudio-kit/rate-limit/client-ip', $ip);
+
+        return filter_var( $ip, FILTER_VALIDATE_IP ) ? $ip : '';
+    }
+
+    /**
+     * @param string $key_prefix    Bucket the request is counted against.
+     * @param int    $default_limit Requests allowed per window before the filter runs.
+     * @return true|\WP_Error
+     */
+    public static function apply_rate_limit( $key_prefix = 'lakit_rl_rest_', $default_limit = 30 ){
+
+        $user_ip = self::get_client_ip();
+
+        // Nothing to attribute the request to (CLI, cron): there is no caller to throttle.
+        if ( '' === $user_ip ) {
+            return true;
+        }
+
+        $limit = (int) apply_filters('lastudio-kit/rate-limit/limit', (int) $default_limit, $key_prefix);
+        $time  = (int) apply_filters('lastudio-kit/rate-limit/window', MINUTE_IN_SECONDS, $key_prefix);
+
+        if ( $limit <= 0 || $time <= 0 ) {
+            return true;
+        }
+
+        $key  = $key_prefix . md5($user_ip);
+        $data = get_transient($key);
+
+        $start_window = static function() use ( $key, $time ) {
+            set_transient( $key, ['count' => 1, 'start' => time()], $time );
+            return true;
+        };
+
+        if ( ! is_array($data) || ! isset($data['count'], $data['start']) ) {
+            return $start_window();
+        }
+
+        $elapsed = time() - (int) $data['start'];
+
+        // Window rolled over (or the clock moved): begin a fresh one.
+        if ( $elapsed >= $time || $elapsed < 0 ) {
+            return $start_window();
+        }
+
+        $data['count'] = (int) $data['count'] + 1;
+
+        // Persist the counter even once the limit is hit, and never with a non-positive TTL:
+        // set_transient() treats an expiration <= 0 as "never expires", which would leave the
+        // address locked out permanently.
+        set_transient( $key, $data, max( 1, $time - $elapsed ) );
+
+        if ( $data['count'] > $limit ) {
+            return new \WP_Error(
+                'rate_limited',
+                'Too many requests. Please wait a moment.',
+                ['status' => 429]
+            );
+        }
+
         return true;
     }
 }

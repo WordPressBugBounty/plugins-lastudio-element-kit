@@ -376,7 +376,7 @@ abstract class LaStudioKit_Base extends Widget_Base
         }
 
         if (!empty($value)) {
-            return sprintf($format, $value);
+            return sprintf($format, self::kses_text($value));
         }
         return false;
     }
@@ -509,6 +509,32 @@ abstract class LaStudioKit_Base extends Widget_Base
      * @param  [type] $format  [description]
      * @return [type]          [description]
      */
+    /**
+     * Allowed HTML for text settings printed by the widget templates.
+     *
+     * @return array
+     */
+    public static function get_allowed_text_html() {
+        static $allowed = null;
+        if ( null === $allowed ) {
+            $allowed = array_merge( wp_kses_allowed_html( 'post' ), \LaStudio_Kit_Helper::kses_allowed_tags() );
+        }
+        return $allowed;
+    }
+
+    /**
+     * Strip unsafe HTML (scripts, event handlers...) from a text value.
+     *
+     * @param mixed $value
+     * @return mixed
+     */
+    public static function kses_text( $value ) {
+        if ( ! is_string( $value ) ) {
+            return $value;
+        }
+        return wp_kses( $value, self::get_allowed_text_html() );
+    }
+
     public function _render_html($setting = null, $format = '%s')
     {
 
@@ -532,10 +558,10 @@ abstract class LaStudioKit_Base extends Widget_Base
         }
 
         if (is_array($val)) {
-            printf($format, $val[$key]); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            printf($format, self::kses_text($val[$key])); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized with wp_kses.
         }
         else {
-            printf($format, $val); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            printf($format, self::kses_text($val)); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- sanitized with wp_kses.
         }
 
     }
@@ -685,7 +711,7 @@ abstract class LaStudioKit_Base extends Widget_Base
                 $icon_class .= ' ' . $settings[$setting];
             }
 
-            $icon_html = sprintf('<i class="%s" aria-hidden="true"></i>', $icon_class);
+            $icon_html = sprintf('<i class="%s" aria-hidden="true"></i>', esc_attr( $icon_class ));
         }
 
         if (empty($icon_html)) {

@@ -61,8 +61,8 @@ else{
 
 $item_instance = 'item-instance-' . $this->_processed_index;
 
-$subtitle = $this->_loop_item( ['subtitle'] );
-$title = $this->_loop_item( ['title'] );
+$subtitle = $this->kses_text( $this->_loop_item( ['subtitle'] ) );
+$title = $this->kses_text( $this->_loop_item( ['title'] ) );
 
 if(!empty($title)){
     $this->add_render_attribute( $link_tag === 'a' ? $link_instance : $btn_instance, 'title', wp_strip_all_tags($title) );
@@ -105,7 +105,7 @@ $button_html = '';
 if(!empty($_processed_item['button_text']) || !empty($btn_icon)){
     $btn_text = '';
     if(!empty($_processed_item['button_text'])){
-        $btn_text = sprintf('<span class="btn-text">%1$s</span>', $_processed_item['button_text']);
+        $btn_text = sprintf('<span class="btn-text">%1$s</span>', $this->kses_text( $_processed_item['button_text'] ));
     }
     $button_html = sprintf('<div class="lakit-bannerlist__btn_wrap"><%1$s %2$s>%3$s%4$s</%1$s></div>', $btn_tag, $this->get_render_attribute_string($btn_instance), $btn_text, $btn_icon);
 }

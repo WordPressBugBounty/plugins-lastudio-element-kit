@@ -9,13 +9,14 @@ trait Tag_Product_Id {
 			'product_id',
 			[
 				'label' => esc_html__( 'Product', 'lastudio-kit' ),
-				'type' => QueryControlModule::QUERY_CONTROL_ID,
+				'type' => \LaStudioKitThemeBuilder\Modules\DynamicTags\Module::get_query_control_type(),
 				'options' => [],
 				'label_block' => true,
 				'autocomplete' => [
 					'object' => QueryControlModule::QUERY_OBJECT_POST,
 					'query' => [
 						'post_type' => [ 'product' ],
+						'post_status' => [ 'publish' ],
 					],
 				],
 				// Since we're using the `wc_get_product` method to retrieve products, when no product selected manually

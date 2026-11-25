@@ -79,7 +79,7 @@ class Pods_Date extends Pods_Base {
 			[
 				'label' => esc_html__( 'Custom Format', 'lastudio-kit' ),
 				'default' => '',
-				'description' => sprintf( '<a href="https://la-studioweb.com/go/elementor-pro" target="_blank">%s</a>', esc_html__( 'Documentation on date and time formatting', 'lastudio-kit' ) ),
+				'description' => sprintf( '<a href="https://go.elementor.com/wordpress-date-time/" target="_blank">%s</a>', esc_html__( 'Documentation on date and time formatting', 'lastudio-kit' ) ),
 				'condition' => [
 					'format' => 'custom',
 				],

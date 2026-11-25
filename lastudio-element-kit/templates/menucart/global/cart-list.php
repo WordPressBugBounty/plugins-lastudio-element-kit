@@ -3,7 +3,7 @@
  * Cart list template
  */
 
-$close_button_html = $this->_get_icon( 'cart_list_close_icon', '<div class="lakit-cart__close-button lakit-blocks-icon">%s</div>' );
+$close_button_html = $this->_get_icon( 'cart_list_close_icon', '<div class="lakit-cart__close_wrap"><div class="lakit-cart__close-button lakit-blocks-icon">%s</div></div>' );
 $heading_label = $this->_get_html( 'cart_list_label', '<div class="lakit-cart__list-title h4 theme-heading">%s</div>' );
 if( str_contains( $heading_label, "{{cart_count}}" ) ){
     $cart_count = '';

@@ -22,8 +22,8 @@
 									include_type: self.model.get('include_type'),
 									query: self.model.get('query')
 								};
-								if( "undefined" !== self.model.get('autocomplete')){
-									data.autocomplete = self.model.get('autocomplete');
+								if( self.model.get('autocomplete') ){
+									data.autocomplete = self.getQueryData().autocomplete;
 								}
 
 								return elementor.ajax.addRequest('lastudiokit_query_control_filter_autocomplete', {
@@ -246,6 +246,12 @@
 			// Add controls views
 			elementor.addControlView( 'lastudiokit-query',    	QueryControlItemView );
 			elementor.addControlView( 'lastudiokit-search',    	LakitSearchView );
+
+			// Without Elementor Pro, the kit registers Pro's `query` control type (dynamic tags such as
+			// WooCommerce Add To Cart / Internal URL use it so they are also available in V4 atomic widgets).
+			if ( ! window.elementorPro ) {
+				elementor.addControlView( 'query', QueryControlItemView );
+			}
 		}
 	};
 

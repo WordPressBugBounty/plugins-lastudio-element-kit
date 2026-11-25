@@ -403,7 +403,7 @@ class LaStudioKit_Post_Info extends LaStudioKit_Base {
 				    break;
                 case 'custom_field':
                     if( !empty($meta['item_ckey']) ){
-                        $meta_value = get_post_meta( get_the_ID(), $meta['item_ckey'], true );
+                        $meta_value = \LaStudio_Kit_Helper::get_public_post_meta( get_the_ID(), $meta['item_ckey'] );
                     }
                     $item_type_class = 'cf__' . $item_type;
                     break;
@@ -418,7 +418,7 @@ class LaStudioKit_Post_Info extends LaStudioKit_Base {
 		    }
 
 		    if (!empty($meta_value)) {
-			    $output .= sprintf('<div class="lakit-posts__meta__item lakit-posts__meta__item--%4$s %5$s">%1$s%2$s%3$s</div>', $meta_icon, $meta_label, $meta_value, $item_type, $item_type_class);
+			    $output .= sprintf('<div class="lakit-posts__meta__item lakit-posts__meta__item--%4$s %5$s">%1$s%2$s%3$s</div>', $meta_icon, $meta_label, $meta_value, esc_attr( $item_type ), esc_attr( $item_type_class ));
 		    }
 
 	    }

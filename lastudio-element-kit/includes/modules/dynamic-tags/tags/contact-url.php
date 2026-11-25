@@ -2,14 +2,14 @@
 namespace LaStudioKitThemeBuilder\Modules\DynamicTags\Tags;
 
 use Elementor\Controls_Manager;
-use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Tag;
+use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Pro_Tag;
 use LaStudioKitThemeBuilder\Modules\DynamicTags\Module;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Contact_URL extends Tag {
+class Contact_URL extends Pro_Tag {
 
 	public function get_name() {
 		return 'contact-url';
@@ -23,6 +23,10 @@ class Contact_URL extends Tag {
 		return Module::ACTION_GROUP;
 	}
 
+	public function get_atomic_group() {
+		return Module::SITE_GROUP;
+	}
+
 	public function get_categories() {
 		return [ Module::URL_CATEGORY ];
 	}
@@ -34,12 +38,10 @@ class Contact_URL extends Tag {
 				'label' => esc_html__( 'Type', 'lastudio-kit' ),
 				'type' => Controls_Manager::SELECT,
 				'options' => [
-					'' => '— ' . esc_html__( 'Select', 'lastudio-kit' ) . ' —',
 					'email' => esc_html__( 'Email', 'lastudio-kit' ),
 					'tel' => esc_html__( 'Tel', 'lastudio-kit' ),
 					'sms' => esc_html__( 'SMS', 'lastudio-kit' ),
 					'whatsapp' => esc_html__( 'WhatsApp', 'lastudio-kit' ),
-					'skype' => esc_html__( 'Skype', 'lastudio-kit' ),
 					'messenger' => esc_html__( 'Messenger', 'lastudio-kit' ),
 					'viber' => esc_html__( 'Viber', 'lastudio-kit' ),
 					'waze' => esc_html__( 'Waze', 'lastudio-kit' ),
@@ -57,6 +59,9 @@ class Contact_URL extends Tag {
 				'type' => Controls_Manager::TEXT,
 				'condition' => [
 					'link_type' => 'email',
+				],
+				'ai' => [
+					'active' => false,
 				],
 			]
 		);
@@ -97,6 +102,9 @@ class Contact_URL extends Tag {
 						'viber',
 					],
 				],
+				'ai' => [
+					'active' => false,
+				],
 			]
 		);
 
@@ -107,6 +115,9 @@ class Contact_URL extends Tag {
 				'type' => Controls_Manager::TEXT,
 				'condition' => [
 					'link_type' => [ 'skype', 'messenger' ],
+				],
+				'ai' => [
+					'active' => false,
 				],
 			]
 		);
@@ -128,25 +139,6 @@ class Contact_URL extends Tag {
 		);
 
 		$this->add_control(
-			'skype_action',
-			[
-				'label' => esc_html__( 'Action', 'lastudio-kit' ),
-				'type' => Controls_Manager::SELECT,
-				'options' => [
-					'call' => esc_html__( 'Call', 'lastudio-kit' ),
-					'chat' => esc_html__( 'Chat', 'lastudio-kit' ),
-					'userinfo' => esc_html__( 'Show Profile', 'lastudio-kit' ),
-					'add' => esc_html__( 'Add to Contacts', 'lastudio-kit' ),
-					'voicemail' => esc_html__( 'Send Voice Mail', 'lastudio-kit' ),
-				],
-				'default' => 'call',
-				'condition' => [
-					'link_type' => 'skype',
-				],
-			]
-		);
-
-		$this->add_control(
 			'waze_address',
 			[
 				'label' => esc_html__( 'Location', 'lastudio-kit' ),
@@ -154,6 +146,9 @@ class Contact_URL extends Tag {
 				'label_block' => 'true',
 				'condition' => [
 					'link_type' => 'waze',
+				],
+				'ai' => [
+					'active' => false,
 				],
 			]
 		);
@@ -201,6 +196,9 @@ class Contact_URL extends Tag {
 						'outlook_calendar',
 						'yahoo_calendar',
 					],
+				],
+				'ai' => [
+					'active' => false,
 				],
 			]
 		);
@@ -275,19 +273,6 @@ class Contact_URL extends Tag {
 		return 'https://api.whatsapp.com/send?phone=' . $settings['tel_number'];
 	}
 
-	private function build_skype_link( $settings ) {
-		if ( empty( $settings['username'] ) ) {
-			return '';
-		}
-
-		$action = 'call';
-		if ( ! empty( $settings['skype_action'] ) ) {
-			$action = $settings['skype_action'];
-		}
-		$link = 'skype:' . $settings['username'] . '?' . $action;
-		return $link;
-	}
-
 	private function build_waze_link( $settings ) {
 		$link = 'https://waze.com/ul?';
 
@@ -302,6 +287,10 @@ class Contact_URL extends Tag {
 
 	private function date_to_iso( $date, $all_day = false ) {
 		$time = strtotime( $date );
+
+		if ( false === $time ) {
+			return '';
+		}
 
 		if ( $all_day ) {
 			return gmdate( 'Ymd\/Ymd', $time );
@@ -325,7 +314,9 @@ class Contact_URL extends Tag {
 			if ( empty( $settings['event_end_date'] ) ) {
 				$dates = $this->date_to_iso( $settings['event_start_date'], true );
 			} else {
-				$dates = $this->date_to_iso( $settings['event_start_date'] ) . '/' . $this->date_to_iso( $settings['event_end_date'] );
+				$start = $this->date_to_iso( $settings['event_start_date'] );
+				$end = $this->date_to_iso( $settings['event_end_date'] );
+				$dates = $start && $end ? ( $start . '/' . $end ) : ( $start ? $start : ( $end ? $end : '' ) );
 			}
 		}
 		$link = 'https://www.google.com/calendar/render?action=TEMPLATE&';
@@ -420,9 +411,6 @@ class Contact_URL extends Tag {
 				break;
 			case 'whatsapp':
 				$value = $this->build_whatsapp_link( $settings );
-				break;
-			case 'skype':
-				$value = $this->build_skype_link( $settings );
 				break;
 			case 'waze':
 				$value = $this->build_waze_link( $settings );

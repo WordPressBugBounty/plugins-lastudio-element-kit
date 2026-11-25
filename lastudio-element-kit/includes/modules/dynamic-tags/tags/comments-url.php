@@ -1,14 +1,14 @@
 <?php
 namespace LaStudioKitThemeBuilder\Modules\DynamicTags\Tags;
 
-use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Data_Tag;
+use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Pro_Data_Tag;
 use LaStudioKitThemeBuilder\Modules\DynamicTags\Module;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Comments_URL extends Data_Tag {
+class Comments_URL extends Pro_Data_Tag {
 
 	public function get_name() {
 		return 'comments-url';

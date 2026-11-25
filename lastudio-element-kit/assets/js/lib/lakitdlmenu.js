@@ -1,183 +1,187 @@
-( function( $, window, undefined ) {
+(function ($) {
     'use strict';
 
-    // global
-    const  $body = $( 'body' );
-
-    $.LakitDLMenu = function( options, element ) {
-        this.$el = $( element );
-        this._init( options );
+    $.LakitDLMenu = function (options, element) {
+        this.$el = $(element);
+        this._init(options);
     };
 
-    // the options
     $.LakitDLMenu.defaults = {
-        // classes for the animation effects
-        animationClasses : { classin : 'lakitdl-animate-in-1', classout : 'lakitdl-animate-out-1' },
-        // callback: click a link that has a sub menu
-        onLevelClick : function( el, name ) { return false; },
+        animationClasses: {
+            classin: 'lakitdl-animate-in-1',
+            classout: 'lakitdl-animate-out-1'
+        },
+        onLevelClick: () => { return false; },
         backLabel: '',
         triggerIcon: '>',
-        // Change to "true" to use the active item as back link label.
         useActiveItemAsBackLabel: false,
-        // Change to "true" to add a navigable link to the active item to its child
-        // menu.
         useActiveItemAsLink: false,
-        // On close reset the menu to root
         resetOnClose: true,
-        supportAnimations: true
+        supportAnimations: true,
+        timing: 300
     };
 
     $.LakitDLMenu.prototype = {
-        _init : function( options ) {
-
-            // options
-            this.options = $.extend( true, {}, $.LakitDLMenu.defaults, options );
-            // cache some elements and initialize some variables
-            this._config();
-
-            // animation end event name
+        _init: function (options) {
+            this.options = $.extend(true, {}, $.LakitDLMenu.defaults, options);
+            this.eId = this.$el.closest('.elementor-element').data('id') || '';
             this.animEndEventName = 'animationend.lakitdlmenu';
-            // transition end event name
             this.transEndEventName = 'transitionend.lakitdlmenu';
-            // support for css animations and css transitions
-            this.supportAnimations = this.options.supportAnimations
+            this.supportAnimations = this.options.supportAnimations;
+            this.isAnimating = false;
 
+            this._config();
             this._initEvents();
-
         },
-        _config : function() {
 
-            const e_id = this.$el.closest('.elementor-element').data('id');
+        _config: function () {
+            const opts = this.options;
+            const eId = this.eId;
 
             this.open = false;
-            this.$menu = this.$el.children( '.lakit-nav.lakitdl-menu' );
-            this.$menuitems = this.$menu.find( '.menu-item:not(.lakitdl-back)' );
-            this.$el.find( '.lakitdl-submenu' ).prepend( '<div class="menu-item lakit-nav__item lakit-nav-id-'+ e_id +' lakitdl-back"><button type="button" class="menu-item-link menu-item-link-sub">' + this.options.backLabel + '</button></div>' );
-            this.$el.find( '.lakitdl-submenu').parent().append('<button type="button" class="trigger-dlmenu" aria-label="Open submenu">'+ this.options.triggerIcon +'</button>');
-            this.$back = this.$menu.find( '.menu-item.lakitdl-back' );
+            this.$menu = this.$el.children('.lakit-nav.lakitdl-menu');
+            this.$menuitems = this.$menu.find('.menu-item:not(.lakitdl-back)');
+
+            this.$menu.find('.lakitdl-back, .trigger-dlmenu, .lakitdl-parent').remove();
+
+            const $submenus = this.$el.find('.lakitdl-submenu');
+
+            $submenus.prepend(
+                `<div class="menu-item lakit-nav__item lakit-nav-id-${eId} lakitdl-back">` +
+                `<button type="button" class="menu-item-link menu-item-link-sub">${opts.backLabel}</button>` +
+                `</div>`
+            );
+
+            $submenus.parent().append(
+                `<button type="button" class="trigger-dlmenu" aria-label="Open submenu">${opts.triggerIcon}</button>`
+            );
+
+            this.$back = this.$menu.find('.menu-item.lakitdl-back');
             this.$itemtrigger = this.$menuitems.find('.trigger-dlmenu');
 
-            // Set the label text for the back link.
-            if (this.options.useActiveItemAsBackLabel) {
-                this.$back.each(function() {
-                    let $this = $(this),
-                        parentLabel = $this.parents('.menu-item:first').find('a:first').text();
-
-                    $this.find('a').html(parentLabel);
-                });
-            }
-            // If the active item should also be a clickable link, create one and put
-            // it at the top of our menu.
-            if (this.options.useActiveItemAsLink) {
-                this.$el.find( '.lakit-nav__sub.lakitdl-submenu' ).prepend(function() {
-                    const parentli = $(this).parents('.menu-item:not(.lakitdl-back):first').find('a:first');
-                    return '<div class="menu-item lakit-nav__item lakitdl-parent"><a class="menu-item-link" href="' + parentli.attr('href') + '">' + parentli.text() + '</a></div>';
+            if (opts.useActiveItemAsBackLabel) {
+                this.$back.each(function () {
+                    const $this = $(this);
+                    const parentLabel = $this.closest('.menu-item:not(.lakitdl-back)').children('a:first').text();
+                    $this.children('button').text(parentLabel);
                 });
             }
 
+            if (opts.useActiveItemAsLink) {
+                this.$el.find('.lakit-nav__sub.lakitdl-submenu').prepend(function () {
+                    const $parentLink = $(this).closest('.menu-item:not(.lakitdl-back)').children('a:first');
+                    return `<div class="menu-item lakit-nav__item lakitdl-parent">` +
+                        `<a class="menu-item-link" href="${$parentLink.attr('href') || '#'}">${$parentLink.text()}</a>` +
+                        `</div>`;
+                });
+            }
         },
-        _initEvents : function() {
 
+        _initEvents: function () {
             const self = this;
-            const e_id = this.$el.closest('.elementor-element').data('id');
 
-            this.$itemtrigger.on('click.lakitdlmenu', function (event){
-                const $item = $(this).parent(),
-                    $submenu = $item.children( '.lakit-nav__sub.lakitdl-submenu' );
-                if( $submenu.length > 0 && !$item.hasClass('lakitdl-subviewopen')){
+            this.$menu.off('.lakitdlmenu');
 
-                    const $clone = $('<div/>').addClass('lakit-nav--clone lakit-nav lakit-nav-'+e_id+' lakit-nav-id-'+e_id).css('opacity', 0).append($submenu.clone());
-                    $clone.insertAfter( self.$menu );
+            this.$menu.on('click.lakitdlmenu', '.trigger-dlmenu', function (e) {
+                e.preventDefault();
+                if (self.isAnimating) return;
 
-                    const onAnimationEndFn = function() {
-                        self.$menu.off( self.animEndEventName ).removeClass( self.options.animationClasses.classout ).addClass( 'lakitdl-subview' );
-                        $item.addClass( 'lakitdl-subviewopen' ).parents( '.lakitdl-subviewopen:first' ).removeClass( 'lakitdl-subviewopen' ).addClass( 'lakitdl-subview' );
-                        $clone.remove();
-                    }
+                const $item = $(this).parent();
+                const $submenu = $item.children('.lakit-nav__sub.lakitdl-submenu');
 
-                    $clone.addClass( self.options.animationClasses.classin );
-                    self.$menu.addClass( self.options.animationClasses.classout );
-                    if( self.supportAnimations ) {
-                        self.$menu.on( self.animEndEventName, onAnimationEndFn );
-                    }
-                    else {
-                        setTimeout( function() {
-                            onAnimationEndFn.call();
-                        }, 300);
-                    }
-                    self.options.onLevelClick( $item, $item.children( 'a:first' ).text() );
+                if ($submenu.length && !$item.hasClass('lakitdl-subviewopen')) {
+                    self.isAnimating = true;
+                    const $clone = self._createClone($submenu).css('opacity', 0);
+
+                    self._runAnimation($clone, self.options.animationClasses.classin, self.options.animationClasses.classout, function () {
+                        self.$menu.addClass('lakitdl-subview');
+                        $item.addClass('lakitdl-subviewopen')
+                            .parents('.lakitdl-subviewopen:first')
+                            .removeClass('lakitdl-subviewopen')
+                            .addClass('lakitdl-subview');
+                        self.isAnimating = false;
+                    });
+
+                    self.options.onLevelClick($item, $item.children('a:first').text());
                 }
             });
 
-            this.$back.on( 'click.lakitdlmenu', function( event ) {
+            this.$menu.on('click.lakitdlmenu', '.lakitdl-back', function (e) {
+                e.preventDefault();
+                if (self.isAnimating) return;
 
-                const $this = $( this ),
-                    $submenu = $this.parents( '.lakit-nav__sub.lakitdl-submenu:first' ),
-                    $item = $submenu.parent();
+                self.isAnimating = true;
+                const $this = $(this);
+                const $submenu = $this.closest('.lakit-nav__sub.lakitdl-submenu');
+                const $item = $submenu.parent();
+                const $clone = self._createClone($submenu);
 
+                requestAnimationFrame(function () {
+                    self._runAnimation($clone, self.options.animationClasses.classout, self.options.animationClasses.classin, function () {
+                        self.isAnimating = false;
+                    });
 
-                const $clone = $('<div/>').addClass('lakit-nav--clone lakit-nav lakit-nav-'+e_id+' lakit-nav-id-'+e_id).append($submenu.clone());
-                $clone.insertAfter( self.$menu );
+                    $item.removeClass('lakitdl-subviewopen');
 
-                const onAnimationEndFn = function() {
-                    self.$menu.off( self.animEndEventName ).removeClass( self.options.animationClasses.classin );
-                    $clone.remove();
-                };
-
-                setTimeout( function() {
-                    $clone.addClass( self.options.animationClasses.classout );
-                    self.$menu.addClass( self.options.animationClasses.classin );
-                    if( self.supportAnimations ) {
-                        self.$menu.on( self.animEndEventName, onAnimationEndFn );
+                    const $subview = $this.closest('.lakitdl-subview');
+                    if ($subview.is('.menu-item')) {
+                        $subview.addClass('lakitdl-subviewopen');
                     }
-                    else {
-                        setTimeout(function (){
-                            onAnimationEndFn.call();
-                        }, 300)
-                    }
-
-                    $item.removeClass( 'lakitdl-subviewopen' );
-
-                    var $subview = $this.parents( '.lakitdl-subview:first' );
-                    if( $subview.is( '.menu-item' ) ) {
-                        $subview.addClass( 'lakitdl-subviewopen' );
-                    }
-                    $subview.removeClass( 'lakitdl-subview' );
-                } );
-
-                return false;
-
-            } );
-        },
-        // resets the menu to its original state (first level of options)
-        _resetMenu : function() {
-            this.$menu.removeClass( 'lakitdl-subview' );
-            this.$menuitems.removeClass( 'lakitdl-subview lakitdl-subviewopen' );
+                    $subview.removeClass('lakitdl-subview');
+                });
+            });
         },
 
-        destroyMenu : function (){
+        _createClone: function ($submenu) {
+            return $('<div/>')
+                .addClass(`lakit-nav--clone lakit-nav lakit-nav-${this.eId} lakit-nav-id-${this.eId}`)
+                .append($submenu.clone())
+                .insertAfter(this.$menu);
+        },
+
+        _runAnimation: function ($clone, cloneClass, menuClass, callback) {
+            const self = this;
+
+            const onEnd = function () {
+                self.$menu.off(self.animEndEventName).removeClass(menuClass);
+                $clone.remove();
+                if (typeof callback === 'function') callback();
+            };
+
+            $clone.addClass(cloneClass);
+            this.$menu.addClass(menuClass);
+
+            if (this.supportAnimations) {
+                this.$menu.one(this.animEndEventName, onEnd);
+            } else {
+                setTimeout(onEnd, this.options.timing);
+            }
+        },
+
+        _resetMenu: function () {
+            this.$menu.removeClass('lakitdl-subview');
+            this.$menuitems.removeClass('lakitdl-subview lakitdl-subviewopen');
+        },
+
+        destroyMenu: function () {
             this.$el.removeClass('lakitdl-menuwrapper');
-            this.$menu.removeClass('lakitdl-menu lakitdl-menuopen lakitdl-subview');
-            this.$menuitems.removeClass('lakitdl-subview lakitdl-subviewopen')
-            this.$back.remove();
-            this.$itemtrigger.remove();
-            this.$el.find('>.lakit-nav__sub').remove();
-            this.$menu.off(this.animEndEventName).off(this.transEndEventName);
-            this.$el.removeData('lakitdlmenu')
+            this.$menu.removeClass('lakitdl-menu lakitdl-menuopen lakitdl-subview').off('.lakitdlmenu');
+            this.$menuitems.removeClass('lakitdl-subview lakitdl-subviewopen');
+            this.$menu.find('.lakitdl-back, .trigger-dlmenu, .lakitdl-parent').remove();
+            this.$el.find('> .lakit-nav__sub, > .lakit-nav--clone').remove();
+            this.$el.removeData('lakitdlmenu');
         }
     };
 
-    $.fn.lakitdlmenu = function( options ) {
-        this.each(function() {
-            let instance = $.data( this, 'lakitdlmenu' );
-            if ( instance ) {
-                instance._init();
+    $.fn.lakitdlmenu = function (options) {
+        return this.each(function () {
+            const instance = $.data(this, 'lakitdlmenu');
+            if (instance) {
+                instance._init(options);
+            } else {
+                $.data(this, 'lakitdlmenu', new $.LakitDLMenu(options, this));
             }
-            else {
-                instance = $.data( this, 'lakitdlmenu', new $.LakitDLMenu( options, this ) );
-            }
-        })
-        return this;
+        });
     };
 
-} )( jQuery, window );
+})(jQuery);

@@ -143,11 +143,32 @@ if (!class_exists('LaStudio_Kit_Ajax_Manager')) {
 
 		    $this->requests = json_decode( stripslashes( $_REQUEST['actions'] ), true );
 
+		    if( ! is_array( $this->requests ) ){
+			    $this->requests = [];
+		    }
+
 		    if(empty($this->requests)){
 			    $this->add_response_data( false, esc_html__( 'Action not found.', 'lastudio-kit' ) )->send_error( 401 );
 		    }
+
+		    /**
+		     * Cap how many actions a single HTTP request may carry.
+		     *
+		     * The dispatcher runs every entry of the client-supplied `actions` array, so
+		     * without a cap one request can fan out into an unbounded number of callbacks.
+		     */
+		    $max_actions = (int) apply_filters( 'lastudio-kit/ajax/max_actions_per_request', 10 );
+
+		    if ( $max_actions > 0 && count( $this->requests ) > $max_actions ) {
+			    $this->requests = array_slice( $this->requests, 0, $max_actions, true );
+		    }
+
 		    foreach ( $this->requests as $id => $action_data ) {
 			    $this->current_action_id = $id;
+			    if ( ! is_array( $action_data ) || ! isset( $action_data['action'] ) || ! is_scalar( $action_data['action'] ) ) {
+				    $this->add_response_data( false, esc_html__( 'Action not found.', 'lastudio-kit' ), 401 );
+				    continue;
+			    }
 			    if ( ! isset( $this->ajax_actions[ $action_data['action'] ] ) ) {
 				    $this->add_response_data( false, esc_html__( 'Action not found.', 'lastudio-kit' ), 401 );
 				    continue;

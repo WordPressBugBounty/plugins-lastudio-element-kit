@@ -27,6 +27,10 @@ class Templates_Conditions extends Base_Endpoint {
 	}
 
 	public function update_item( $template_id, $request ) {
+		if ( ! absint( $template_id ) || 'elementor_library' !== get_post_type( $template_id ) || ! current_user_can( 'edit_post', $template_id ) ) {
+			return new \WP_Error( 'rest_forbidden', esc_html__( 'Sorry, you are not allowed to edit this template.', 'lastudio-kit' ), [ 'status' => 403 ] );
+		}
+
 		$lock_by_user_id = $this->is_post_lock( $template_id );
 
 		if ( $lock_by_user_id ) {

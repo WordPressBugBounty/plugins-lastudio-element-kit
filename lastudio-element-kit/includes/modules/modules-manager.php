@@ -22,6 +22,10 @@ final class Modules_Manager {
             'woofilters',
             'nested-elements',
 			'edynamic-tags',
+			'shape-divider',
+			'loop-builder',
+			'atomic-pro',
+			'atomic-loop',
 //			'givewp'
 		];
 
@@ -29,7 +33,8 @@ final class Modules_Manager {
 			'woocommerce',
 			'woofilters',
             'nested-elements',
-            'edynamic-tags'
+            'edynamic-tags',
+            'loop-builder',
 		];
 
 		foreach ( $modules as $module_name ) {
@@ -40,6 +45,14 @@ final class Modules_Manager {
 			/** @var Module_Base $class_name */
             if( ( $class_name::is_active() && ( !lastudio_kit()->has_elementor_pro() || in_array($module_name, $forceActivateModules, true) ) ) ){
                 $this->modules[ $module_name ] = $class_name::instance();
+            }
+            elseif ( 'atomic-pro' === $module_name && lastudio_kit()->has_elementor_pro() ) {
+                // With Elementor Pro active, unlock the features its license does not cover.
+                \LaStudioKitThemeBuilder\Modules\AtomicPro\Pro_Unlock::instance();
+            }
+            elseif ( 'atomic-pro' === $module_name ) {
+                // Atomic elements disabled: still provide Display Conditions for classic (v3) elements.
+                \LaStudioKitThemeBuilder\Modules\AtomicPro\DisplayConditions\Display_Conditions::boot();
             }
 		}
 	}

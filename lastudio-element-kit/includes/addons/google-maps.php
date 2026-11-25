@@ -436,6 +436,11 @@ class LaStudioKit_Google_Maps extends LaStudioKit_Base {
      */
     public function _get_map_style( $style ) {
 
+        // Only styles offered by the control are allowed (SELECT values are not validated server side).
+        if ( ! is_string( $style ) || '' === $style || false !== strpos( $style, '://' ) || false !== strpos( $style, '..' ) || ! array_key_exists( $style, $this->_get_available_map_styles() ) ) {
+            return [];
+        }
+
         $full_path    = untrailingslashit( ABSPATH ) . $style;
         $include_path = null;
 
@@ -607,7 +612,7 @@ class LaStudioKit_Google_Maps extends LaStudioKit_Base {
 
         }
 
-        $this->add_render_attribute( 'map-data', 'data-pins', wp_json_encode( $pins ) );
+        $this->add_render_attribute( 'map-data', 'data-pins', wp_json_encode( $pins, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) );
         $this->add_render_attribute( 'map-data', 'class', 'lakit-gmap' );
 
         echo sprintf( '<div %s></div>', $this->get_render_attribute_string( 'map-data' ) );

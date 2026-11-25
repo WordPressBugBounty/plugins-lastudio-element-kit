@@ -17,7 +17,7 @@ $box_btn_url = $this->get_settings_for_display('box_btn_url');
 $box_enable_link = $this->get_settings_for_display('box_enable_link');
 $box_website_link = $this->get_settings_for_display('box_website_link');
 $title_tag = lastudio_kit_helper()->validate_html_tag( $this->get_settings_for_display('box_title_size') );
-$body_icon_hover_animation = sprintf('elementor-animation-%s', $this->get_settings_for_display('body_icon_hover_animation'));
+$body_icon_hover_animation = sprintf('elementor-animation-%s', sanitize_html_class( $this->get_settings_for_display('body_icon_hover_animation') ));
 
 $box_top_icons__pos = $this->get_settings_for_display('box_top_icons__pos');
 if(empty($box_top_icons__pos)){
@@ -78,6 +78,7 @@ echo sprintf('<div %1$s>', $this->get_render_attribute_string('wrapper')); // ph
         if(filter_var($box_enable_btn, FILTER_VALIDATE_BOOLEAN)){
             echo '<div class="lakit-iconbox__button_wrapper">';
             $this->add_link_attributes( 'button', $box_btn_url);
+            $box_icon_align = sanitize_html_class( $box_icon_align );
             $this->add_render_attribute('button', 'class', 'elementor-button-link elementor-button elementor-btn-align-icon-'. $box_icon_align );
             $btn_text = $this->get_button_icon('<span class="elementor-button-icon">%s</span>');
             $btn_text .= sprintf('<span class="elementor-button-text">%s</span>', esc_html($this->get_settings_for_display('box_btn_text')));

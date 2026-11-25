@@ -56,7 +56,7 @@ class Tag extends DynamicTagsTag {
 			'popup',
 			[
 				'label' => esc_html__( 'Popup', 'lastudio-kit' ),
-				'type' => QueryControlModule::QUERY_CONTROL_ID,
+				'type' => \LaStudioKitThemeBuilder\Modules\DynamicTags\Module::get_query_control_type(),
 				'autocomplete' => [
 					'object' => QueryControlModule::QUERY_OBJECT_LIBRARY_TEMPLATE,
 					'query' => [

@@ -350,11 +350,24 @@ class LaStudioKit_Post_Author extends LaStudioKit_Base {
 
         $animation_class = ! empty( $settings['hover_animation'] ) ? 'elementor-animation-' . $settings['hover_animation'] : '';
 
+        // `image` is HTML by design (the <img> from get_avatar()) and the bio may legitimately
+        // carry formatting, so it goes through kses. Every other field is a raw profile value
+        // and is escaped before it reaches the markup.
+        if ( 'image' === $settings['author'] ) {
+            $author_html = $author;
+        }
+        elseif ( 'description' === $settings['author'] ) {
+            $author_html = wp_kses_post( $author );
+        }
+        else {
+            $author_html = esc_html( $author );
+        }
+
         $html = sprintf( '<%1$s class="lakit-post-author %2$s">', $html_tag, esc_attr($animation_class) );
         if ( $link ) {
-            $html .= sprintf( '<a href="%1$s" %2$s>%3$s</a>', $link, $target, $author );
+            $html .= sprintf( '<a href="%1$s" %2$s>%3$s</a>', $link, $target, $author_html );
         } else {
-            $html .= $author;
+            $html .= $author_html;
         }
         $html .= sprintf( '</%s>', $html_tag );
 
@@ -364,12 +377,7 @@ class LaStudioKit_Post_Author extends LaStudioKit_Base {
     protected function content_template() {
         ?>
         <#
-        var author_data = [];
-        <?php
-        foreach ( $this->user_data() as $key => $value ) {
-            printf( 'author_data[ "%1$s" ] = "%2$s";', $key, $value ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-        }
-        ?>
+        var author_data = <?php echo wp_json_encode( (object) $this->user_data(), JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>;
         var author = author_data[ settings.author ];
         var htmlTag = elementor.helpers.validateHTMLTag(settings.html_tag);
 
@@ -398,11 +406,19 @@ class LaStudioKit_Post_Author extends LaStudioKit_Base {
             animation_class = 'elementor-animation-' + settings.hover_animation;
         }
 
+        if ( link_url && /^\s*(javascript|data|vbscript):/i.test( link_url ) ) {
+            link_url = false;
+        }
+
+        // `image` is HTML by design (the <img> from get_avatar()); every other field is a raw
+        // profile value, so it is escaped before it goes into the markup.
+        var author_html = ( 'image' === settings.author ) ? author : _.escape( author || '' );
+
         var html = '<' + htmlTag + ' class="lakit-post-author ' + animation_class + '">';
         if ( link_url ) {
-            html += '<a href="' + link_url + '" ' + target + '>' + author + '</a>';
+            html += '<a href="' + _.escape( link_url ) + '" ' + target + '>' + author_html + '</a>';
         } else {
-            html += author;
+            html += author_html;
         }
         html += '</' + htmlTag + '>';
 

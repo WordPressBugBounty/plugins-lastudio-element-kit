@@ -22,7 +22,8 @@ class Templates_Types_Manager {
 		foreach ( $document_types as $type => $document_type ) {
 			$properties = $document_type::get_properties();
 
-			if ( ( new $document_type() ) instanceof Documents\Theme_Document ) {
+			// Theme documents + the LaStudio Kit Loop Item (it is not a theme document, see loop-builder module).
+			if ( ( new $document_type() ) instanceof Documents\Theme_Document || is_a( $document_type, 'LaStudioKitThemeBuilder\\Modules\\LoopBuilder\\Documents\\Loop', true ) ) {
 				$config[ $type ] = $properties;
 			}
 		}

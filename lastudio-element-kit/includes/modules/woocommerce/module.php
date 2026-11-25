@@ -38,12 +38,14 @@ class Module extends \Elementor\Core\Base\Module {
       'Product_Price',
       'Product_Rating',
       'Product_Sale',
+      'Product_Content',
       'Product_Short_Description',
       'Product_SKU',
       'Product_Stock',
       'Product_Terms',
       'Product_Title',
       'Category_Image',
+      'Woocommerce_Add_To_Cart',
     ];
 
     /** @var \Elementor\Core\DynamicTags\Manager $module */

@@ -2,14 +2,15 @@
 namespace LaStudioKitThemeBuilder\Modules\DynamicTags\Tags;
 
 use Elementor\Controls_Manager;
-use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Tag;
+use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Pro_Tag;
 use LaStudioKitThemeBuilder\Modules\DynamicTags\Module;
+use LaStudioKitThemeBuilder\Modules\DynamicTags\Classes\Pro_Utils as Utils;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Request_Parameter extends Tag {
+class Request_Parameter extends Pro_Tag {
 	public function get_name() {
 		return 'request-arg';
 	}
@@ -41,22 +42,22 @@ class Request_Parameter extends Tag {
 
 		switch ( $request_type ) {
 			case 'POST':
-				if ( ! isset( $_POST[ $param_name ] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-					return '';
-				}
-				$value = $_POST[ $param_name ]; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+				$value = Utils::_unstable_get_super_global_value( $_POST, $param_name ) ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Missing
 				break;
 			case 'GET':
-				if ( ! isset( $_GET[ $param_name ] ) ) { // phpcs:ignore
-					return '';
-				}
-				$value = $_GET[ $param_name ]; // phpcs:ignore
+				$value = Utils::_unstable_get_super_global_value( $_GET, $param_name ) ?? ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				break;
 			case 'QUERY_VAR':
 				$value = get_query_var( $param_name );
 				break;
 		}
-		echo htmlentities( wp_kses_post( $value ) );  // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		if ( ! is_scalar( $value ) ) {
+			return '';
+		}
+		$value = sanitize_text_field( wp_unslash( (string) $value ) );
+		// Encode shortcode brackets so visitor input is never executed by do_shortcode().
+		$value = str_replace( [ '[', ']' ], [ '&#91;', '&#93;' ], esc_html( $value ) );
+		echo $value; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above.
 	}
 
 	protected function register_controls() {
@@ -78,6 +79,9 @@ class Request_Parameter extends Tag {
 			[
 				'label'   => esc_html__( 'Parameter Name', 'lastudio-kit' ),
 				'type' => Controls_Manager::TEXT,
+				'ai' => [
+					'active' => false,
+				],
 			]
 		);
 	}

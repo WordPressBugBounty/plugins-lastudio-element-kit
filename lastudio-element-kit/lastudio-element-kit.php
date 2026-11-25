@@ -3,19 +3,19 @@
  * Plugin Name:       LA-Studio Element Kit for Elementor
  * Plugin URI:        https://la-studioweb.com/lastudio-element-kit/
  * Description:       Additional widgets for Elementor page builder. It has 60 highly customizable widgets
- * Version:           1.6.3
+ * Version:           1.6.4
  * Requires at least: 6.0
  * Requires PHP:      7.4
  * Author:            LA-Studio
- * Author URI:        https://1.envato.market/POnObq
+ * Author URI:        https://la-studioweb.com/lastudio-element-kit
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
  * Text Domain:       lastudio-kit
  * Domain Path:       /languages
  *
- * Elementor tested up to: 4.3.2
- * Elementor Pro tested up to: 4.3.0
- * WooCommerce tested up to: 11.1.2
+ * Elementor tested up to: 4.4.2
+ * Elementor Pro tested up to: 4.4.2
+ * WooCommerce tested up to: 11.3.1
  *
  * @package lastudio-kit
  * @author  LA-Studio
@@ -62,7 +62,7 @@ if(!class_exists('LaStudio_Kit')){
          *
          * @var string
          */
-        private $version = '1.6.3';
+        private $version = '1.6.4';
 
         /**
          * Framework component
@@ -124,7 +124,7 @@ if(!class_exists('LaStudio_Kit')){
             add_action( 'init', array( $this, 'lang' ), 0 );
 
             // Load files.
-            add_action( 'init', array( $this, 'init' ), -999 );
+            add_action( 'init', array( $this, 'init' ), -1000 );
 
             // Dashboard Init
             add_action( 'init', array( $this, 'dashboard_init' ), -999 );
@@ -232,6 +232,11 @@ if(!class_exists('LaStudio_Kit')){
          * @return [type] [description]
          */
         public function dashboard_init() {
+
+            // Settings/Dashboard classes are loaded in init() -> load_files(), which is skipped without Elementor.
+            if ( ! $this->has_elementor() ) {
+                return;
+            }
 
             if ( is_admin() ) {
 

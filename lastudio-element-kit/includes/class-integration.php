@@ -88,8 +88,6 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
             add_filter('elementor/widgets/black_list', [ $this, 'e_widget_blacklist' ], 20);
             add_filter('elementor/editor/localize_settings', [ $this, 'e_pro_widgets' ], 20);
 
-            add_filter('elementor/shapes/additional_shapes', [ $this, 'e_shapes' ], 20);
-
             add_action( 'elementor/frontend/before_enqueue_scripts', [ $this, 'enqueue_frontend_scripts' ] );
 
             add_filter( 'woocommerce_add_to_cart_redirect', [ $this, 'woocommerce_add_to_cart_redirect' ], 100, 1 );
@@ -120,6 +118,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
                 'subscribe_success'           => esc_html__( 'Success', 'lastudio-kit' ),
                 'invalid_captcha'             => esc_html__( 'reCAPTCHA response token is invalid.', 'lastudio-kit' ),
                 'require_field'               => esc_html__( 'Please fill out this field.', 'lastudio-kit' ),
+                'rate_limited'                => esc_html__( 'Too many requests. Please wait a moment.', 'lastudio-kit' ),
             ) );
         }
 
@@ -702,11 +701,11 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
                     throw new Exception( $signon->get_error_message() );
                 }
 
-                $redirect = isset( $_POST['redirect_to'] )
-                    ? esc_url( $_POST['redirect_to'] )
-                    : esc_url( home_url( '/' ) );
+                $redirect = isset( $_POST['redirect_to'] ) && is_string( $_POST['redirect_to'] )
+                    ? wp_validate_redirect( wp_unslash( $_POST['redirect_to'] ), home_url( '/' ) )
+                    : home_url( '/' );
 
-                wp_redirect( $redirect );
+                wp_safe_redirect( $redirect );
                 exit;
 
             } catch ( Exception $e ) {
@@ -753,13 +752,13 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
                 $current_user = get_user_by( 'id', $user );
                 wp_set_auth_cookie( $user, true );
 
-                if ( ! empty( $_POST['lakit_redirect'] ) ) {
-                    $redirect = wp_sanitize_redirect( $_POST['lakit_redirect'] );
+                if ( ! empty( $_POST['lakit_redirect'] ) && is_string( $_POST['lakit_redirect'] ) ) {
+                    $redirect = wp_unslash( $_POST['lakit_redirect'] );
                 } else {
-                    $redirect = $_POST['_wp_http_referer'];
+                    $redirect = isset( $_POST['_wp_http_referer'] ) && is_string( $_POST['_wp_http_referer'] ) ? wp_unslash( $_POST['_wp_http_referer'] ) : '';
                 }
 
-                wp_redirect( $redirect );
+                wp_safe_redirect( wp_validate_redirect( $redirect, home_url( '/' ) ) );
                 exit;
 
             } catch ( Exception $e ) {
@@ -778,7 +777,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
          */
         public function create_user( $username, $email, $password ) {
 
-	        if('yes' !== get_option( 'woocommerce_enable_myaccount_registration' ) && 'yes' !== get_option( 'users_can_register' )){
+	        if(! ( function_exists( 'WC' ) && 'yes' === get_option( 'woocommerce_enable_myaccount_registration' ) ) && ! get_option( 'users_can_register' )){
 		        return new WP_Error(
 			        'registration-error-disable',
 			        __( 'This feature is not available.', 'lastudio-kit' )
@@ -1044,7 +1043,11 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 
             $api_server = sprintf( 'https://%s.api.mailchimp.com/3.0/', $key_data[1] );
 
-            $url = esc_url( trailingslashit( $api_server . 'lists/' . $list_id . '/members/' ) );
+            if ( ! preg_match( '/^[a-zA-Z0-9]{1,32}$/', (string) $list_id ) || ! preg_match( '/^[a-z]{2,4}[0-9]{1,3}$/', $key_data[1] ) ) {
+                return false;
+            }
+
+            $url = esc_url( trailingslashit( $api_server . 'lists/' . rawurlencode( $list_id ) . '/members/' ) );
 
             $data = wp_json_encode( $args );
 
@@ -1090,14 +1093,40 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 		 * @param LaStudio_Kit_Ajax_Manager $ajax_manager
 		 */
 		public function register_ajax_actions( $ajax_manager ){
-			$ajax_manager->register_ajax_action( 'newsletter_subscribe', [ $this, 'ajax_newsletter_subscribe' ], false );
-			$ajax_manager->register_ajax_action( 'elementor_template', [ $this, 'ajax_get_elementor_template' ], false);
-			$ajax_manager->register_ajax_action( 'elementor_widget', [ $this, 'ajax_get_elementor_widget' ], false);
+			/**
+			 * These actions are reachable over wp_ajax_nopriv_ and used to skip the nonce
+			 * check entirely, which let any anonymous visitor drive the template renderer.
+			 *
+			 * The nonce is printed on the front end as LaStudioKitSettings.ajaxNonce and the
+			 * bundled scripts already send it as `_nonce`. If a full-page cache serves HTML
+			 * older than the nonce lifetime (24h) the nonce can go stale; in that case opt
+			 * back out with:
+			 *
+			 *     add_filter( 'lastudio-kit/ajax/protected_public_actions', '__return_false' );
+			 */
+			$protect_public = (bool) apply_filters( 'lastudio-kit/ajax/protected_public_actions', true );
+
+			$ajax_manager->register_ajax_action( 'newsletter_subscribe', [ $this, 'ajax_newsletter_subscribe' ], $protect_public );
+			$ajax_manager->register_ajax_action( 'elementor_template', [ $this, 'ajax_get_elementor_template' ], $protect_public );
+			$ajax_manager->register_ajax_action( 'elementor_widget', [ $this, 'ajax_get_elementor_widget' ], $protect_public );
 			$ajax_manager->register_ajax_action( 'login', [ $this, 'ajax_login_handle' ], true );
 			$ajax_manager->register_ajax_action( 'register', [ $this, 'ajax_register_handle' ], true );
 		}
 
 		public function ajax_newsletter_subscribe( $request ){
+
+			/**
+			 * Every accepted call makes an outbound MailChimp API request, so this one is
+			 * throttled harder than the template renderers and is counted on its own bucket.
+			 */
+			$rate_limit = \LaStudioKit\Template_Helper::apply_rate_limit( 'lakit_rl_newsletter_', 10 );
+
+			if ( is_wp_error( $rate_limit ) ) {
+				return [
+					'type'    => 'error',
+					'message' => $this->sys_messages['rate_limited'] ?? $rate_limit->get_error_message(),
+				];
+			}
 
 			$api_key = apply_filters('lastudio-kit/mailchimp/api', lastudio_kit_settings()->get_option('mailchimp-api-key'));
 			$list_id = apply_filters('lastudio-kit/mailchimp/list_id', lastudio_kit_settings()->get_option('mailchimp-list-id'));
@@ -1117,7 +1146,14 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 			     filter_var( $request['use_target_list_id'], FILTER_VALIDATE_BOOLEAN ) &&
 			     ! empty( $request['target_list_id'] )
 			) {
-				$list_id = esc_attr($request['target_list_id']);
+				$target_list_id = is_scalar( $request['target_list_id'] ) ? (string) $request['target_list_id'] : '';
+				if ( ! preg_match( '/^[a-zA-Z0-9]{1,32}$/', $target_list_id ) ) {
+					return [
+						'type'    => 'error',
+						'message' => $this->sys_messages['mailchimp'],
+					];
+				}
+				$list_id = $target_list_id;
 			}
 
 			if ( ! $list_id ) {
@@ -1200,9 +1236,9 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 				'template_metadata' => []
 			];
 			$args = [
-				'dev' => !empty($request['dev']) ? $request['dev'] : false
+				'dev' => !empty($request['dev']) && current_user_can( 'edit_posts' ) ? $request['dev'] : false
 			];
-			$template_ids = !empty($request['template_ids']) ? (array) $request['template_ids'] : [];
+			$template_ids = !empty($request['template_ids']) ? array_slice( array_unique( array_filter( array_map( 'absint', (array) $request['template_ids'] ) ) ), 0, 10 ) : [];
 			if(empty($template_ids)){
 				return [ $template_data ];
 			}
@@ -1227,7 +1263,9 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
                     }
                 }
             }
-            $is_dev = !empty($request['dev']) && LaStudio_Kit_Helper::string_to_bool($request['dev']);
+            $is_dev = !empty($request['dev']) && LaStudio_Kit_Helper::string_to_bool($request['dev']) && current_user_can( 'edit_posts' );
+            // Only `filter` is used by the renderer; drop anything else so arbitrary keys cannot create new cache entries.
+            $widget_args = is_array( $widget_args ) && isset( $widget_args['filter'] ) ? [ 'filter' => absint( $widget_args['filter'] ) ] : [];
             /**
              * disable cache if is wc filters
              */
@@ -1236,7 +1274,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
             }
 			$args = [
 				'template_id' => !empty($request['template_id']) ? absint($request['template_id']) : false,
-				'widget_id' => !empty($request['widget_id']) ? $request['widget_id'] : false,
+				'widget_id' => !empty($request['widget_id']) && is_scalar($request['widget_id']) ? sanitize_key( $request['widget_id'] ) : false,
 				'widget_args' => !empty($widget_args) ? $widget_args : false,
 				'dev' => $is_dev
 			];
@@ -1446,7 +1484,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 				return [
 					'type'          => 'success',
 					'message'       => __('Logged in successful', 'lastudio-kit'),
-					'redirect_to'   => esc_url($request['redirect_to'] ?? $request['redirect'] ?? home_url('/') )
+					'redirect_to'   => esc_url( wp_validate_redirect( (string) ( $request['redirect_to'] ?? $request['redirect'] ?? '' ), home_url('/') ) )
 				];
 			}
 		}
@@ -1471,7 +1509,7 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
 			$username   = wp_slash($username);
 			$email      = wp_slash($email);
 
-			if('yes' !== get_option( 'woocommerce_enable_myaccount_registration' ) && 'yes' !== get_option( 'users_can_register' )){
+			if(! ( function_exists( 'WC' ) && 'yes' === get_option( 'woocommerce_enable_myaccount_registration' ) ) && ! get_option( 'users_can_register' )){
 				return [
 					'type'      => 'error',
 					'message'   => __( '<strong>Error:</strong> This feature is not available.', 'lastudio-kit' ),
@@ -1589,22 +1627,6 @@ if ( ! class_exists( 'LaStudio_Kit_Integration' ) ) {
                 unset($settings['promotionWidgets']);
             }
             return $settings;
-        }
-
-        public function e_shapes( $additional_shapes ){
-	        $lakit_shapes = [];
-	        $title =  esc_html_x( 'LA-Kit Shape', 'Shapes', 'lastudio-kit' );
-			for ($i = 1; $i <= 19; $i++){
-				$k = $i < 10 ? '0' . $i : $i;
-				$lakit_shapes['lakit-shape-' . $k] = [
-					'title' => $title . ' ' . $k,
-					'has_negative' => true,
-					'has_flip' => true,
-					'url'   => lastudio_kit()->plugin_url('assets/shapes/custom-'.$k.'.svg'),
-					'path'   => lastudio_kit()->plugin_path('assets/shapes/custom-'.$k.'.svg'),
-				];
-			}
-            return array_merge( $additional_shapes, $lakit_shapes );
         }
 
         public function enqueue_frontend_scripts(){

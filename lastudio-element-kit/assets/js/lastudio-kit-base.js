@@ -3245,12 +3245,14 @@ document.addEventListener('DOMContentLoaded', function () {
             function setupDLMenu(){
                 $navmenu.find('.lakit-nav-id-' + e_id + '.lakit-nav-hover').removeClass('lakit-nav-hover');
                 $navmenu.addClass('lakitdl-menu lakitdl-menuopen').parent().addClass('lakitdl-menuwrapper').find('.lakit-nav-id-' + e_id + ' > .lakit-nav__sub').addClass('lakitdl-submenu');
-                const dl_opts = {
+
+                const dl_opts = elementorFrontend.hooks.applyFilters('lastudio-kit/lakitdlmenu/options', {
                     backLabel: `${dlconfig?.backicon}${dlconfig?.backtext}`,
                     triggerIcon: dlconfig?.triggericon ?? '>',
                     animationClasses : menuEffect,
                     supportAnimations: !LaStudioKits.isEditMode()
-                }
+                });
+
                 if(!!$navmenu.parent().data('lakitdlmenu') === false){
                     $navmenu.parent().lakitdlmenu(dl_opts);
                 }

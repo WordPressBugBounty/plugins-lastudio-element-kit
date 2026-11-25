@@ -1985,7 +1985,7 @@ class LaStudioKit_Team_Member extends LaStudioKit_Base {
             $icon_key = 's_icon_' . $i;
             $link_key = 's_link_' . $i;
             $att_uid = 'member_'.$uid . '_social_' . $i;
-            if(!empty($member_item[$icon_key])){
+            if(!empty($member_item[$icon_key]) && is_string($member_item[$icon_key]) && isset($icon_lists[$member_item[$icon_key]])){
                 $icon_value = $member_item[$icon_key];
                 $icon_name = $icon_lists[$icon_value];
                 if ( !empty($member_item[$link_key]) && ! empty( $member_item[$link_key]['url'] ) ) {
@@ -1993,7 +1993,7 @@ class LaStudioKit_Team_Member extends LaStudioKit_Base {
                     $this->add_render_attribute( $att_uid, 'title', esc_attr($icon_name) );
                 }
                 $this->add_render_attribute( $att_uid, 'class', sprintf('social-%1$s %1$s', strtolower($icon_name)) );
-                $html .= sprintf('<a %1$s><i class="%2$s"></i></a>', $this->get_render_attribute_string( $att_uid ), $icon_value);
+                $html .= sprintf('<a %1$s><i class="%2$s"></i></a>', $this->get_render_attribute_string( $att_uid ), esc_attr( $icon_value ));
             }
         }
         if(!empty($html)){

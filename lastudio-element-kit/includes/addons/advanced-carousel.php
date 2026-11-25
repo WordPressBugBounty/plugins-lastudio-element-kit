@@ -1908,10 +1908,12 @@ class LaStudioKit_Advanced_Carousel extends LaStudioKit_Base {
 
 	    $item_enable_ajax = !empty($this->_processed_item['item_enable_ajax']) && filter_var($this->_processed_item['item_enable_ajax'], FILTER_VALIDATE_BOOLEAN);
 
+	    $content = '';
+
 	    if($item_enable_ajax && !Plugin::instance()->editor->is_edit_mode()){
 		    $content = '<div data-lakit_ajax_loadtemplate="true" data-template-id="'.esc_attr($template_id).'"><span class="lakit-css-loader"></span></div>';
 	    }
-	    else{
+	    elseif ( \LaStudio_Kit_Helper::can_render_template( $template_id ) ) {
 			ob_start();
             if(Plugin::instance()->editor->is_edit_mode()){
                 $css_file = Post_CSS::create( $template_id );

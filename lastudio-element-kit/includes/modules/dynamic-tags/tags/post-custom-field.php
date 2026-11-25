@@ -29,6 +29,9 @@ class Post_Custom_Field extends Tag {
 			Module::URL_CATEGORY,
 			Module::POST_META_CATEGORY,
 			Module::COLOR_CATEGORY,
+			Module::DATETIME_CATEGORY,
+			Module::MEDIA_CATEGORY,
+			Module::SVG_CATEGORY,
 		];
 	}
 
@@ -59,9 +62,22 @@ class Post_Custom_Field extends Tag {
 				'condition' => [
 					'key' => '',
 				],
+				'ai' => [
+					'active' => false,
+				],
 			]
 		);
 
+	}
+
+	public function get_custom_field_value( string $key ) : string {
+		$value = get_post_meta( get_the_ID(), $key, true );
+
+		if ( ! is_string( $value ) ) {
+			return '';
+		}
+
+		return $value;
 	}
 
 	public function render() {
@@ -75,14 +91,17 @@ class Post_Custom_Field extends Tag {
 			return;
 		}
 
-        $value = apply_filters('lakit_dynamictags/custom_field', get_post_meta( get_the_ID(), $key, true ), $key, get_the_ID() );
+		$value = $this->get_custom_field_value( $key );
+
+		if ( empty( $value ) ) {
+			return;
+		}
 
 		echo wp_kses_post( $value );
 	}
 
 	private function get_custom_keys_array() {
 		$custom_keys = get_post_custom_keys();
-
 		$options = [
 			'' => esc_html__( 'Select...', 'lastudio-kit' ),
 		];

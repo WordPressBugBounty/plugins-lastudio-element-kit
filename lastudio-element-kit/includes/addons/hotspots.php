@@ -725,7 +725,7 @@ class LaStudioKit_Hotspots extends Widget_Image {
       ],
     ] );
 
-    $this->update_control(
+    $this->update_responsive_control(
       'width',
       [
         'selectors' => [
@@ -734,7 +734,7 @@ class LaStudioKit_Hotspots extends Widget_Image {
       ]
     );
 
-    $this->update_control(
+    $this->update_responsive_control(
       'space',
       [
         'selectors' => [
@@ -743,7 +743,7 @@ class LaStudioKit_Hotspots extends Widget_Image {
       ]
     );
 
-    $this->update_control(
+    $this->update_responsive_control(
       'height',
       [
         'selectors' => [
@@ -1515,7 +1515,7 @@ class LaStudioKit_Hotspots extends Widget_Image {
           <?php if ( $hotspot['hotspot_label'] ) : ?>
             <div class="lakit-hotspot__label"><?php
               // PHPCS - the main text of a widget should not be escaped.
-              echo $hotspot['hotspot_label']; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+              echo wp_kses_post( $hotspot['hotspot_label'] ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
               ?></div>
           <?php endif; ?>
         <?php endif; ?>

@@ -31,15 +31,21 @@ class Module extends Module_Base {
 	 */
 	public function get_proxy_data( $url ) {
 
-        $response = wp_safe_remote_get( utf8_decode( $url ) );
+        $response = wp_safe_remote_get( mb_convert_encoding( $url, 'ISO-8859-1', 'UTF-8' ) );
 
 		if ( is_wp_error( $response ) ) {
 			return '';
 		}
 
-		$content_type = wp_remote_retrieve_headers( $response )->offsetGet( 'content-type' );
+		$content_type = (string) wp_remote_retrieve_headers( $response )->offsetGet( 'content-type' );
+
+		// Only proxy assets needed to draw the screenshot (stylesheets, images, fonts).
+		if ( ! preg_match( '#^(text/css|image/(png|jpe?g|gif|webp|avif|bmp|x-icon|vnd\.microsoft\.icon)|font/[a-z0-9.+-]+|application/(font-woff2?|x-font-[a-z0-9-]+|vnd\.ms-fontobject))\b#i', $content_type ) ) {
+			return '';
+		}
 
 		header( 'content-type: ' . $content_type );
+		header( 'X-Content-Type-Options: nosniff' );
 
 		return wp_remote_retrieve_body( $response );
 	}

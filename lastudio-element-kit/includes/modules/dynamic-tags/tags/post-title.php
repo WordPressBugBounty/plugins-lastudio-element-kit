@@ -1,14 +1,14 @@
 <?php
 namespace LaStudioKitThemeBuilder\Modules\DynamicTags\Tags;
 
-use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Tag;
+use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Pro_Tag;
 use LaStudioKitThemeBuilder\Modules\DynamicTags\Module;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Post_Title extends Tag {
+class Post_Title extends Pro_Tag {
 	public function get_name() {
 		return 'post-title';
 	}

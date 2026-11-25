@@ -818,10 +818,10 @@ class LaStudioKit_Login extends LaStudioKit_Base {
 			$password_placeholder = $settings['label_password'];
 		}
 
-		$login_form = str_replace(['id="user_login"', 'id="user_pass"'], ['id="user_login" placeholder="'.$username_placeholder.'"', 'id="user_pass" placeholder="'.$password_placeholder.'"'], $login_form);
+		$login_form = str_replace(['id="user_login"', 'id="user_pass"'], ['id="user_login" placeholder="'.esc_attr($username_placeholder).'"', 'id="user_pass" placeholder="'.esc_attr($password_placeholder).'"'], $login_form);
 
         if(filter_var($this->get_settings_for_display('lost_password_link'), FILTER_VALIDATE_BOOLEAN)){
-            $lost_password_link = sprintf('<a class="lakit-login-lost-password-link" href="%1$s">%2$s</a>', esc_url(wp_lostpassword_url()), $this->get_settings_for_display('lost_password_link_text'));
+            $lost_password_link = sprintf('<a class="lakit-login-lost-password-link" href="%1$s">%2$s</a>', esc_url(wp_lostpassword_url()), $this->kses_text( $this->get_settings_for_display('lost_password_link_text') ));
             $login_form = str_replace('<p class="login-remember">', '<p class="login-remember">' . $lost_password_link, $login_form);
         }
 

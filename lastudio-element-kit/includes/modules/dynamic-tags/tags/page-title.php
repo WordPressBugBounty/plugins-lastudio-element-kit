@@ -2,14 +2,16 @@
 namespace LaStudioKitThemeBuilder\Modules\DynamicTags\Tags;
 
 use Elementor\Controls_Manager;
-use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Tag;
+use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Pro_Tag;
+use LaStudioKitThemeBuilder\Modules\DynamicTags\Classes\Pro_Utils as Utils;
 use LaStudioKitThemeBuilder\Modules\DynamicTags\Module;
+use LaStudioKitThemeBuilder\Modules\LoopBuilder\Classes\Plugin;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Page_Title extends Tag {
+class Page_Title extends Pro_Tag {
 	public function get_name() {
 		return 'page-title';
 	}
@@ -31,8 +33,8 @@ class Page_Title extends Tag {
 			return;
 		}
 
-		if ( lastudio_kit()->elementor()->common ) {
-			$current_action_data = lastudio_kit()->elementor()->common->get_component( 'ajax' )->get_current_action_data();
+		if ( Plugin::elementor()->common ) {
+			$current_action_data = Plugin::elementor()->common->get_component( 'ajax' )->get_current_action_data();
 
 			if ( $current_action_data && 'render_tags' === $current_action_data['action'] ) {
 				// Override the global $post for the render.
@@ -45,9 +47,10 @@ class Page_Title extends Tag {
 			}
 		}
 
-		$include_context = 'yes' === $this->get_settings( 'include_context' );
+		$include_context = $this->get_settings( 'include_context' );
+		$is_included = 'yes' === $include_context || true === $include_context;
 
-		$title = lastudio_kit_helper()->get_page_title( $include_context );
+		$title = Utils::get_page_title( $is_included );
 
 		echo wp_kses_post( $title );
 	}

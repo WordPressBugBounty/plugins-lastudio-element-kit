@@ -59,8 +59,8 @@ $this->add_render_attribute( 'wrapper', 'data-columns', wp_json_encode( $data_co
 		if ( 'arrows-nav' === $nav_type ) {
             $selected_prev_arrow_icon = $this->get_settings_for_display('selected_prev_arrow_icon');
             $selected_next_arrow_icon = $this->get_settings_for_display('selected_next_arrow_icon');
-		    echo $this->_get_icon_setting( $selected_prev_arrow_icon, '<button class="lakit-arrow prev-arrow arrow-disabled">%s</button>'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-            echo $this->_get_icon_setting( $selected_next_arrow_icon, '<button class="lakit-arrow next-arrow">%s</button>'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		    echo $this->_get_icon_setting( is_rtl() ? $selected_next_arrow_icon : $selected_prev_arrow_icon, '<button class="lakit-arrow prev-arrow arrow-disabled">%s</button>'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+            echo $this->_get_icon_setting( is_rtl() ? $selected_prev_arrow_icon : $selected_next_arrow_icon, '<button class="lakit-arrow next-arrow">%s</button>'); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		}
 	?>
 </div>

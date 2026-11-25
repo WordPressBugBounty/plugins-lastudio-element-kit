@@ -693,7 +693,7 @@ class LaStudioKit_Table_Of_Contents extends LaStudioKit_Base {
     $html_tag = Utils::validate_html_tag( $settings['html_tag'] );
     ?>
     <div class="lakit-toc__header">
-      <?php echo '<' . $html_tag . ' class="lakit-toc__header-title">' . $settings['title'] . '</' . $html_tag . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+      <?php echo '<' . $html_tag . ' class="lakit-toc__header-title">' . $this->kses_text( $settings['title'] ) . '</' . $html_tag . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
       <?php if ( 'yes' === $settings['minimize_box'] ) : ?>
         <div class="lakit-toc__toggle-button lakit-toc__toggle-button--expand"><?php Icons_Manager::render_icon( $settings['expand_icon'] ); ?></div>
         <div class="lakit-toc__toggle-button lakit-toc__toggle-button--collapse"><?php Icons_Manager::render_icon( $settings['collapse_icon'] ); ?></div>

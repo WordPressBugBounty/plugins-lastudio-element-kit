@@ -129,7 +129,7 @@ if(filter_var($show_global_link, FILTER_VALIDATE_BOOLEAN)){
         }
 
         $btn_text = $this->get_button_icon('<span class="elementor-button-icon">%s</span>');
-        $btn_text .= sprintf('<span class="elementor-button-text">%s</span>', $this->get_settings_for_display('btn_text'));
+        $btn_text .= sprintf('<span class="elementor-button-text">%s</span>', $this->kses_text( $this->get_settings_for_display('btn_text') ));
         echo sprintf('<a %1$s><span class="elementor-button-content-wrapper">%2$s</span></a>', $this->get_render_attribute_string('button'), $btn_text);
         echo '</div>';
     }

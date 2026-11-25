@@ -2,14 +2,14 @@
 namespace LaStudioKitThemeBuilder\Modules\DynamicTags\Tags;
 
 use Elementor\Controls_Manager;
-use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Tag;
+use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Pro_Tag;
 use LaStudioKitThemeBuilder\Modules\DynamicTags\Module;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Current_Date_Time extends Tag {
+class Current_Date_Time extends Pro_Tag {
 	public function get_name() {
 		return 'current-date-time';
 	}
@@ -69,9 +69,12 @@ class Current_Date_Time extends Tag {
 			[
 				'label' => esc_html__( 'Custom Format', 'lastudio-kit' ),
 				'default' => get_option( 'date_format' ) . ' ' . get_option( 'time_format' ),
-				'description' => sprintf( '<a href="https://la-studioweb.com/go/elementor-pro" target="_blank">%s</a>', esc_html__( 'Documentation on date and time formatting', 'lastudio-kit' ) ),
+				'description' => sprintf( '<a href="https://go.elementor.com/wordpress-date-time/" target="_blank">%s</a>', esc_html__( 'Documentation on date and time formatting', 'lastudio-kit' ) ),
 				'condition' => [
 					'date_format' => 'custom',
+				],
+				'ai' => [
+					'active' => false,
 				],
 			]
 		);

@@ -62,6 +62,9 @@ class Plugin_Settings extends Base {
 
 		foreach ( $data as $key => $value ) {
             if($key === 'head_code' || $key === 'footer_code' || $key === 'custom_css'){
+                if ( ! current_user_can( 'unfiltered_html' ) ) {
+                    $value = 'custom_css' === $key ? wp_strip_all_tags( (string) $value ) : wp_kses_post( (string) $value );
+                }
                 $current[ $key ] = apply_filters('lastudio-kit/settings/sanitize_save', $value, $value, $key);
             }
             else{

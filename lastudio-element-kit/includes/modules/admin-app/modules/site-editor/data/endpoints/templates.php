@@ -72,16 +72,32 @@ class Templates extends Base_Endpoint {
 		return $this->normalize_templates_json( $response );
 	}
 
+	private function can_manage_template( $id, $cap = 'edit_post' ) {
+		$id = absint( $id );
+		return $id && 'elementor_library' === get_post_type( $id ) && current_user_can( $cap, $id );
+	}
+
 	public function update_item( $id, $request ) {
+		if ( ! $this->can_manage_template( $id ) ) {
+			return new \WP_Error( 'rest_forbidden', esc_html__( 'Sorry, you are not allowed to edit this template.', 'lastudio-kit' ), [ 'status' => 403 ] );
+		}
+
 		$lock_by_user_id = $this->is_post_lock( $id );
 
 		if ( $lock_by_user_id ) {
 			return new Lock_Error_Response( $lock_by_user_id );
 		}
 
-		wp_update_post( array_merge( [
-			'ID' => $id,
-		], $request->get_body_params() ) );
+		$allowed_fields = [ 'post_title', 'post_status', 'post_name', 'menu_order' ];
+		$body = array_intersect_key( (array) $request->get_body_params(), array_flip( $allowed_fields ) );
+
+		if ( isset( $body['post_status'] ) && 'publish' === $body['post_status'] && ! current_user_can( 'publish_post', $id ) ) {
+			unset( $body['post_status'] );
+		}
+
+		wp_update_post( wp_slash( array_merge( $body, [
+			'ID' => absint( $id ),
+		] ) ) );
 
 		return $this->normalize_template_json_item(
 			$this->templates_manager->get_source( 'local' )->get_item( $id )
@@ -89,6 +105,10 @@ class Templates extends Base_Endpoint {
 	}
 
 	public function delete_item( $id, $request ) {
+		if ( ! $this->can_manage_template( $id, 'delete_post' ) ) {
+			return new \WP_Error( 'rest_forbidden', esc_html__( 'Sorry, you are not allowed to delete this template.', 'lastudio-kit' ), [ 'status' => 403 ] );
+		}
+
 		$lock_by_user_id = $this->is_post_lock( $id );
 
 		if ( $lock_by_user_id ) {

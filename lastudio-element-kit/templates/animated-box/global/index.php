@@ -10,7 +10,13 @@ $sub_title_tag   = lastudio_kit_helper()->validate_html_tag($this->_get_html( 's
 $front_side_icon = $this->get_settings_for_display('front_side_icon');
 $back_side_icon  = $this->get_settings_for_display('back_side_icon');
 ?>
-<div class="lakit-animated-box <?php $this->_html( 'animation_effect', '%s' ); ?>">
+<?php
+$animation_effect = $this->get_settings_for_display( 'animation_effect' );
+if ( ! is_string( $animation_effect ) || ! preg_match( '/^lab-ef-[0-9]+$/', $animation_effect ) ) {
+    $animation_effect = 'lab-ef-1';
+}
+?>
+<div class="lakit-animated-box <?php echo esc_attr( $animation_effect ); ?>">
 	<div class="lakit-animated-box__front">
 		<div class="lakit-animated-box__overlay"></div>
 		<div class="lakit-animated-box__inner">

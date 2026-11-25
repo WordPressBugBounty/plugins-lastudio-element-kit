@@ -10,7 +10,7 @@ $show_title     = $this->get_settings_for_display('show_title');
 $show_more      = $this->get_settings_for_display('show_more');
 $show_excerpt   = $this->get_settings_for_display('show_excerpt');
 $excerpt_length   = $this->get_settings_for_display('excerpt_length');
-$title_html_tag = $this->get_settings_for_display('title_html_tag');
+$title_html_tag = lastudio_kit_helper()->validate_html_tag( $this->get_settings_for_display('title_html_tag') );
 
 $show_play      = $this->get_settings_for_display('show_play_album');
 

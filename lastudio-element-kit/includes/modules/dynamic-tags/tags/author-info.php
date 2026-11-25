@@ -2,14 +2,13 @@
 namespace LaStudioKitThemeBuilder\Modules\DynamicTags\Tags;
 
 use Elementor\Controls_Manager;
-use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Tag;
-use LaStudioKitThemeBuilder\Modules\DynamicTags\Module;
+use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Author_Tag;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Author_Info extends Tag {
+class Author_Info extends Author_Tag {
 
 	public function get_name() {
 		return 'author-info';
@@ -19,28 +18,28 @@ class Author_Info extends Tag {
 		return esc_html__( 'Author Info', 'lastudio-kit' );
 	}
 
-	public function get_group() {
-		return Module::AUTHOR_GROUP;
-	}
+	public function get_editor_config() {
+		$config = parent::get_editor_config();
 
-	public function get_categories() {
-		return [ Module::TEXT_CATEGORY ];
-	}
+		$config['display_conditions'] = [
+			'author_info_bio' => [
+				'label' => esc_html__( 'Author Bio', 'lastudio-kit' ),
+				'settings' => [ 'key' => 'description' ],
+				'group' => 'author',
+			],
+			'author_info_email' => [
+				'label' => esc_html__( 'Author Email', 'lastudio-kit' ),
+				'settings' => [ 'key' => 'email' ],
+				'group' => 'author',
+			],
+			'author_info_website' => [
+				'label' => esc_html__( 'Author Website', 'lastudio-kit' ),
+				'settings' => [ 'key' => 'url' ],
+				'group' => 'author',
+			],
+		];
 
-	public function render() {
-		$key = $this->get_settings( 'key' );
-
-		if ( empty( $key ) ) {
-			return;
-		}
-
-		$value = get_the_author_meta( $key );
-
-		echo wp_kses_post( $value );
-	}
-
-	public function get_panel_template_setting_key() {
-		return 'key';
+		return $config;
 	}
 
 	protected function register_controls() {
@@ -50,12 +49,21 @@ class Author_Info extends Tag {
 				'label' => esc_html__( 'Field', 'lastudio-kit' ),
 				'type' => Controls_Manager::SELECT,
 				'default' => 'description',
-				'options' => [
-					'description' => esc_html__( 'Bio', 'lastudio-kit' ),
-					'email' => esc_html__( 'Email', 'lastudio-kit' ),
-					'url' => esc_html__( 'Website', 'lastudio-kit' ),
-				],
+				'options' => $this->get_key_options(),
 			]
 		);
+	}
+
+	private function get_key_options() {
+		$options = [];
+		$options['description'] = esc_html__( 'Bio', 'lastudio-kit' );
+
+		if ( current_user_can( 'manage_options' ) ) {
+			$options['email'] = esc_html__( 'Email', 'lastudio-kit' );
+		}
+
+		$options['url'] = esc_html__( 'Website', 'lastudio-kit' );
+
+		return $options;
 	}
 }

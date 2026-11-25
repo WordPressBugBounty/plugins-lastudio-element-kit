@@ -715,11 +715,11 @@ if ( ! class_exists( 'LaStudio_Kit_Helper' ) ) {
             arsort($breakpoints);
 
             $css = [];
-            $css[] = sprintf('%1$s{--e-c-col:%2$s}', $css_selector, $columns['desktop'] ?? 1);
+            $css[] = sprintf('%1$s{--e-c-col:%2$s}', $css_selector, (float) ( $columns['desktop'] ?? 1 ));
 
             foreach ($breakpoints as $k => $vl){
                 if( isset($columns[$k]) ){
-                    $css[] = sprintf('@media(max-width: %3$spx){%1$s{--e-c-col:%2$s}}', $css_selector, $columns[$k], $vl);
+                    $css[] = sprintf('@media(max-width: %3$spx){%1$s{--e-c-col:%2$s}}', $css_selector, (float) $columns[$k], absint( $vl ));
                 }
             }
             return join('', $css);
@@ -1230,6 +1230,33 @@ if ( ! class_exists( 'LaStudio_Kit_Helper' ) ) {
 		public function print_elementor_template( $template_id ){
 
 		}
+
+        /**
+         * Whether the current visitor may see the rendered Elementor content of a post/template
+         * referenced by ID from a widget setting (settings are not validated server side).
+         */
+        public static function can_render_template( $template_id ){
+            $post = get_post( absint( $template_id ) );
+            if ( ! $post || post_password_required( $post ) ) {
+                return false;
+            }
+            if ( 'publish' === $post->post_status ) {
+                return true;
+            }
+            return current_user_can( 'read_post', $post->ID );
+        }
+
+        /**
+         * Read a custom field chosen in a widget setting: protected (`_` prefixed) keys are refused
+         * and the value is limited to safe HTML.
+         */
+        public static function get_public_post_meta( $post_id, $meta_key ){
+            if ( ! is_string( $meta_key ) || '' === $meta_key || is_protected_meta( $meta_key, 'post' ) ) {
+                return '';
+            }
+            $value = get_post_meta( $post_id, $meta_key, true );
+            return is_scalar( $value ) ? wp_kses_post( (string) $value ) : '';
+        }
 
         public static function string_to_bool( $string ){
             $string = $string ?? '';

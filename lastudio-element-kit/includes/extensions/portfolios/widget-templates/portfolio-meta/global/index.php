@@ -32,7 +32,7 @@ if (!empty($metadata)) {
 				break;
             case 'custom_field':
                 if( !empty($meta['item_ckey']) ){
-                    $meta_value = get_post_meta( $post->ID, $meta['item_ckey'], true );
+                    $meta_value = \LaStudio_Kit_Helper::get_public_post_meta( $post->ID, $meta['item_ckey'] );
                 }
                 $item_type_class = 'pf__' . $item_type;
                 break;
@@ -55,7 +55,7 @@ if (!empty($metadata)) {
 		}
 
 		if (!empty($meta_value)) {
-			$output .= sprintf('<div class="lakit-pf-meta__item lakit-pf-meta__item--%4$s %5$s">%1$s%2$s%3$s</div>', $meta_icon, $meta_label, $meta_value, $item_type, $item_type_class);
+			$output .= sprintf('<div class="lakit-pf-meta__item lakit-pf-meta__item--%4$s %5$s">%1$s%2$s%3$s</div>', $meta_icon, $meta_label, $meta_value, esc_attr( $item_type ), esc_attr( $item_type_class ));
 		}
 
 	}

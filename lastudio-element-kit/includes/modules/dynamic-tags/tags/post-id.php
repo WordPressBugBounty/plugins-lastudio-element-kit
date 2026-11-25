@@ -1,14 +1,14 @@
 <?php
 namespace LaStudioKitThemeBuilder\Modules\DynamicTags\Tags;
 
-use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Tag;
+use LaStudioKitThemeBuilder\Modules\DynamicTags\Tags\Base\Pro_Tag;
 use LaStudioKitThemeBuilder\Modules\DynamicTags\Module;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
 }
 
-class Post_ID extends Tag {
+class Post_ID extends Pro_Tag {
 	public function get_name() {
 		return 'post-id';
 	}
@@ -29,6 +29,6 @@ class Post_ID extends Tag {
 	}
 
 	public function render() {
-		echo esc_attr(get_the_ID());
+		echo get_the_ID();
 	}
 }

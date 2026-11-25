@@ -44,7 +44,7 @@ class Tag extends DynamicTagsTag {
 			'lakit_popup_id',
 			[
 				'label' => esc_html__( 'Popup Template', 'lastudio-kit' ),
-				'type' => QueryControlModule::QUERY_CONTROL_ID,
+				'type' => DynamicTagsModule::get_query_control_type(),
 				'autocomplete' => [
 					'object' => QueryControlModule::QUERY_OBJECT_LIBRARY_TEMPLATE,
 					'query' => [
@@ -65,7 +65,7 @@ class Tag extends DynamicTagsTag {
 			'lakit_album_id',
 			[
 				'label' => esc_html__( 'Album ID', 'lastudio-kit' ),
-				'type' => QueryControlModule::QUERY_CONTROL_ID,
+				'type' => DynamicTagsModule::get_query_control_type(),
 				'autocomplete' => [
 					'object' => 'post',
 					'query' => [
